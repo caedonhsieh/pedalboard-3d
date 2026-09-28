@@ -179,14 +179,15 @@ export function knob(style = 'ts9', pointerRot = 0) {
     const pg = new THREE.Group(); pg.add(pointer); pg.rotation.y = pointerRot;
     k.add(body, top, pg);
   } else { // 'ts9'
-    // Measured from side photo: visible knob >0.65" (photo crops top, true height taller).
-    // Davies-style TS9 knobs ~0.70" total. Skirt 0.60 + cap 0.05 + pointer.
-    const skirt = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.295, 0.33, 0.60, 48), FIN.knobRib));
+    // Measured from Sweetwater top view: knob body ~0.34" diameter (0.17" radius),
+    // ~0.65" tall. Davies-style. Marker rings are 0.56" diameter, OUTSIDE the knob.
+    // Previous model was 2x too big (0.66" dia), covering the decal markers.
+    const skirt = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.155, 0.175, 0.60, 32), FIN.knobRib));
     skirt.position.y = 0.30;
-    const cap = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.05, 48), FIN.silverCap));
+    const cap = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.125, 0.125, 0.05, 32), FIN.silverCap));
     cap.position.y = 0.625;
-    const pointer = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.014, 0.19), FIN.pointer);
-    pointer.position.set(0, 0.652, -0.055);
+    const pointer = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.012, 0.11), FIN.pointer);
+    pointer.position.set(0, 0.652, -0.03);
     const pg = new THREE.Group(); pg.add(pointer); pg.rotation.y = pointerRot;
     k.add(skirt, cap, pg);
   }
