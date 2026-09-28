@@ -200,10 +200,12 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate' } = {}) {
     btn.position.y = 0.14;
     g.add(washer, btn);
   } else {
+    // TS9-style: black bezel RECESSED into the deck (sunk so only a thin lip
+    // shows; the deck occludes the rest), chrome treadle sitting down inside it.
     const bezel = shadowed(new THREE.Mesh(new RoundedBoxGeometry(w + 0.26, 0.12, d + 0.26, 4, 0.06), FIN.blackPlastic));
-    bezel.position.y = 0.05;
+    bezel.position.y = -0.04;
     const plate = shadowed(new THREE.Mesh(new RoundedBoxGeometry(w, 0.16, d, 4, 0.05), FIN.plateRib));
-    plate.position.y = 0.13;
+    plate.position.y = 0.06;
     g.add(bezel, plate);
   }
   g.userData.switchStyle = style;
