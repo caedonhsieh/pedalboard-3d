@@ -113,16 +113,22 @@ export function boxEnclosure({ w, d, h, edgeRadius = 0.06, material = FIN.green 
 export function profileEnclosure({ w, d, points, bevel = 0.05, frontLean = 0, material = FIN.green } = {}) {
   const b = bevel;
   const X = (z) => -z; // shape-x from board-z
-  const n = points.length;
+  // Densify the spec polyline through a centripetal Catmull-Rom so the deck
+  // renders as one smooth surface. The spec points stay the source of truth;
+  // without this the 7 straight facets show visible crease lines under studio
+  // lighting even though the silhouette is correct.
+  const curve = new THREE.CatmullRomCurve3(
+    points.map(([z, y]) => new THREE.Vector3(X(z), y, 0)), false, 'centripetal');
+  const dense = curve.getPoints(72);
+  const n = dense.length;
   const s = new THREE.Shape();
-  s.moveTo(X(points[n - 1][0]) + b + frontLean, b);
-  s.lineTo(X(points[0][0]) - b, b);
+  s.moveTo(dense[n - 1].x + b + frontLean, b);
+  s.lineTo(dense[0].x - b, b);
   for (let i = 0; i < n; i++) {
-    const [z, y] = points[i];
-    let x = X(z);
+    let x = dense[i].x;
     if (i === 0) x -= b;
     else if (i === n - 1) x += b;
-    s.lineTo(x, y - b);
+    s.lineTo(x, dense[i].y - b);
   }
   s.closePath();
   const geo = new THREE.ExtrudeGeometry(s, {
