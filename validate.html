@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Validate — pedal spec self-check</title>
+<style>
+  :root { --bg:#0b0c0e; --panel:#14161a; --line:#26292f; --txt:#e8e9ec; --dim:#9aa0ab;
+          --pass:#3fd97c; --fail:#ff5147; --accent:#7fb75c; }
+  html, body { margin:0; background:var(--bg); color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,Helvetica,Arial,sans-serif; }
+  body { max-width:1060px; margin:0 auto; padding:20px 16px 80px; }
+  h1 { font-size:24px; margin:0 0 4px; letter-spacing:-0.01em; }
+  h2 { font-size:17px; margin:0 0 8px; }
+  .sub { color:var(--dim); font-size:13px; margin:0 0 18px; word-break:break-all; }
+  #summary { border:1px solid var(--line); border-radius:12px; padding:18px 20px;
+    margin-bottom:22px; background:var(--panel); }
+  #verdict { font-size:30px; font-weight:800; letter-spacing:0.02em; margin:0 0 10px; }
+  #verdict.pass { color:var(--pass); } #verdict.fail { color:var(--fail); }
+  #checklines { margin:0; padding:0; list-style:none; font-size:14px; }
+  #checklines li { margin:6px 0; font-variant-numeric:tabular-nums; }
+  .pill { display:inline-block; min-width:52px; text-align:center; font-weight:700; font-size:12px;
+    border-radius:6px; padding:2px 8px; margin-right:8px; }
+  .pill.pass { background:rgba(63,217,124,.14); color:var(--pass); }
+  .pill.fail { background:rgba(255,81,71,.14); color:var(--fail); }
+  section.card { border:1px solid var(--line); border-radius:12px; background:var(--panel);
+    padding:18px; margin-bottom:22px; }
+  section.card p.cap { color:var(--dim); font-size:13px; line-height:1.5; margin:8px 0 0; }
+  .stage { position:relative; display:inline-block; max-width:100%; }
+  .stage canvas.overlay { position:absolute; left:0; top:0; pointer-events:none; }
+  img.shot { display:block; max-width:100%; height:auto; border-radius:8px; background:#000; }
+  .duo { display:flex; gap:14px; flex-wrap:wrap; }
+  .duo > div { flex:1 1 300px; }
+  .duo .lbl { font-size:12px; color:var(--dim); margin:0 0 6px; font-weight:600; letter-spacing:.04em; }
+  table { width:100%; border-collapse:collapse; font-size:12.5px; margin-top:12px;
+    font-variant-numeric:tabular-nums; }
+  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); }
+  th { color:var(--dim); font-weight:600; font-size:11px; letter-spacing:.05em; }
+  td.ok { color:var(--pass); font-weight:700; } td.bad { color:var(--fail); font-weight:700; }
+  .mono { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+  button { background:#1e2126; color:var(--txt); border:1px solid var(--line); border-radius:8px;
+    padding:9px 16px; font-size:14px; font-weight:600; cursor:pointer; margin-top:12px; }
+  button.on { border-color:var(--accent); color:var(--accent); }
+  #blinkwrap { position:relative; }
+  #blinkwrap img.shot { position:relative; }
+  #blinkwrap img.top { position:absolute; left:0; top:0; }
+  .thresh { color:var(--dim); font-size:12px; margin-top:14px; line-height:1.6; }
+  .err { color:var(--fail); font-weight:600; }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+<h1>Spec self-validation</h1>
+<p class="sub">spec: <span id="specUrl" class="mono"></span></p>
+
+<div id="summary">
+  <p id="verdict">RUNNING…</p>
+  <ul id="checklines"></ul>
+</div>
+
+<section class="card" id="cardA">
+  <h2>A · Spec → render placement</h2>
+  <div class="stage"><span id="stageA"></span></div>
+  <div id="tableA"></div>
+  <p class="cap">Each part anchor's placed position is read back from the object graph
+  (world matrices) and compared against an <em>independent</em> interpolation of the
+  spec performed in this page — never against the assembler's own math. Green ring =
+  spec position, cyan dot = placed position. Fails above 2&nbsp;mm.</p>
+</section>
+
+<section class="card" id="cardB">
+  <h2>B · Render → photo</h2>
+  <div class="duo">
+    <div><p class="lbl">TOP RENDER · PARTS HIDDEN, DECAL ON</p><div id="blinkwrap"></div></div>
+    <div><p class="lbl">DECAL ART · SCALED TO W×D</p><div id="decalwrap"></div></div>
+  </div>
+  <button id="blinkbtn">blink compare: off</button>
+  <div id="iouLine" class="mono" style="margin-top:12px;font-size:14px;"></div>
+  <p class="cap">The decal is the processed top-face art actually applied to the model.
+  Blink flips between the 3D render and the flat art at the same scale — graphics
+  should sit still. Silhouette IoU is reported below; shading differences between the
+  lit render and the flat art are expected and do not fail the check.</p>
+</section>
+
+<section class="card" id="cardC">
+  <h2>C · Profile</h2>
+  <div class="stage"><span id="stageC"></span></div>
+  <div id="devLine" class="mono" style="margin-top:12px;font-size:14px;"></div>
+  <p class="cap">Side silhouette (parts hidden) with the spec profile polyline overlaid
+  in green and the extracted silhouette edge in cyan. Max deviation reported in mm.
+  Fails above 2.5&nbsp;mm (slightly looser than A — bevel rounding eats ~1&nbsp;mm
+  at the silhouette edge).</p>
+</section>
+
+<p class="thresh">Thresholds: A ≤ 2.0 mm · B IoU ≥ 0.90 with bbox center ≤ 2 mm and size ≤ 2 mm ·
+C ≤ 2.5 mm. Cameras are fixed canonical orthographic views; no auto-rotation.
+Nothing here leaves the browser.</p>
+
+<script type="module">
+import * as THREE from 'three';
+import { assemblePedal, applyDecal, setPartsVisible, pedalSpacePos, IN } from './parts.js';
+
+const $ = (id) => document.getElementById(id);
+const params = new URLSearchParams(location.search);
+const specUrl = params.get('spec') || 'specs/ts9.json';
+const MARGIN = 0.75;               // inches of margin around the pedal in check views
+const TH_A = 2.0, TH_C = 2.5;      // mm
+const TH_B_IOU = 0.90, TH_B_MM = 2.0;
+$('specUrl').textContent = specUrl;
+
+const results = [];
+function line(pass, html) {
+  results.push(pass);
+  const li = document.createElement('li');
+  li.innerHTML = `<span class="pill ${pass ? 'pass' : 'fail'}">${pass ? 'PASS' : 'FAIL'}</span>${html}`;
+  $('checklines').appendChild(li);
+  return pass;
+}
+function verdict() {
+  const v = $('verdict');
+  const ok = results.length === 3 && results.every(Boolean);
+  v.textContent = ok ? 'PASS — shippable' : 'FAIL — do not ship';
+  v.className = ok ? 'pass' : 'fail';
+}
+
+const loadImg = (src) => new Promise((res, rej) => {
+  const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src;
+});
+const _v = new THREE.Vector3();
+function toPx(v3, cam, wPx, hPx) {
+  _v.copy(v3).project(cam);
+  return [(_v.x * 0.5 + 0.5) * wPx, (-_v.y * 0.5 + 0.5) * hPx];
+}
+const isBg = (r, g, b) => r > 180 && g < 120 && b > 180; // near-magenta key
+
+try {
+  /* ---------- load spec, assemble ---------- */
+  const spec = await (await fetch(specUrl)).json();
+  document.title = `Validate — ${spec.brand} ${spec.name}`;
+  const A = assemblePedal(spec);
+  const { w: W, d: D, h: H } = spec.dims;
+
+  /* ---------- check renderer: flat magenta key, ortho, preserveDrawingBuffer ---------- */
+  const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xff00ff);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x555555, 1.2));
+  const dl = new THREE.DirectionalLight(0xffffff, 1.8);
+  dl.position.set(4, 8, 5); scene.add(dl);
+  scene.add(A.group);
+
+  const topCam = new THREE.OrthographicCamera(-(W / 2 + MARGIN), W / 2 + MARGIN, D / 2 + MARGIN, -(D / 2 + MARGIN), 0.1, 80);
+  topCam.position.set(0, 30, 0); topCam.up.set(0, 0, -1); topCam.lookAt(0, 0, 0);
+  const sideCam = new THREE.OrthographicCamera(-(D / 2 + MARGIN), D / 2 + MARGIN, H / 2 + MARGIN, -(H / 2 + MARGIN), 0.1, 80);
+  sideCam.position.set(-30, H / 2, 0); sideCam.up.set(0, 1, 0); sideCam.lookAt(0, H / 2, 0);
+
+  function capture(cam, wPx, hPx) {
+    renderer.setSize(wPx, hPx);
+    renderer.render(scene, cam);
+    return renderer.domElement.toDataURL('image/png');
+  }
+
+  /* ================= CHECK A ================= */
+  setPartsVisible(A, true);
+  // Independent expected position: interpolate the SPEC profile here in the
+  // page — deliberately NOT parts.js's surfaceAt().
+  function expectedY(z) {
+    const pts = spec.enclosure.points;
+    if (!pts) return H;
+    if (z <= pts[0][0]) return pts[0][1];
+    for (let i = 0; i < pts.length - 1; i++) {
+      const [z0, y0] = pts[i], [z1, y1] = pts[i + 1];
+      if (z >= z0 && z <= z1) { const t = (z - z0) / (z1 - z0); return y0 + t * (y1 - y0); }
+    }
+    return pts[pts.length - 1][1];
+  }
+  function expectedPos(a) {
+    if (a.kind === 'jack') {
+      const j = (spec.jacks || []).find((s) => (s.id || `jack-${s.side}`) === a.id) || {};
+      return new THREE.Vector3(a.x, j.y ?? 0.78, a.z);
+    }
+    if (a.kind === 'powerJack') return new THREE.Vector3(a.x, (spec.powerJack || {}).y ?? 1.0, a.z);
+    return new THREE.Vector3(a.x, expectedY(a.z), a.z);
+  }
+  const [aw, ah] = [560, Math.round(560 * (D + 2 * MARGIN) / (W + 2 * MARGIN))];
+  const topUrlA = capture(topCam, aw, ah);
+  const aImg = await loadImg(topUrlA);
+  const stageA = $('stageA');
+  stageA.appendChild(aImg); aImg.className = 'shot';
+  const ovA = document.createElement('canvas');
+  ovA.width = aw; ovA.height = ah; ovA.className = 'overlay';
+  stageA.appendChild(ovA);
+  const gA = ovA.getContext('2d');
+  let aPass = true;
+  let rows = `<table><tr><th>anchor</th><th>kind</th><th>expected (in)</th><th>placed (in)</th><th>dev</th><th></th></tr>`;
+  for (const an of A.anchors) {
+    const placed = pedalSpacePos(A, an.obj);   // from the object graph
+    const exp = expectedPos(an);               // independent spec interpolation
+    const devMm = placed.distanceTo(exp) * IN;
+    const ok = devMm <= TH_A;
+    aPass = aPass && ok;
+    const [ex, ey] = toPx(exp, topCam, aw, ah);
+    const [px, py] = toPx(placed, topCam, aw, ah);
+    gA.strokeStyle = ok ? '#3fd97c' : '#ff5147'; gA.lineWidth = 2;
+    gA.beginPath(); gA.arc(ex, ey, 11, 0, Math.PI * 2); gA.stroke();
+    gA.fillStyle = '#22d3ee';
+    gA.beginPath(); gA.arc(px, py, 4.5, 0, Math.PI * 2); gA.fill();
+    gA.fillStyle = ok ? '#3fd97c' : '#ff5147';
+    gA.font = '600 11px system-ui'; gA.fillText(an.id, ex + 14, ey - 10);
+    const f = (n) => n.toFixed(3);
+    rows += `<tr><td class="mono">${an.id}</td><td>${an.kind}</td>` +
+      `<td class="mono">${f(exp.x)}, ${f(exp.y)}, ${f(exp.z)}</td>` +
+      `<td class="mono">${f(placed.x)}, ${f(placed.y)}, ${f(placed.z)}</td>` +
+      `<td class="mono">${devMm.toFixed(2)} mm</td>` +
+      `<td class="${ok ? 'ok' : 'bad'}">${ok ? 'PASS' : 'FAIL'}</td></tr>`;
+  }
+  rows += '</table>';
+  $('tableA').innerHTML = rows;
+  line(aPass, `<b>A · placement</b> — worst anchor deviation ${(Math.max(...A.anchors.map((an) => pedalSpacePos(A, an.obj).distanceTo(expectedPos(an)) * IN))).toFixed(2)} mm (limit ${TH_A} mm)`);
+
+  /* ================= CHECK B ================= */
+  let bNote = '';
+  try {
+    const tex = await new THREE.TextureLoader().loadAsync(spec.decal);
+    applyDecal(A, tex);
+  } catch (e) { bNote = 'decal failed to load — render shown without art. '; }
+  setPartsVisible(A, false);
+  const [bw, bh] = [560, Math.round(560 * (D + 2 * MARGIN) / (W + 2 * MARGIN))];
+  const renderImg = await loadImg(capture(topCam, bw, bh));
+
+  // pedal rect in px from projected top corners
+  const corners = [[-W / 2, -D / 2], [W / 2, -D / 2], [-W / 2, D / 2], [W / 2, D / 2]]
+    .map(([x, z]) => toPx(new THREE.Vector3(x, H, z), topCam, bw, bh));
+  const rx = Math.min(...corners.map((c) => c[0])), ry = Math.min(...corners.map((c) => c[1]));
+  const rw = Math.max(...corners.map((c) => c[0])) - rx, rh = Math.max(...corners.map((c) => c[1])) - ry;
+
+  const bwWrap = $('blinkwrap');
+  const rEl = renderImg; rEl.className = 'shot';
+  const rTop = rEl.cloneNode(); rTop.className = 'shot top'; rTop.style.opacity = '0';
+  bwWrap.appendChild(rEl); bwWrap.appendChild(rTop);
+
+  let bPass = false, bDetail = '';
+  try {
+    const decalImg = await loadImg(spec.decal);
+    // decal panel, drawn at the same scale as the render
+    const dc = document.createElement('canvas'); dc.width = bw; dc.height = bh;
+    const dctx = dc.getContext('2d', { willReadFrequently: true });
+    dctx.drawImage(decalImg, rx, ry, rw, rh);
+    const dUrl = dc.toDataURL('image/png');
+    const dEl = await loadImg(dUrl); dEl.className = 'shot';
+    $('decalwrap').appendChild(dEl);
+    rTop.src = dUrl; // blink target
+
+    // silhouettes at identical scale
+    const rc = document.createElement('canvas'); rc.width = bw; rc.height = bh;
+    const rctx = rc.getContext('2d', { willReadFrequently: true });
+    rctx.drawImage(renderImg, 0, 0);
+    const rd = rctx.getImageData(0, 0, bw, bh).data;
+    const dd = dctx.getImageData(0, 0, bw, bh).data;
+    let inter = 0, union = 0, rMinX = 1e9, rMaxX = -1e9, rMinY = 1e9, rMaxY = -1e9;
+    for (let i = 0; i < bw * bh; i++) {
+      const o = i * 4;
+      const rs = !isBg(rd[o], rd[o + 1], rd[o + 2]);
+      const ds = dd[o + 3] > 128;
+      if (rs || ds) union++;
+      if (rs && ds) inter++;
+      if (rs) {
+        const x = i % bw, y = (i / bw) | 0;
+        if (x < rMinX) rMinX = x; if (x > rMaxX) rMaxX = x;
+        if (y < rMinY) rMinY = y; if (y > rMaxY) rMaxY = y;
+      }
+    }
+    const iou = union ? inter / union : 0;
+    const mmPx = (2 * (W / 2 + MARGIN) * IN) / bw;
+    const cOff = Math.hypot((rMinX + rMaxX) / 2 - (rx + rw / 2), (rMinY + rMaxY) / 2 - (ry + rh / 2)) * mmPx;
+    const sizeD = Math.max(Math.abs((rMaxX - rMinX) - rw), Math.abs((rMaxY - rMinY) - rh)) * mmPx;
+    bPass = iou >= TH_B_IOU && cOff <= TH_B_MM && sizeD <= TH_B_MM;
+    bDetail = `${bNote}IoU ${(iou * 100).toFixed(1)}% (≥ ${(TH_B_IOU * 100).toFixed(0)}%), ` +
+      `bbox center off ${cOff.toFixed(2)} mm, size Δ ${sizeD.toFixed(2)} mm (≤ ${TH_B_MM} mm)`;
+  } catch (e) {
+    bDetail = `${bNote}decal unreadable for pixel comparison (${e.message || e}) — comparison skipped.`;
+  }
+  $('iouLine').textContent = bDetail;
+  $('iouLine').style.color = bPass ? 'var(--pass)' : 'var(--fail)';
+  line(bPass, `<b>B · render→photo</b> — ${bDetail}`);
+  let blinking = false, blinkT = null, flip = false;
+  $('blinkbtn').onclick = () => {
+    blinking = !blinking;
+    $('blinkbtn').textContent = `blink compare: ${blinking ? 'on' : 'off'}`;
+    $('blinkbtn').className = blinking ? 'on' : '';
+    clearInterval(blinkT);
+    if (blinking) blinkT = setInterval(() => {
+      flip = !flip; rTop.style.opacity = flip ? '1' : '0';
+    }, 700);
+    else rTop.style.opacity = '0';
+  };
+
+  /* ================= CHECK C ================= */
+  const [cw2, ch2] = [680, Math.round(680 * (H + 2 * MARGIN) / (D + 2 * MARGIN))];
+  const sideImg = await loadImg(capture(sideCam, cw2, ch2));
+  const stageC = $('stageC');
+  stageC.appendChild(sideImg); sideImg.className = 'shot';
+  const ovC = document.createElement('canvas');
+  ovC.width = cw2; ovC.height = ch2; ovC.className = 'overlay';
+  stageC.appendChild(ovC);
+  const gC = ovC.getContext('2d');
+
+  const sc = document.createElement('canvas'); sc.width = cw2; sc.height = ch2;
+  const sctx = sc.getContext('2d', { willReadFrequently: true });
+  sctx.drawImage(sideImg, 0, 0);
+  const sd = sctx.getImageData(0, 0, cw2, ch2).data;
+  const edge = new Array(cw2).fill(-1);
+  for (let x = 0; x < cw2; x++)
+    for (let y = 0; y < ch2; y++) {
+      const o = (y * cw2 + x) * 4;
+      if (!isBg(sd[o], sd[o + 1], sd[o + 2])) { edge[x] = y; break; }
+    }
+  // dense spec profile samples
+  const profPts = spec.enclosure.points || [[-D / 2, H], [D / 2, H]];
+  const samples = [];
+  for (let i = 0; i < profPts.length - 1; i++) {
+    const [z0, y0] = profPts[i], [z1, y1] = profPts[i + 1];
+    const n = Math.max(2, Math.ceil((z1 - z0) / 0.1));
+    for (let k = 0; k < n; k++) { const t = k / n; samples.push([z0 + t * (z1 - z0), y0 + t * (y1 - y0)]); }
+  }
+  samples.push(profPts[profPts.length - 1].slice());
+  const mmPxV = (2 * (H / 2 + MARGIN) * IN) / ch2;
+  let maxDev = 0;
+  const scr = samples.map(([z, y]) => { const [sx, sy] = toPx(new THREE.Vector3(0, y, z), sideCam, cw2, ch2); return [sx, sy]; });
+  for (const [sx, sy] of scr) {
+    const col = Math.round(sx);
+    if (col < 0 || col >= cw2 || edge[col] < 0) continue;
+    maxDev = Math.max(maxDev, Math.abs(edge[col] - sy) * mmPxV);
+  }
+  const cPass = maxDev <= TH_C;
+  // overlay: spec polyline (green) + extracted edge (cyan)
+  gC.strokeStyle = '#3fd97c'; gC.lineWidth = 2.5; gC.beginPath();
+  scr.forEach(([sx, sy], i) => i ? gC.lineTo(sx, sy) : gC.moveTo(sx, sy)); gC.stroke();
+  gC.strokeStyle = '#22d3ee'; gC.lineWidth = 1.5; gC.beginPath();
+  edge.forEach((ey, x) => { if (ey >= 0) { const px = x + 0.5; gC.moveTo(px, ey); gC.lineTo(px + 1, ey); } });
+  gC.stroke();
+  $('devLine').textContent = `max silhouette deviation ${maxDev.toFixed(2)} mm (limit ${TH_C} mm)`;
+  $('devLine').style.color = cPass ? 'var(--pass)' : 'var(--fail)';
+  line(cPass, `<b>C · profile</b> — max silhouette deviation ${maxDev.toFixed(2)} mm (limit ${TH_C} mm)`);
+
+  verdict();
+} catch (e) {
+  $('verdict').textContent = 'ERROR — could not run';
+  $('verdict').className = 'fail';
+  const li = document.createElement('li');
+  li.innerHTML = `<span class="err">${e.message || e}</span>`;
+  $('checklines').appendChild(li);
+  console.error(e);
+}
+</script>
+</body>
+</html>
