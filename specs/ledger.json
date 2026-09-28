@@ -1,1 +1,284 @@
-{"entries":[{"brand":"Ibanez","enclosure":"custom (wedge profile)","id":"ibanez-ts9","name":"TS9 Tube Screamer","notes":"Hero model 01. Spec: specs/ts9.json. Profile corrected 2026-09-28.","priority":1,"status":"hero"},{"brand":"Boss","enclosure":"boss_compact","id":"boss-ds1","name":"DS-1","notes":"","priority":1,"status":"planned"},{"brand":"MXR","enclosure":"mxr_standard","id":"mxr-phase90","name":"Phase 90","notes":"","priority":1,"status":"planned"},{"brand":"EHX","enclosure":"custom","id":"ehx-big-muff-pi","name":"Big Muff Pi","notes":"NYC reissue big box.","priority":1,"status":"planned"},{"brand":"ProCo","enclosure":"custom","id":"proco-rat2","name":"Rat 2","notes":"","priority":1,"status":"planned"},{"brand":"Dunlop","enclosure":"custom (wah shell)","id":"dunlop-crybaby-gcb95","name":"Cry Baby GCB95","notes":"Wah shell — needs custom profile work, not a box.","priority":1,"status":"planned"},{"brand":"Boss","enclosure":"boss_compact","id":"boss-tu3","name":"TU-3","notes":"","priority":1,"status":"planned"},{"brand":"Klon","enclosure":"custom","id":"klon-centaur","name":"Centaur","notes":"Custom enclosure, gold finish.","priority":1,"status":"planned"},{"brand":"Boss","enclosure":"boss_compact","id":"boss-sd1","name":"SD-1","notes":"","priority":2,"status":"planned"},{"brand":"Boss","enclosure":"boss_compact","id":"boss-dd8","name":"DD-8","notes":"","priority":2,"status":"planned"},{"brand":"Boss","enclosure":"boss_compact","id":"boss-ce2w","name":"CE-2W","notes":"","priority":2,"status":"planned"},{"brand":"MXR","enclosure":"mxr_standard","id":"mxr-dyna-comp","name":"Dyna Comp","notes":"","priority":2,"status":"planned"},{"brand":"MXR","enclosure":"mxr_standard","id":"mxr-carbon-copy","name":"Carbon Copy","notes":"","priority":2,"status":"planned"},{"brand":"EHX","enclosure":"custom","id":"ehx-small-clone","name":"Small Clone","notes":"","priority":2,"status":"planned"},{"brand":"EHX","enclosure":"custom","id":"ehx-deluxe-memory-man","name":"Deluxe Memory Man","notes":"Large box.","priority":2,"status":"planned"},{"brand":"Strymon","enclosure":"custom","id":"strymon-timeline","name":"Timeline","notes":"","priority":2,"status":"planned"},{"brand":"Strymon","enclosure":"custom","id":"strymon-bigsky","name":"BigSky","notes":"","priority":2,"status":"planned"},{"brand":"TC Electronic","enclosure":"custom","id":"tc-electronic-hall-of-fame-2","name":"Hall of Fame 2","notes":"","priority":2,"status":"planned"},{"brand":"TC Electronic","enclosure":"custom","id":"tc-electronic-ditto","name":"Ditto","notes":"","priority":2,"status":"planned"},{"brand":"Fulltone","enclosure":"custom","id":"fulltone-ocd","name":"OCD","notes":"","priority":2,"status":"planned"},{"brand":"Xotic","enclosure":"custom","id":"xotic-ep-booster","name":"EP Booster","notes":"Mini enclosure.","priority":2,"status":"planned"},{"brand":"Dunlop","enclosure":"custom (round)","id":"dunlop-fuzz-face","name":"Fuzz Face","notes":"Round enclosure — custom, not a box.","priority":2,"status":"planned"},{"brand":"JHS","enclosure":"custom","id":"jhs-morning-glory","name":"Morning Glory","notes":"","priority":3,"status":"planned"},{"brand":"Walrus Audio","enclosure":"custom","id":"walrus-audio-julia","name":"Julia","notes":"","priority":3,"status":"planned"},{"brand":"Wampler","enclosure":"custom","id":"wampler-tumnus","name":"Tumnus","notes":"Mini enclosure.","priority":3,"status":"planned"},{"brand":"EarthQuaker Devices","enclosure":"custom","id":"earthquaker-devices-plumes","name":"Plumes","notes":"","priority":3,"status":"planned"},{"brand":"Keeley","enclosure":"custom","id":"keeley-compressor-plus","name":"Compressor Plus","notes":"","priority":3,"status":"planned"},{"brand":"Chase Bliss","enclosure":"custom","id":"chase-bliss-mood","name":"Mood","notes":"","priority":3,"status":"planned"},{"brand":"JHS","enclosure":"custom","id":"jhs-bonsai","name":"Bonsai","notes":"","priority":3,"status":"planned"},{"brand":"Strymon","enclosure":"custom","id":"strymon-iridium","name":"Iridium","notes":"","priority":3,"status":"planned"}],"header":{"about":"DRAFT hero-model priority queue for Caedon's cuts/additions — seeded 2026-09-28, not final. The other ~8,550 pedals in the catalog are IMPLICIT placeholders (procedural boxes in the main app); only hero candidates are tracked here explicitly.","dims":"Entries carry no dims yet. A separate research pass is collecting manufacturer spec sheets for these 30 pedals; dims upgrade the specs when written. Until then, specs use heights.json / pedals.json values marked provisional.","enclosure_note":"Enclosure assignments are provisional guesses (preset keys from parts.js PRESETS, or 'custom'). Confirmed at spec-writing time.","statuses":{"hero":"fully modeled — spec written AND validate.html passing","placeholder":"(implicit, not listed) procedural box in the main app","planned":"queued for hero modeling"}}}
+{
+  "entries": [
+    {
+      "brand": "Ibanez",
+      "enclosure": "custom (wedge profile)",
+      "id": "ibanez-ts9",
+      "name": "TS9 Tube Screamer",
+      "notes": "Hero model 01. Spec: specs/ts9.json. Hexagon profile auto-fitted 2026-09-28 (silhouette 0.98px PASS, knobs 3.20px PASS). Awaiting Caedon visual acceptance.",
+      "priority": 1,
+      "status": "in-progress"
+    },
+    {
+      "brand": "Boss",
+      "enclosure": "boss_compact",
+      "id": "boss-ds1",
+      "name": "DS-1",
+      "notes": "",
+      "priority": 1,
+      "status": "planned"
+    },
+    {
+      "brand": "MXR",
+      "enclosure": "mxr_standard",
+      "id": "mxr-phase90",
+      "name": "Phase 90",
+      "notes": "",
+      "priority": 1,
+      "status": "planned"
+    },
+    {
+      "brand": "EHX",
+      "enclosure": "custom",
+      "id": "ehx-big-muff-pi",
+      "name": "Big Muff Pi",
+      "notes": "NYC reissue big box.",
+      "priority": 1,
+      "status": "planned"
+    },
+    {
+      "brand": "ProCo",
+      "enclosure": "custom",
+      "id": "proco-rat2",
+      "name": "Rat 2",
+      "notes": "",
+      "priority": 1,
+      "status": "planned"
+    },
+    {
+      "brand": "Dunlop",
+      "enclosure": "custom (wah shell)",
+      "id": "dunlop-crybaby-gcb95",
+      "name": "Cry Baby GCB95",
+      "notes": "Wah shell \u2014 needs custom profile work, not a box.",
+      "priority": 1,
+      "status": "planned"
+    },
+    {
+      "brand": "Boss",
+      "enclosure": "boss_compact",
+      "id": "boss-tu3",
+      "name": "TU-3",
+      "notes": "",
+      "priority": 1,
+      "status": "planned"
+    },
+    {
+      "brand": "Klon",
+      "enclosure": "custom",
+      "id": "klon-centaur",
+      "name": "Centaur",
+      "notes": "Custom enclosure, gold finish.",
+      "priority": 1,
+      "status": "planned"
+    },
+    {
+      "brand": "Boss",
+      "enclosure": "boss_compact",
+      "id": "boss-sd1",
+      "name": "SD-1",
+      "notes": "",
+      "priority": 2,
+      "status": "planned"
+    },
+    {
+      "brand": "Boss",
+      "enclosure": "boss_compact",
+      "id": "boss-dd8",
+      "name": "DD-8",
+      "notes": "",
+      "priority": 2,
+      "status": "planned"
+    },
+    {
+      "brand": "Boss",
+      "enclosure": "boss_compact",
+      "id": "boss-ce2w",
+      "name": "CE-2W",
+      "notes": "",
+      "priority": 2,
+      "status": "planned"
+    },
+    {
+      "brand": "MXR",
+      "enclosure": "mxr_standard",
+      "id": "mxr-dyna-comp",
+      "name": "Dyna Comp",
+      "notes": "",
+      "priority": 2,
+      "status": "planned"
+    },
+    {
+      "brand": "MXR",
+      "enclosure": "mxr_standard",
+      "id": "mxr-carbon-copy",
+      "name": "Carbon Copy",
+      "notes": "",
+      "priority": 2,
+      "status": "planned"
+    },
+    {
+      "brand": "EHX",
+      "enclosure": "custom",
+      "id": "ehx-small-clone",
+      "name": "Small Clone",
+      "notes": "",
+      "priority": 2,
+      "status": "planned"
+    },
+    {
+      "brand": "EHX",
+      "enclosure": "custom",
+      "id": "ehx-deluxe-memory-man",
+      "name": "Deluxe Memory Man",
+      "notes": "Large box.",
+      "priority": 2,
+      "status": "planned"
+    },
+    {
+      "brand": "Strymon",
+      "enclosure": "custom",
+      "id": "strymon-timeline",
+      "name": "Timeline",
+      "notes": "",
+      "priority": 2,
+      "status": "planned"
+    },
+    {
+      "brand": "Strymon",
+      "enclosure": "custom",
+      "id": "strymon-bigsky",
+      "name": "BigSky",
+      "notes": "",
+      "priority": 2,
+      "status": "planned"
+    },
+    {
+      "brand": "TC Electronic",
+      "enclosure": "custom",
+      "id": "tc-electronic-hall-of-fame-2",
+      "name": "Hall of Fame 2",
+      "notes": "",
+      "priority": 2,
+      "status": "planned"
+    },
+    {
+      "brand": "TC Electronic",
+      "enclosure": "custom",
+      "id": "tc-electronic-ditto",
+      "name": "Ditto",
+      "notes": "",
+      "priority": 2,
+      "status": "planned"
+    },
+    {
+      "brand": "Fulltone",
+      "enclosure": "custom",
+      "id": "fulltone-ocd",
+      "name": "OCD",
+      "notes": "",
+      "priority": 2,
+      "status": "planned"
+    },
+    {
+      "brand": "Xotic",
+      "enclosure": "custom",
+      "id": "xotic-ep-booster",
+      "name": "EP Booster",
+      "notes": "Mini enclosure.",
+      "priority": 2,
+      "status": "planned"
+    },
+    {
+      "brand": "Dunlop",
+      "enclosure": "custom (round)",
+      "id": "dunlop-fuzz-face",
+      "name": "Fuzz Face",
+      "notes": "Round enclosure \u2014 custom, not a box.",
+      "priority": 2,
+      "status": "planned"
+    },
+    {
+      "brand": "JHS",
+      "enclosure": "custom",
+      "id": "jhs-morning-glory",
+      "name": "Morning Glory",
+      "notes": "",
+      "priority": 3,
+      "status": "planned"
+    },
+    {
+      "brand": "Walrus Audio",
+      "enclosure": "custom",
+      "id": "walrus-audio-julia",
+      "name": "Julia",
+      "notes": "",
+      "priority": 3,
+      "status": "planned"
+    },
+    {
+      "brand": "Wampler",
+      "enclosure": "custom",
+      "id": "wampler-tumnus",
+      "name": "Tumnus",
+      "notes": "Mini enclosure.",
+      "priority": 3,
+      "status": "planned"
+    },
+    {
+      "brand": "EarthQuaker Devices",
+      "enclosure": "custom",
+      "id": "earthquaker-devices-plumes",
+      "name": "Plumes",
+      "notes": "",
+      "priority": 3,
+      "status": "planned"
+    },
+    {
+      "brand": "Keeley",
+      "enclosure": "custom",
+      "id": "keeley-compressor-plus",
+      "name": "Compressor Plus",
+      "notes": "",
+      "priority": 3,
+      "status": "planned"
+    },
+    {
+      "brand": "Chase Bliss",
+      "enclosure": "custom",
+      "id": "chase-bliss-mood",
+      "name": "Mood",
+      "notes": "",
+      "priority": 3,
+      "status": "planned"
+    },
+    {
+      "brand": "JHS",
+      "enclosure": "custom",
+      "id": "jhs-bonsai",
+      "name": "Bonsai",
+      "notes": "",
+      "priority": 3,
+      "status": "planned"
+    },
+    {
+      "brand": "Strymon",
+      "enclosure": "custom",
+      "id": "strymon-iridium",
+      "name": "Iridium",
+      "notes": "",
+      "priority": 3,
+      "status": "planned"
+    }
+  ],
+  "header": {
+    "about": "DRAFT hero-model priority queue for Caedon's cuts/additions \u2014 seeded 2026-09-28, not final. The other ~8,550 pedals in the catalog are IMPLICIT placeholders (procedural boxes in the main app); only hero candidates are tracked here explicitly.",
+    "dims": "Entries carry no dims yet. A separate research pass is collecting manufacturer spec sheets for these 30 pedals; dims upgrade the specs when written. Until then, specs use heights.json / pedals.json values marked provisional.",
+    "enclosure_note": "Enclosure assignments are provisional guesses (preset keys from parts.js PRESETS, or 'custom'). Confirmed at spec-writing time.",
+    "statuses": {
+      "hero": "fully modeled \u2014 spec written AND validate.html passing",
+      "placeholder": "(implicit, not listed) procedural box in the main app",
+      "planned": "queued for hero modeling"
+    }
+  }
+}

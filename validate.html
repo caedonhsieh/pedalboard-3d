@@ -190,6 +190,11 @@ try {
       return new THREE.Vector3(a.x, j.y ?? 0.78, a.z);
     }
     if (a.kind === 'powerJack') return new THREE.Vector3(a.x, (spec.powerJack || {}).y ?? 1.0, a.z);
+    if (a.kind === 'knob') {
+      const k = (spec.knobs || []).find((s) => (s.id || 'knob') === a.id) || {};
+      const recess = k.recess ?? 0;
+      return new THREE.Vector3(a.x, expectedY(a.z) - recess, a.z);
+    }
     return new THREE.Vector3(a.x, expectedY(a.z), a.z);
   }
   const [aw, ah] = [560, Math.round(560 * (D + 2 * MARGIN) / (W + 2 * MARGIN))];
