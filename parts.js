@@ -299,7 +299,7 @@ export function studioScene(container, {
   cameraPos = [6.4, 4.8, 8.8], target = [0, 1.25, 0],
   autoRotate = true, exposure = 1.12,
 } = {}) {
-  const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
   const softwareGL = isSoftwareGL(renderer);
   renderer.setPixelRatio(softwareGL ? 1 : Math.min(window.devicePixelRatio, 2));
   renderer.setSize(container.clientWidth || window.innerWidth, container.clientHeight || window.innerHeight);
