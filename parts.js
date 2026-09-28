@@ -303,7 +303,10 @@ export function studioScene(container, {
   const softwareGL = isSoftwareGL(renderer);
   renderer.setPixelRatio(softwareGL ? 1 : Math.min(window.devicePixelRatio, 2));
   renderer.setSize(container.clientWidth || window.innerWidth, container.clientHeight || window.innerHeight);
-  renderer.shadowMap.enabled = true;
+  // Shadow maps are the biggest per-frame cost after env lighting — disable
+  // entirely under software GL (headless/test browsers) where they can hang
+  // the renderer. On hardware GL they stay on.
+  renderer.shadowMap.enabled = !softwareGL;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = exposure;
