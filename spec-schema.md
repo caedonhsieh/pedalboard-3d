@@ -62,8 +62,11 @@ Custom profile (TS9 wedge and friends):
   **nominal design intent** — the builder compensates for bevel internally.
 - `bevel` (default 0.05): edge softening, inches. Larger values round
   corners more (e.g. the TS9's rounded rear-top corner).
-- `frontLean` (default 0): inches the front-top edge leans forward —
+- `frontLean` (default 0): inches the front face leans forward at the top —
   a slightly sloped front face instead of a perfectly vertical one.
+  Implemented by setting the front-*bottom* corner back; the front-*top*
+  corner always lands exactly on the nominal spec point after bevel
+  compensation.
 
 ## Minimal example — MXR Phase 90 style box
 

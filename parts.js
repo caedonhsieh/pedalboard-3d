@@ -97,9 +97,17 @@ export function boxEnclosure({ w, d, h, edgeRadius = 0.06, material = FIN.green 
  * Extruded custom side profile for unorthodox shapes (TS9 wedge, etc.).
  * points: [[z, y], ...] from back (-d/2) to front (+d/2), y up from base.
  * The profile is the NOMINAL design intent; bevel compensation is applied
- * internally so the outer surface matches the points.
- * frontLean: inches the front-top edge leans forward (slightly sloped front
- * face, e.g. 0.06 on the TS9). Larger `bevel` softens all corners.
+ * internally so the outer surface matches the points. The bevel expands the
+ * outline outward by exactly `bevel`, so every pre-bevel outline point is
+ * inset by `bevel` along the outline — the outer surface then lands on the
+ * nominal points (up to normal bevel-arc rounding at corners).
+ * frontLean: inches the front face leans forward at the top (slightly sloped
+ * front face, e.g. 0.06 on the TS9). Implemented by setting the front-BOTTOM
+ * corner back by frontLean; the front-TOP corner keeps full bevel
+ * compensation and lands exactly on the nominal spec point. (Subtracting the
+ * lean from the top corner instead would let the bevel push the outer surface
+ * `frontLean` past nominal — a real bug we shipped once: +0.06" silhouette
+ * overshoot on the TS9.)
  * Shape +x (tall end) maps to world -z (back) after rotation.y.
  */
 export function profileEnclosure({ w, d, points, bevel = 0.05, frontLean = 0, material = FIN.green } = {}) {
@@ -107,13 +115,13 @@ export function profileEnclosure({ w, d, points, bevel = 0.05, frontLean = 0, ma
   const X = (z) => -z; // shape-x from board-z
   const n = points.length;
   const s = new THREE.Shape();
-  s.moveTo(X(points[n - 1][0]) + b, b);
+  s.moveTo(X(points[n - 1][0]) + b + frontLean, b);
   s.lineTo(X(points[0][0]) - b, b);
   for (let i = 0; i < n; i++) {
     const [z, y] = points[i];
     let x = X(z);
     if (i === 0) x -= b;
-    else if (i === n - 1) x += b - frontLean; // front face leans slightly forward
+    else if (i === n - 1) x += b;
     s.lineTo(x, y - b);
   }
   s.closePath();
@@ -252,15 +260,40 @@ export function powerJack() {
 /* ---------------- studio scene (hero presentation) ---------------- */
 
 /**
+ * True when the WebGL context is a software rasterizer (SwiftShader,
+ * llvmpipe, …) rather than real GPU hardware. Typical in headless / CI
+ * browsers. The studio's heavy synchronous GPU work (PMREM environment
+ * convolution, large PCFSoft shadow maps, MSAA + clearcoat materials) is
+ * fine on hardware GL but can block the main thread for tens of seconds
+ * under software GL — long enough for the browser to kill the page as
+ * "unresponsive". Callers degrade gracefully instead.
+ */
+export function isSoftwareGL(renderer) {
+  try {
+    const gl = renderer.getContext();
+    const ext = gl.getExtension('WEBGL_debug_renderer_info');
+    const name = ext ? String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) || '') : '';
+    return /swiftshader|llvmpipe|softpipe|software rasterizer|basic render/i.test(name);
+  } catch {
+    return false;
+  }
+}
+
+/**
  * The shared studio: gradient backdrop, soft floor, 3-point-ish lighting,
  * environment reflections, orbit controls with gentle auto-rotate.
+ *
+ * On software WebGL (headless/test browsers) the expensive bits are scaled
+ * back — pixel ratio 1, 1024px shadows, no PMREM environment convolution —
+ * so the page stays interactive. Visuals on hardware GL are untouched.
  */
 export function studioScene(container, {
   cameraPos = [6.4, 4.8, 8.8], target = [0, 1.25, 0],
   autoRotate = true, exposure = 1.12,
 } = {}) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const softwareGL = isSoftwareGL(renderer);
+  renderer.setPixelRatio(softwareGL ? 1 : Math.min(window.devicePixelRatio, 2));
   renderer.setSize(container.clientWidth || window.innerWidth, container.clientHeight || window.innerHeight);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -295,12 +328,16 @@ export function studioScene(container, {
   });
 
   const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  // PMREM RoomEnvironment convolution is the single biggest synchronous GPU
+  // cost on this page — skipped under software GL (see isSoftwareGL).
+  // Metals render flatter without an env map, but the page stays alive.
+  if (!softwareGL) scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   pmrem.dispose();
 
   const key = new THREE.DirectionalLight(0xffffff, 3.0);
   key.position.set(5, 8, 5); key.castShadow = true;
-  key.shadow.mapSize.set(2048, 2048);
+  const shadowRes = softwareGL ? 1024 : 2048;
+  key.shadow.mapSize.set(shadowRes, shadowRes);
   key.shadow.camera.left = -7; key.shadow.camera.right = 7;
   key.shadow.camera.top = 7; key.shadow.camera.bottom = -7;
   key.shadow.camera.near = 1; key.shadow.camera.far = 30;

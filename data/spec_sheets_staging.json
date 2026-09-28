@@ -1,0 +1,572 @@
+[
+  {
+    "brand": "Ibanez",
+    "dims_in": {
+      "d": 4.88,
+      "h": 2.09,
+      "w": 2.91
+    },
+    "dims_mm": {
+      "d": 124.0,
+      "h": 53.0,
+      "w": 74.0
+    },
+    "height_includes_knobs": "unknown",
+    "notes": "No official Ibanez-hosted manual or dimensions found; Ibanez product page (opened) omits dimensions. Dims printed in reproduced Ibanez owner's manual as Size: 124(D) x 74(W) x 53(H)mm.",
+    "pedal": "TS9",
+    "source_type": "secondary",
+    "url": "https://manualmachine.com/ibanez/tubescreamerts9/19060840-owners-manual/",
+    "verified": true
+  },
+  {
+    "brand": "Boss",
+    "dims_in": {
+      "d": 5.08,
+      "h": 2.32,
+      "w": 2.87
+    },
+    "dims_mm": {
+      "d": 129.0,
+      "h": 59.0,
+      "w": 73.0
+    },
+    "height_includes_knobs": "unknown",
+    "notes": "Official BOSS specs page (opened). Section labeled 'Size and Weight (incl. battery)'; no statement on whether height includes knobs.",
+    "pedal": "DS-1",
+    "source_type": "product_page",
+    "url": "https://www.boss.info/ca/products/ds-1/specifications/",
+    "verified": true
+  },
+  {
+    "brand": "Boss",
+    "dims_in": {
+      "d": 5.08,
+      "h": 2.32,
+      "w": 2.87
+    },
+    "dims_mm": {
+      "d": 129.0,
+      "h": 59.0,
+      "w": 73.0
+    },
+    "height_includes_knobs": "unknown",
+    "notes": "Official BOSS product page opened but fetched text omitted the dimensions table. Dims visible in reproduction of the \u00a92016 Roland BOSS SD-1 owner's manual: 73 (W) x 129 (D) x 59 (H) mm.",
+    "pedal": "SD-1",
+    "source_type": "secondary",
+    "url": "https://www.manualslib.com/manual/3805381/Boss-Super-Overdrive.html",
+    "verified": true
+  },
+  {
+    "brand": "Boss",
+    "dims_in": {
+      "d": 5.08,
+      "h": 2.32,
+      "w": 2.87
+    },
+    "dims_mm": {
+      "d": 129.0,
+      "h": 59.0,
+      "w": 73.0
+    },
+    "height_includes_knobs": "unknown",
+    "notes": "Official BOSS specs page (opened). Section labeled 'Size and Weight (incl. battery)'; no statement on whether height includes knobs.",
+    "pedal": "TU-3",
+    "source_type": "product_page",
+    "url": "https://www.boss.info/jp/products/tu-3/specifications/",
+    "verified": true
+  },
+  {
+    "brand": "Boss",
+    "dims_in": {
+      "d": 5.08,
+      "h": 2.32,
+      "w": 2.87
+    },
+    "dims_mm": {
+      "d": 129.0,
+      "h": 59.0,
+      "w": 73.0
+    },
+    "height_includes_knobs": "unknown",
+    "notes": "Official BOSS specs page (opened). Section labeled 'Size and Weight (incl. battery)'; no statement on whether height includes knobs.",
+    "pedal": "DD-8",
+    "source_type": "product_page",
+    "url": "https://www.boss.info/pl/products/dd-8/specifications/",
+    "verified": true
+  },
+  {
+    "brand": "Boss",
+    "dims_in": {
+      "d": 5.08,
+      "h": 2.32,
+      "w": 2.87
+    },
+    "dims_mm": {
+      "d": 129.0,
+      "h": 59.0,
+      "w": 73.0
+    },
+    "height_includes_knobs": "unknown",
+    "notes": "Official BOSS product page opened but fetched text omitted the dimensions table. Dims visible in reproduction of the BOSS CE-2W owner's manual: 73 (W) x 129 (D) x 59 (H) mm.",
+    "pedal": "CE-2W",
+    "source_type": "secondary",
+    "url": "https://manuals.plus/boss/ce-2w-waza-craft-chorus-pedal-manual",
+    "verified": true
+  },
+  {
+    "brand": "ProCo",
+    "dims_in": {
+      "d": 4.0,
+      "h": 2.5,
+      "w": 3.5
+    },
+    "dims_mm": {
+      "d": 101.6,
+      "h": 63.5,
+      "w": 88.9
+    },
+    "height_includes_knobs": "unknown",
+    "notes": "Manufacturer publishes no dimensions: the official ratdistortion.com RAT 2 product URL redirects and the site has no spec page; the official RAT2 owner's manual (zZounds-hosted sheet) contains no dimensions. Retail spec listing (opened): Dimensions 4 x 3.5 x 2.5 in, interpreted as D x W x H; corroborated by eBay product catalog (W 88.9 / D 101.6 / H 63.5 mm).",
+    "pedal": "RAT 2",
+    "source_type": "secondary",
+    "url": "https://buyorborrowmusic.com/proco-rat-2-distortion/",
+    "verified": true
+  },
+  {
+    "brand": "Klon",
+    "dims_in": {
+      "d": 5.0,
+      "h": 2.0,
+      "w": 6.63
+    },
+    "dims_mm": {
+      "d": 127.0,
+      "h": 50.8,
+      "w": 168.3
+    },
+    "height_includes_knobs": "unknown",
+    "notes": "No official source: Klon company closed in 2008 and publishes no spec sheet. Dealer listing (opened) states 'Length is 5 in., 6 5/8 in. width, and 2 in. in depth at deepest point.' Length mapped to depth (front-back); mapping 'depth at deepest point' to height is interpretive; knob inclusion unstated.",
+    "pedal": "Centaur",
+    "source_type": "secondary",
+    "url": "https://reverb.com/item/90989796-klon-centaur-overdrive-effect-c-2003-ser-s1288",
+    "verified": true
+  },
+  {
+    "brand": "MXR",
+    "pedal": "Phase 90 (M101)",
+    "url": "https://www.sweetwater.com/store/detail/Phase90--mxr-m101-phase-90-phaser-pedal",
+    "source_type": "secondary",
+    "dims_mm": {
+      "w": 57.2,
+      "d": 108.0,
+      "h": 31.8
+    },
+    "dims_in": {
+      "w": 2.25,
+      "d": 4.25,
+      "h": 1.25
+    },
+    "height_includes_knobs": "unknown",
+    "verified": true,
+    "notes": "No physical dimensions on jimdunlop.com (product page and official manual are electrical specs only). Sweetwater Tech Specs list Height/Width/Depth; Width mapped to w (left-right), Depth to d (front-back). Model M101."
+  },
+  {
+    "brand": "MXR",
+    "pedal": "Dyna Comp (M102)",
+    "url": "https://equipboard.com/items/mxr-dyna-comp-compressor-m102?cid=206845",
+    "source_type": "secondary",
+    "dims_mm": {
+      "w": 57.2,
+      "d": 108.0,
+      "h": 31.8
+    },
+    "dims_in": {
+      "w": 2.25,
+      "d": 4.25,
+      "h": 1.25
+    },
+    "height_includes_knobs": "unknown",
+    "verified": true,
+    "notes": "No physical dimensions on jimdunlop.com (product page and official manual are electrical specs only). Same enclosure as Phase 90; Equipboard specs match Sweetwater's M101 figures. Model M102."
+  },
+  {
+    "brand": "MXR",
+    "pedal": "Carbon Copy (M169)",
+    "url": "https://equipboard.com/items/mxr-carbon-copy-analog-delay",
+    "source_type": "secondary",
+    "dims_mm": {
+      "w": 69.9,
+      "d": 120.7,
+      "h": 31.8
+    },
+    "dims_in": {
+      "w": 2.75,
+      "d": 4.75,
+      "h": 1.25
+    },
+    "height_includes_knobs": "unknown",
+    "verified": true,
+    "notes": "No physical dimensions on jimdunlop.com. Dealer specs consistently 4.75 x 2.75 x 1.25 in despite Dunlop marketing copy saying 'no bigger than a Phase 90'; Carbon Copy uses a larger enclosure than M101/M102. Model M169."
+  },
+  {
+    "brand": "Dunlop",
+    "pedal": "Cry Baby (GCB95)",
+    "url": "https://equipboard.com/items/jim-dunlop-gcb95-original-crybaby-wah",
+    "source_type": "secondary",
+    "dims_mm": {
+      "w": 102.0,
+      "d": 254.0,
+      "h": 64.0
+    },
+    "dims_in": {
+      "w": 4.02,
+      "d": 10.0,
+      "h": 2.52
+    },
+    "height_includes_knobs": "unknown",
+    "verified": true,
+    "notes": "No physical dimensions on jimdunlop.com (product page and official manual lack them). Spec 'Dimensions (W x D x H): 102 x 254 x 64 mm' is Dunlop-sourced dealer data (official distributor notes 'product info taken from the Dunlop website'). Amazon's listing swaps W/H (10L x 2.5W x 4H); distributor data used. Wah has no top knobs; treadle position affects effective height. Model GCB95."
+  },
+  {
+    "brand": "Dunlop",
+    "pedal": "Fuzz Face (JDF2)",
+    "url": "https://www.sweetwater.com/store/detail/FuzzFace--dunlop-jdf2-classic-fuzz-face-pedal",
+    "source_type": "secondary",
+    "dims_mm": {
+      "w": 184.2,
+      "d": 184.2,
+      "h": 82.6
+    },
+    "dims_in": {
+      "w": 7.25,
+      "d": 7.25,
+      "h": 3.25
+    },
+    "height_includes_knobs": "unknown",
+    "verified": true,
+    "notes": "Full-size JDF2, circular enclosure. Published spec is a rectangular bounding box (7.25 in W x 8 in D x 3.25 in H); diameter stored as w=d=7.25 in (smaller horizontal dimension, the constraining body diameter; 8 in likely includes jack/footswitch protrusion). Model JDF2."
+  },
+  {
+    "brand": "Fulltone",
+    "pedal": "OCD",
+    "url": "https://www.stars-music.com/fulltone-ocd-v1_4_213339.html",
+    "source_type": "secondary",
+    "dims_mm": {
+      "w": 60.0,
+      "d": 115.0,
+      "h": 55.0
+    },
+    "dims_in": {
+      "w": 2.36,
+      "d": 4.53,
+      "h": 2.17
+    },
+    "height_includes_knobs": "unknown",
+    "verified": true,
+    "notes": "fulltone.com is a stub with no product info; official OCD manual covers electrical specs only. Star's Music (major FR retailer) lists Dunlop-style dealer spec 'Dimensions (W x D x H): 60 x 115 x 55 mm'. Model OCD."
+  },
+  {
+    "brand": "Xotic",
+    "pedal": "EP Booster",
+    "url": "https://xotic.us/effects/ep-booster/",
+    "source_type": "product_page",
+    "dims_mm": {
+      "w": 38.1,
+      "d": 88.9,
+      "h": 38.1
+    },
+    "dims_in": {
+      "w": 1.5,
+      "d": 3.5,
+      "h": 1.5
+    },
+    "height_includes_knobs": "unknown",
+    "verified": true,
+    "notes": "Official Xotic product page prints 'Dimensions (W/D/H): 3.5 x 1.5 x 1.5 in (89 x 38 x 38 mm)' with W/D labels rotated relative to physical orientation; remapped to physical convention (w=left-right=1.5 in, d=front-back=3.5 in). Model EP Booster. [source_type normalized from \"official\" to \"product_page\": official manufacturer product page.]"
+  },
+  {
+    "brand": "EHX",
+    "pedal": "Big Muff Pi",
+    "url": "http://ehx.com/products/big-muff-pi/",
+    "source_type": "product_page",
+    "dims_mm": {
+      "w": 139.7,
+      "d": 174.8,
+      "h": 74.9
+    },
+    "dims_in": {
+      "w": 5.5,
+      "d": 6.88,
+      "h": 2.95
+    },
+    "height_includes_knobs": "unknown",
+    "verified": true,
+    "notes": "Official EHX page prints 'Dimensions (in) 5.5 x 2.95 x 6.88' without axis labels. Mapped via labeled dealer W x D x H (140 x 175 x 75 mm): w=5.5 (L-R), d=6.88 (F-B), h=2.95. NYC/original current reissue (released 2000); not a Nano or Op-Amp variant."
+  },
+  {
+    "brand": "EHX",
+    "pedal": "Small Clone",
+    "url": "https://www.zozomusic.com/electro-harmonix-ehx-small-clone-analog-chorus-guitar-effects-pedal/",
+    "source_type": "secondary",
+    "dims_mm": {
+      "w": 85.9,
+      "d": 133.4,
+      "h": 69.9
+    },
+    "dims_in": {
+      "w": 3.38,
+      "d": 5.25,
+      "h": 2.75
+    },
+    "height_includes_knobs": "unknown",
+    "verified": true,
+    "notes": "EHX's published spec block (UPC 683274010137, MPN CLONE) is '5.25 x 3.38 x 2.75' in, carried verbatim by dealers; EHX's own shop page currently lists unboxed dimensions as TBD, so no current manufacturer-hosted dims. EHX orders this series L x W x H, giving w=3.38 (L-R), d=5.25 (F-B), h=2.75."
+  },
+  {
+    "brand": "EHX",
+    "pedal": "Deluxe Memory Man",
+    "url": "https://www.ehx.com/products/deluxe-memory-man/",
+    "source_type": "product_page",
+    "dims_mm": {
+      "w": 120.7,
+      "d": 146.1,
+      "h": 63.5
+    },
+    "dims_in": {
+      "w": 4.75,
+      "d": 5.75,
+      "h": 2.5
+    },
+    "height_includes_knobs": "unknown",
+    "verified": true,
+    "notes": "Official EHX page prints 'Dimensions (in) 5.75 x 4.75 x 2.5' without axis labels. EHX's shop spec table for this series labels the sequence L x W x H, and dealer W x D x H listings give 120 x 145 x 64 mm, both consistent with w=4.75 (L-R), d=5.75 (F-B), h=2.5. XO/current model (UPC 683274010724, released 2008); not vintage large-box or Nano."
+  },
+  {
+    "brand": "Strymon",
+    "pedal": "TimeLine",
+    "url": "https://manuals.plus/m/b687c80c8062b9241cd6e38e67ff1f970e5c949a508f3f63f9fce8a8516e0749_optim.pdf",
+    "source_type": "manual_pdf",
+    "dims_mm": {
+      "w": 171.5,
+      "d": 127.0,
+      "h": 47.5
+    },
+    "dims_in": {
+      "w": 6.75,
+      "d": 5.0,
+      "h": 1.87
+    },
+    "height_includes_knobs": "unknown",
+    "verified": true,
+    "notes": "Mirror of Strymon's official TimeLine User Manual (Z12A-TML2, Rev H); the strymon.net-hosted PDF returned 403 on direct fetch. Manual specs table prints 'Dimensions 5\" deep x 6.75\" wide x 1.87\" tall'. Note: an example schema floating around showed 5.1 deep / 2.6 tall, but the current official manual says 5.0 deep / 1.87 tall. Manual does not state whether height includes knobs/footswitch."
+  },
+  {
+    "brand": "Strymon",
+    "pedal": "BigSky",
+    "url": "https://manualmachine.com/strymon/bigsky/2532245-user-manual/",
+    "source_type": "manual_pdf",
+    "dims_mm": {
+      "w": 171.5,
+      "d": 127.0,
+      "h": 47.5
+    },
+    "dims_in": {
+      "w": 6.75,
+      "d": 5.0,
+      "h": 1.87
+    },
+    "height_includes_knobs": "unknown",
+    "verified": true,
+    "notes": "Mirror of Strymon's official BigSky User Manual for the ORIGINAL BigSky (not BigSky MX). Specs table prints 'Dimensions 5\" deep x 6.75\" wide x 1.87\" tall'. Same chassis as TimeLine. Manual does not state whether height includes knobs/footswitch."
+  },
+  {
+    "brand": "Strymon",
+    "pedal": "Iridium",
+    "url": "https://manuals.plus/m/9200fabf2c23d955af59d7a045c05d76226f4248ae20ea78815f03bd633d7c49",
+    "source_type": "manual_pdf",
+    "dims_mm": {
+      "w": 101.6,
+      "d": 114.3,
+      "h": 44.5
+    },
+    "dims_in": {
+      "w": 4.0,
+      "d": 4.5,
+      "h": 1.75
+    },
+    "height_includes_knobs": "unknown",
+    "verified": true,
+    "notes": "Mirror of Strymon's official Iridium User Manual Rev D (2023). Specs table prints 'Dimensions 4.5\" deep x 4\" wide x 1.75\" tall (11.4 cm deep x 10.2 cm wide x 4.4 cm tall)'. Manual does not state whether height includes knobs/footswitch."
+  },
+  {
+    "brand": "TC Electronic",
+    "pedal": "Hall of Fame 2",
+    "url": "https://www.thomann.ie/tc_electronic_hall_of_fame_2.htm",
+    "source_type": "secondary",
+    "dims_mm": {
+      "w": 72.0,
+      "d": 122.0,
+      "h": 50.0
+    },
+    "dims_in": {
+      "w": 2.83,
+      "d": 4.8,
+      "h": 1.97
+    },
+    "height_includes_knobs": "unknown",
+    "verified": true,
+    "notes": "No usable manufacturer-published dims for the full-size HOF2: TC's own HOF2 User Manual (Rev.1, 2017-01-06) misprints the HOF 2 MINI's dimensions ('93 x 48 x 48 mm'), and TC's product page specs did not render. Thomann labels W x D x H: 72 x 122 x 50 mm. Cross-check: TC's official manual for the original Hall of Fame (identical enclosure) states 'Dimensions (width x depth x height) 72 x 122 x 50 mm'. Not the HOF 2 Mini (93 x 48 x 48) or HOF 2 X4."
+  },
+  {
+    "brand": "TC Electronic",
+    "pedal": "Ditto",
+    "url": "https://manuals.plus/tc-electronic/tc-electronic-ditto-looper-user-manual",
+    "source_type": "manual_pdf",
+    "dims_mm": {
+      "w": 48.0,
+      "d": 93.0,
+      "h": 48.0
+    },
+    "dims_in": {
+      "w": 1.89,
+      "d": 3.66,
+      "h": 1.89
+    },
+    "height_includes_knobs": "unknown",
+    "verified": true,
+    "notes": "Mirror of TC Electronic's official Ditto Looper User Manual v1.0 (original Ditto Looper; not Ditto+, Ditto X2, or Ditto X4). Specs table prints 'Dimensions (Width x Depth x Height) 48 x 48 x 93 mm / 1.9 x 1.9 x 3.7\"'. TC labels the 93 mm front-back footprint axis as 'Height', but the pedal physically sits 48 mm tall, so canonical mapping is w=48 (L-R), d=93 (F-B), h=48. Manual does not state whether height includes footswitch."
+  },
+  {
+    "brand": "JHS",
+    "dims_in": {
+      "d": 4.8,
+      "h": 1.6,
+      "w": 2.6
+    },
+    "dims_mm": {
+      "d": 121.9,
+      "h": 40.6,
+      "w": 66.0
+    },
+    "height_includes_knobs": "unknown",
+    "notes": "V4. Official product page states \"MEASURES 2.6\" X 4.8\" X 1.6\".\" Dimension order unstated; assumed W x D x H. Knob inclusion not stated.",
+    "pedal": "Morning Glory",
+    "source_type": "product_page",
+    "url": "https://jhspedals.info/products/morning-glory",
+    "verified": true
+  },
+  {
+    "brand": "JHS",
+    "dims_in": {
+      "d": 4.8,
+      "h": 1.6,
+      "w": 2.6
+    },
+    "dims_mm": {
+      "d": 121.9,
+      "h": 40.6,
+      "w": 66.0
+    },
+    "height_includes_knobs": "unknown",
+    "notes": "Official product page states \"MEASURES 2.6\"X4.8\"X1.6\".\" Dimension order unstated; assumed W x D x H. Knob inclusion not stated.",
+    "pedal": "Bonsai",
+    "source_type": "product_page",
+    "url": "https://jhspedals.info/products/bonsai",
+    "verified": true
+  },
+  {
+    "brand": "Walrus Audio",
+    "dims_in": {
+      "d": 4.76,
+      "h": 1.61,
+      "w": 2.6
+    },
+    "dims_mm": {
+      "d": 121.0,
+      "h": 41.0,
+      "w": 66.0
+    },
+    "height_includes_knobs": "unknown",
+    "notes": "Walrus product page (walrusaudio.com) publishes no dimensions. Cited PDF is a Walrus-authored dealer info sheet (hosted by official EU distributor Face) listing \"121 x 66 x 41 mm\"; order unstated, assumed L x W x H. Separate shipping-box dims (14.6 x 9 x 6.3 cm) excluded. Knob inclusion not stated.",
+    "pedal": "Julia V2",
+    "source_type": "spec_sheet",
+    "url": "https://store.face.be/Article/DownloadAsset/WalrusAudio_JuliaV2_Translation_EN.pdf?documentId=assets/1033/6337b8fde760417fb238b47c0faf22f4",
+    "verified": true
+  },
+  {
+    "brand": "Wampler",
+    "dims_in": {
+      "d": 3.5,
+      "h": 1.5,
+      "w": 1.5
+    },
+    "dims_mm": {
+      "d": 88.9,
+      "h": 38.1,
+      "w": 38.1
+    },
+    "height_includes_knobs": false,
+    "notes": "Original mini Tumnus (not Deluxe). Official product page states 1.5 x 3.5 x 1.5 in (38.1 x 88.9 x 38.1 mm) and explicitly says height excludes knobs and switches. Order unstated; assumed W x D x H.",
+    "pedal": "Tumnus",
+    "source_type": "product_page",
+    "url": "https://wamplerpedals.com/products/tumnus",
+    "verified": true
+  },
+  {
+    "brand": "EarthQuaker Devices",
+    "dims_in": {
+      "d": 4.65,
+      "h": 2.24,
+      "w": 2.52
+    },
+    "dims_mm": {
+      "d": 118.0,
+      "h": 57.0,
+      "w": 64.0
+    },
+    "height_includes_knobs": "unknown",
+    "notes": "No official EarthQuaker Devices product page with dimensions found. Figures from retailer Musikhaus Korn, explicitly labeled \"W 6,40 x H 5,70 x D 11,80 cm\" (= 64 x 57 x 118 mm). Knob inclusion not stated.",
+    "pedal": "Plumes",
+    "source_type": "secondary",
+    "url": "https://www.musikhaus-korn.de/en/earthquaker-devices-plumes-overdrive/pd/179937",
+    "verified": true
+  },
+  {
+    "brand": "Keeley",
+    "dims_in": {
+      "d": 4.33,
+      "h": 2.01,
+      "w": 2.68
+    },
+    "dims_mm": {
+      "d": 110.0,
+      "h": 51.0,
+      "w": 68.0
+    },
+    "height_includes_knobs": "unknown",
+    "notes": "Keeley publishes no dimensions: official robertkeeley.com product page (opened 2026-09-28) tech specs cover power/bypass only. Figures from Guitar.com review: \"DIMENSIONS 110 x 68 x 51mm\"; order unstated, assumed D x W x H. Star's Music independently reports 112 x 68 x 51 mm; Sweetwater-family specs list width 2.35 in instead. Knob inclusion not stated.",
+    "pedal": "Compressor Plus",
+    "source_type": "secondary",
+    "url": "https://guitar.com/reviews/keeley-compressor-plus/",
+    "verified": true
+  },
+  {
+    "brand": "Chase Bliss",
+    "dims_in": {
+      "d": 4.88,
+      "h": 2.38,
+      "w": 2.5
+    },
+    "dims_mm": {
+      "d": 124.0,
+      "h": 60.5,
+      "w": 63.5
+    },
+    "height_includes_knobs": "unknown",
+    "notes": "Original MOOD (MKI), not MKII; discontinued listing. Perfect Circuit lists \"Dimensions: 4.88\\\" x 2.5\\\" x 2.38\\\"\"; order unstated, assumed D x W x H. Glued to Music independently lists W 66 / L 124 / H 57 mm. No official Chase Bliss MKI manual or product page with dimensions found (one archived MKI manual URL returned 404); Chase Bliss manuals do not publish dims.",
+    "pedal": "MOOD",
+    "source_type": "secondary",
+    "url": "https://www.perfectcircuit.com/chase-bliss-audio-mood.html",
+    "verified": true
+  }
+]

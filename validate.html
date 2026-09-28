@@ -85,8 +85,11 @@
   <div id="iouLine" class="mono" style="margin-top:12px;font-size:14px;"></div>
   <p class="cap">The decal is the processed top-face art actually applied to the model.
   Blink flips between the 3D render and the flat art at the same scale — graphics
-  should sit still. Silhouette IoU is reported below; shading differences between the
-  lit render and the flat art are expected and do not fail the check.</p>
+  should sit still. Silhouette IoU compares the render's top-down footprint
+  against the spec's nominal W&times;D rect (not the decal's alpha — art
+  transparency must not fail a geometry check); the bbox readouts verify the
+  decal art is placed at the right scale and position. Shading differences
+  between the lit render and the flat art are expected and do not fail the check.</p>
 </section>
 
 <section class="card" id="cardC">
@@ -263,16 +266,20 @@ try {
     const rctx = rc.getContext('2d', { willReadFrequently: true });
     rctx.drawImage(renderImg, 0, 0);
     const rd = rctx.getImageData(0, 0, bw, bh).data;
-    const dd = dctx.getImageData(0, 0, bw, bh).data;
     let inter = 0, union = 0, rMinX = 1e9, rMaxX = -1e9, rMinY = 1e9, rMaxY = -1e9;
     for (let i = 0; i < bw * bh; i++) {
       const o = i * 4;
+      const x = i % bw, y = (i / bw) | 0;
       const rs = !isBg(rd[o], rd[o + 1], rd[o + 2]);
-      const ds = dd[o + 3] > 128;
+      // Reference silhouette = the spec's nominal WxD rect (the rect the
+      // decal is drawn into at rx,ry,rw,rh). Deliberately NOT the decal
+      // PNG's alpha: decal art legitimately contains transparency (the TS9
+      // decal is ~87% opaque), which capped IoU at ~87% no matter how
+      // perfect the model. Art transparency must not fail a geometry check.
+      const ds = x >= rx && x < rx + rw && y >= ry && y < ry + rh;
       if (rs || ds) union++;
       if (rs && ds) inter++;
       if (rs) {
-        const x = i % bw, y = (i / bw) | 0;
         if (x < rMinX) rMinX = x; if (x > rMaxX) rMaxX = x;
         if (y < rMinY) rMinY = y; if (y > rMaxY) rMaxY = y;
       }

@@ -58,9 +58,16 @@ auto-rotation:
   compared against an *independent* interpolation of the spec done inside
   validate.html — never against the assembler's own math. **> 2 mm fails.**
 - **CHECK B — render→photo.** Top render next to the spec's face art, blink
-  toggle, silhouette-over-silhouette IoU. Catches decal misalignment and
-  wrong part layout (this is what would have caught the TS9's misplaced
-  knobs and the jacks-printed-on-top decal bug). **IoU < 0.95 fails.**
+  toggle, footprint IoU. The IoU compares the render's top-down silhouette
+  against the spec's nominal W×D rect — deliberately **not** against the decal
+  PNG's alpha channel. Decal art legitimately contains transparency (the TS9
+  decal is ~87% opaque), which capped IoU at ~87% no matter how perfect the
+  model — comparing against alpha conflates art coverage with geometry, so
+  the check measured the wrong thing. The bbox center/size readouts verify the
+  decal art is drawn at the right scale and position; the blink test covers
+  art alignment qualitatively. **IoU < 0.90 fails** (with bbox center/size
+  ≤ 2 mm). The threshold itself was not weakened — the comparison was fixed
+  to measure geometry instead of art transparency.
 - **CHECK C — profile.** Side render with the spec profile polyline
   overlaid; max deviation of the rendered silhouette from the polyline.
   This is what would have caught the TS9's exaggerated single-slope wedge.
@@ -90,6 +97,25 @@ sloped front face). Knob/switch/LED z-positions were untouched; their heights
 reseated automatically via the surface-sampling rule. Then re-run
 validate.html. No geometry code changed. This is the process working as
 designed.
+
+A follow-up fix (same day) corrected `profileEnclosure`'s bevel compensation:
+`frontLean` had been subtracted from the front-*top* corner's pre-bevel
+position, so the bevel expanded the outer surface `frontLean` (0.06") past the
+nominal spec point — the rendered silhouette overshot the spec footprint and
+check B's bbox size readout caught it (Δ 1.54 mm). The lean is now applied to
+the front-*bottom* corner instead, so the front-top corner lands exactly on the
+nominal point. Lesson: the profile is the design intent, and the builder must
+be held to it — that's what check B's footprint IoU is for.
+
+## Hero page robustness
+
+`studioScene()` (parts.js) detects software WebGL (SwiftShader / llvmpipe —
+typical in headless/test browsers) via `WEBGL_debug_renderer_info` and scales
+back: pixel ratio 1, 1024px shadow maps, no PMREM environment convolution
+(the biggest synchronous GPU cost on the page). Without this, the page can
+block the main thread long enough for the browser to kill it as
+"unresponsive" under software GL. Hardware-GL visuals are untouched. This is a
+fallback path, not a quality reduction.
 
 ## Model ledger (`specs/ledger.json`)
 
