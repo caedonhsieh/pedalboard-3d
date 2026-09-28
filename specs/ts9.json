@@ -8,7 +8,7 @@
     "w": 2.91
   },
   "enclosure": {
-    "bevel": 0.05,
+    "bevel": 0.03,
     "color": "#7fb75c",
     "frontLean": 0.06,
     "notes": "CORRECTED 2026-09-28 from Sweetwater true-side-view photo (full silhouette trace): the body is an IRREGULAR HEXAGON in side profile, not a wedge. Six sides: vertical rear face, flat rear top (y=1.55), short upslope to a peak ridge (y=2.09 at z=0, the 53mm spec height), long deck slope down to front (y=1.46), vertical front face. The earlier 'straight wedge' was wrong \u2014 it missed the rear flat + upslope + peak. [AUTO-FIT 2026-09-28: profile optimized against side-photo silhouette (RMS 1.0px), knob recess 0.000in from measured heights.] [AUTO-FIT 2026-09-28: profile optimized against side-photo silhouette (RMS 1.0px). knob recess 0.035in from measured heights.]",
