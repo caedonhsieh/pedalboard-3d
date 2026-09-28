@@ -479,7 +479,7 @@ export function assemblePedal(spec) {
     const part = seat(knob(k.style || 'ts9', k.rot || 0), k.x, k.z, k.id || 'knob', 'knob');
     // Recessed knobs (e.g. TS9): sink the skirt into the deck so the knob
     // emerges from the surface instead of perching on top of it.
-    const recess = k.recess ?? (k.style === 'ts9' || !k.style ? 0.15 : 0);
+    const recess = k.recess ?? 0;
     if (recess) part.position.y -= recess;
   }
   if (spec.led) seat(led(), spec.led.x, spec.led.z, 'led', 'led');
