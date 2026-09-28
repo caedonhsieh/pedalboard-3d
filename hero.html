@@ -52,19 +52,28 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 /* ============================================================
    TS9 HERO — parametric part-library spike for pedalboard-3d
-   Dimensions (in): W 3.0 x D 4.9 x H 2.09 (mfr 74x124x53mm).
-   Wedge: back 2.09 -> front 1.20, from TS9 side-profile photos
-   (front height estimated; back height is manufacturer spec).
+   Dimensions (in): W 3.0 x D 4.9.
+   Side profile measured from the Wikimedia 3/4 photo
+   (Ibanez_ts9_tube_screamer.jpg) via keypoint grounding:
+     back wall 2.09 (mfr spec 74x124x53mm) -> knob deck, nearly
+     flat (~1 deg), to a KINK at z=-0.60 (37.8% of depth from the
+     back; kink verified 30px above the straight back-to-front
+     line, so it is a real shoulder, not noise), height 2.05 there
+     -> footswitch deck at ~15.6 deg down to front wall 1.20
+     (estimated). The kink is the dominant shape cue; the old
+     single-slope (~10.3 deg) model is gone.
    Knob/switch/LED layout measured from the PedalPlayground
-   top-down photo (ibanez-ts9.png), image-top = pedal back.
-   Knob centers via bright-cap centroid + Kasa circle fit on the
-   knob skirt ring, converted through the decal UV mapping
+   top-down photo (ibanez-ts9.png); knob centers via Kasa circle
+   fit, converted through the decal UV mapping
    (x=(u-.5)*W, z=(.5-v)*D, v=1 at image top = back).
    NOTE: TONE sits ~0.55" lower (toward front) than DRIVE/LEVEL.
    ============================================================ */
-const W = 3.0, D = 4.9, H_BACK = 2.09, H_FRONT = 1.20;
-const SLOPE = Math.atan2(H_BACK - H_FRONT, D);          // ~10.3 deg
-const topY = (z) => H_BACK - ((z + D / 2) / D) * (H_BACK - H_FRONT);
+const W = 3.0, D = 4.9;
+const H_BACK = 2.09, H_BRK = 2.05, H_FRONT = 1.20;
+const Z_BRK = -0.60;                        // profile kink, board z
+const A1 = Math.atan2(H_BACK - H_BRK, Z_BRK + D / 2);  // knob-deck pitch ~1 deg
+const A2 = Math.atan2(H_BRK - H_FRONT, D / 2 - Z_BRK); // switch-deck pitch ~15.6 deg
+const V_BRK = 0.5 - Z_BRK / D;               // decal v-coordinate of the kink
 
 // measured layout (inches, origin = board center, -z = back)
 const KNOBS = [
@@ -201,13 +210,15 @@ pedal.position.y = 0.02;
 scene.add(pedal);
 const shadowed = (m) => { m.castShadow = true; m.receiveShadow = true; return m; };
 
-/* enclosure: extruded wedge side-profile, beveled */
+/* enclosure: extruded two-segment side profile, beveled.
+   shape +x = tall/back end (maps to world -z after rotation.y). */
 {
   const b = 0.05; // bevel compensation
   const s = new THREE.Shape();
   s.moveTo(-D / 2 + b, b);
   s.lineTo(D / 2 - b, b);
   s.lineTo(D / 2 - b, H_BACK - b);
+  s.lineTo(-Z_BRK, H_BRK - b);      // profile kink -> shoulder
   s.lineTo(-D / 2 + b, H_FRONT - b);
   s.closePath();
   const geo = new THREE.ExtrudeGeometry(s, {
@@ -225,31 +236,46 @@ const shadowed = (m) => { m.castShadow = true; m.receiveShadow = true; return m;
   pedal.add(base);
 }
 
-/* sloped-top group: everything mounted on the wedge surface.
-   rotation.x = +SLOPE tips local +y to the surface normal. */
-const topGroup = new THREE.Group();
-topGroup.position.set(0, topY(0), 0);
-topGroup.rotation.x = SLOPE;
-pedal.add(topGroup);
+/* two deck groups, one per profile segment. rotation.x = +pitch tips
+   local +y to the segment's surface normal (surface descends toward
+   +z/front). Children use deck-local coords: board z minus group z. */
+const ZC1 = (-D / 2 + Z_BRK) / 2, YC1 = (H_BACK + H_BRK) / 2; // knob deck center
+const deck1 = new THREE.Group();
+deck1.position.set(0, YC1, ZC1);
+deck1.rotation.x = A1;
+pedal.add(deck1);
 
-/* faceplate decal: lighting-normalized real photo, top face only */
+const ZC2 = (Z_BRK + D / 2) / 2, YC2 = (H_BRK + H_FRONT) / 2; // switch deck center
+const deck2 = new THREE.Group();
+deck2.position.set(0, YC2, ZC2);
+deck2.rotation.x = A2;
+pedal.add(deck2);
+
+/* faceplate decal: lighting-normalized real photo, split across the two
+   deck planes so it follows the kink (knob graphics on deck 1, badge art
+   on deck 2; no texture stretching across the shoulder). */
 {
   const loader = new THREE.TextureLoader();
-  loader.load('./ts9-top-decal.png?v=2',
+  loader.load('./ts9-top-decal.png?v=3',
     (tex) => {
       tex.colorSpace = THREE.SRGBColorSpace;
       tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-      const decal = new THREE.Mesh(
-        new THREE.PlaneGeometry(W, D),
-        new THREE.MeshStandardMaterial({
-          map: tex, transparent: true, roughness: 0.42, metalness: 0.05,
-          envMapIntensity: 0.7, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
-        })
-      );
-      decal.rotation.x = -Math.PI / 2; // texture-top (v=1) -> -z (back)
-      decal.position.y = 0.008;
-      decal.receiveShadow = true;
-      topGroup.add(decal);
+      const mat = new THREE.MeshStandardMaterial({
+        map: tex, transparent: true, roughness: 0.42, metalness: 0.05,
+        envMapIntensity: 0.7, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
+      });
+      const mkDecal = (len, vMap) => {
+        const g = new THREE.PlaneGeometry(W, len);
+        const uv = g.attributes.uv;
+        for (let i = 0; i < uv.count; i++) uv.setY(i, vMap(uv.getY(i)));
+        const m = new THREE.Mesh(g, mat);
+        m.rotation.x = -Math.PI / 2; // texture-top (v=1) -> local -z (back)
+        m.position.y = 0.008;
+        m.receiveShadow = true;
+        return m;
+      };
+      deck1.add(mkDecal(Z_BRK + D / 2, (v) => V_BRK + v * (1 - V_BRK)));
+      deck2.add(mkDecal(D / 2 - Z_BRK, (v) => v * V_BRK));
       document.getElementById('loader').style.opacity = '0';
     },
     undefined,
@@ -272,8 +298,8 @@ function makeKnob(pointerRot) {
 }
 for (const { x, z, rot } of KNOBS) {
   const k = makeKnob(rot);
-  k.position.set(x, 0, z);
-  topGroup.add(k);
+  k.position.set(x, 0, z - ZC1); // deck-local z
+  deck1.add(k);
 }
 
 /* LED: chrome bezel + glowing red dome */
@@ -286,8 +312,8 @@ for (const { x, z, rot } of KNOBS) {
   const glow = new THREE.PointLight(0xff2a18, 0.9, 2.6, 2);
   glow.position.y = 0.35;
   g.add(bezel, dome, glow);
-  g.position.set(LED_POS.x, 0, LED_POS.z);
-  topGroup.add(g);
+  g.position.set(LED_POS.x, 0, LED_POS.z - ZC1);
+  deck1.add(g);
 }
 
 /* footswitch: black bezel + ribbed chrome stomp plate */
@@ -298,8 +324,8 @@ for (const { x, z, rot } of KNOBS) {
   const plate = shadowed(new THREE.Mesh(new RoundedBoxGeometry(SWITCH.w, 0.16, SWITCH.d, 4, 0.05), matPlateRib));
   plate.position.y = 0.13;
   g.add(bezel, plate);
-  g.position.set(SWITCH.x, 0, SWITCH.z);
-  topGroup.add(g);
+  g.position.set(SWITCH.x, 0, SWITCH.z - ZC2);
+  deck2.add(g);
 }
 
 /* side jacks: 1/4" panel jack hardware, built along +X.
