@@ -57,6 +57,10 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
    (front height estimated; back height is manufacturer spec).
    Knob/switch/LED layout measured from the PedalPlayground
    top-down photo (ibanez-ts9.png), image-top = pedal back.
+   Knob centers via bright-cap centroid + Kasa circle fit on the
+   knob skirt ring, converted through the decal UV mapping
+   (x=(u-.5)*W, z=(.5-v)*D, v=1 at image top = back).
+   NOTE: TONE sits ~0.55" lower (toward front) than DRIVE/LEVEL.
    ============================================================ */
 const W = 3.0, D = 4.9, H_BACK = 2.09, H_FRONT = 1.20;
 const SLOPE = Math.atan2(H_BACK - H_FRONT, D);          // ~10.3 deg
@@ -64,9 +68,9 @@ const topY = (z) => H_BACK - ((z + D / 2) / D) * (H_BACK - H_FRONT);
 
 // measured layout (inches, origin = board center, -z = back)
 const KNOBS = [
-  { x: -0.746, z: -1.815, rot:  0.30 },
-  { x:  0.000, z: -1.815, rot: -0.18 },
-  { x:  0.746, z: -1.815, rot:  0.14 },
+  { x: -0.741, z: -1.825, rot:  0.30 }, // DRIVE
+  { x: -0.002, z: -1.266, rot: -0.18 }, // TONE (lower than the other two)
+  { x:  0.765, z: -1.821, rot:  0.14 }, // LEVEL
 ];
 const LED_POS = { x: 0, z: -2.298 };
 const SWITCH = { x: 0, z: 1.522, w: 2.046, d: 1.382 };
@@ -184,6 +188,9 @@ const matLed = new THREE.MeshPhysicalMaterial({
   color: 0x2a0505, roughness: 0.25, metalness: 0.0,
   emissive: 0xff2015, emissiveIntensity: 2.4, clearcoat: 1.0, envMapIntensity: 0.8,
 });
+const matJackChrome = new THREE.MeshStandardMaterial({
+  color: 0xf4f4f6, roughness: 0.30, metalness: 1.0, envMapIntensity: 1.35,
+});
 const matDarkMetal = new THREE.MeshStandardMaterial({
   color: 0x2a2a2e, roughness: 0.45, metalness: 0.85, envMapIntensity: 0.8,
 });
@@ -295,26 +302,42 @@ for (const { x, z, rot } of KNOBS) {
   topGroup.add(g);
 }
 
-/* side jacks: hex nut + barrel + socket (input right, output left) */
-function makeJack(side) {
+/* side jacks: 1/4" panel jack hardware, built along +X.
+   washer -> hex nut (0.55" across flats) -> dark socket recess.
+   input right wall, output left wall. */
+const JACK_Z = -0.18; // mount point, from photo blob corrected for top-down parallax
+function makeJack() {
   const g = new THREE.Group();
-  const nut = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.155, 0.155, 0.09, 6), matChrome));
-  nut.rotation.z = Math.PI / 2;
-  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.10, 0.12, 24), matDarkMetal);
-  barrel.rotation.z = Math.PI / 2;
-  const hole = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.062, 0.062, 0.13, 20),
-    new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.9 })
-  );
-  hole.rotation.z = Math.PI / 2;
-  nut.position.x = side * 0.045; barrel.position.x = side * 0.01;
-  g.add(nut, barrel, hole);
+  const washerGeo = new THREE.CylinderGeometry(0.31, 0.31, 0.035, 32);
+  washerGeo.rotateZ(Math.PI / 2);
+  const washer = shadowed(new THREE.Mesh(washerGeo, matJackChrome));
+  washer.position.x = 0.018;
+  const nutGeo = new THREE.CylinderGeometry(0.55 / Math.sqrt(3), 0.55 / Math.sqrt(3), 0.11, 6);
+  nutGeo.rotateZ(Math.PI / 2);
+  nutGeo.rotateX(Math.PI / 6); // flat faces up/down
+  const nut = shadowed(new THREE.Mesh(nutGeo, matJackChrome));
+  nut.position.x = 0.035 + 0.055;
+  // socket: dark bore seen through the nut + inner contact ring for depth
+  const boreGeo = new THREE.CylinderGeometry(0.125, 0.125, 0.17, 24);
+  boreGeo.rotateZ(Math.PI / 2);
+  const bore = new THREE.Mesh(boreGeo,
+    new THREE.MeshStandardMaterial({ color: 0x060606, roughness: 0.9, metalness: 0.2 }));
+  bore.position.x = 0.055;
+  const ringGeo = new THREE.CylinderGeometry(0.062, 0.062, 0.02, 16);
+  ringGeo.rotateZ(Math.PI / 2);
+  const contact = new THREE.Mesh(ringGeo, matDarkMetal);
+  contact.position.x = 0.015;
+  g.add(washer, nut, bore, contact);
   return g;
 }
-for (const side of [1, -1]) {
-  const j = makeJack(side);
-  j.position.set(side * (W / 2 - 0.01), 0.78, 0.10);
-  pedal.add(j);
+{
+  const jr = makeJack(); // input, right wall (+x)
+  jr.position.set(W / 2 - 0.06, 0.78, JACK_Z);
+  pedal.add(jr);
+  const jl = makeJack(); // output, left wall (-x)
+  jl.rotation.y = Math.PI;
+  jl.position.set(-(W / 2 - 0.06), 0.78, JACK_Z);
+  pedal.add(jl);
 }
 
 /* rear power jack */
