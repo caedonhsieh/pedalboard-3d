@@ -59,25 +59,28 @@ def extract_photo():
         col = np.where(filled[:, x])[0]
         if len(col) > 10:
             tops[x] = col.min()
-    # Knobs: dark pixels in upper-left, find each knob's top and the deck below
-    dark = (r < 60) & (g < 60) & (b < 60)
+    # Knobs: find the top edge where background (light) transitions to knob (dark)
+    # The knob top is the first row going down where pixels become dark,
+    # not the first dark pixel (which might be a gray transition).
     knobs = []
-    # Three knobs expected around x=100,150,200 — find dark clusters
     for xc in [100, 150, 200]:
-        # search x window
-        x0, x1 = xc-30, xc+30
-        region = dark[:, x0:x1]
-        cols = np.where(region.any(axis=0))[0]
-        if len(cols) == 0:
-            continue
-        # knob top = min y of dark in this window (above deck)
-        # deck y = tops at center
-        sub = np.where(dark[:, x0:x1].any(axis=1))[0]
-        # filter to y < deck (above the deck line)
-        deck_y = tops[xc]
-        above = sub[sub < deck_y - 5]
-        if len(above) > 0:
-            knobs.append({'x': xc, 'top_y': int(above.min()), 'deck_y': int(deck_y)})
+        # Scan down from y=0 to find the transition
+        top_y = None
+        for y in range(0, 60):
+            r_v, g_v, b_v = a[y, xc].astype(int)
+            # Background is light (r>200), knob is dark (r<100)
+            # Find first y where it's clearly knob (not transition)
+            if r_v < 80 and g_v < 80 and b_v < 80:
+                # Verify it's actually the knob by checking a few more rows are also dark
+                if all(a[y+i, xc, 0] < 100 for i in range(3)):
+                    top_y = y
+                    break
+        if top_y is not None:
+            deck_y = int(tops[xc])
+            # Only accept if top_y is well below image top (not cropped)
+            # and above the deck
+            if top_y > 2 and top_y < deck_y - 10:
+                knobs.append({'x': xc, 'top_y': top_y, 'deck_y': deck_y})
     return {'tops': tops, 'knobs': knobs, 'W': W}
 
 def model_top_edge(points, xs):
@@ -115,10 +118,10 @@ def knob_error(points, recess, photo, spec_knobs):
     (top_y < 15px from image top), returns (None, 'cropped') to signal
     that validation is impossible from this photo.
     """
-    # Check for cropping: if any knob top is within 15px of image top,
+    # Check for cropping: if any knob top is within 2px of image top,
     # the photo is cropped and we cannot measure true height.
     for km in photo['knobs']:
-        if km['top_y'] < 15:
+        if km['top_y'] <= 2:
             return None, 'cropped'
     KNOB_H_IN = 0.65  # total knob height (skirt 0.60 + cap 0.05)
     errs = []
