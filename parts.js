@@ -222,6 +222,47 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate' } = {}) {
   return g;
 }
 
+/** Ibanez logo plate: black border + white plate + blue "Ibanez" text.
+ *  Physical 3D element on the downslope deck. Origin at deck (y=0). */
+export function ibanezPlate({ w = 2.145, d = 0.733, border = 0.06 } = {}) {
+  const g = new THREE.Group();
+  // Black border (slightly larger, thin)
+  const borderMesh = shadowed(new THREE.Mesh(
+    new RoundedBoxGeometry(w + border*2, 0.04, d + border*2, 2, 0.02),
+    FIN.blackPlastic
+  ));
+  borderMesh.position.y = 0.02;
+  // White plate on top
+  const plateMesh = shadowed(new THREE.Mesh(
+    new RoundedBoxGeometry(w, 0.04, d, 2, 0.02),
+    new THREE.MeshStandardMaterial({ color: 0xf5f5f5, roughness: 0.35, metalness: 0.0 })
+  ));
+  plateMesh.position.y = 0.05;
+  g.add(borderMesh, plateMesh);
+  // "Ibanez" text via canvas texture
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024; canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#f5f5f5';
+  ctx.fillRect(0, 0, 1024, 256);
+  ctx.fillStyle = '#1a8cd8';  // Ibanez blue
+  ctx.font = 'italic bold 140px Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Ibanez', 512, 138);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  const textMesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(w * 0.85, d * 0.55),
+    new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.35 })
+  );
+  textMesh.rotation.x = -Math.PI / 2;
+  textMesh.position.y = 0.071;
+  g.add(textMesh);
+  return g;
+}
+
 /** LED with chrome bezel + emissive dome + glow light. Origin at deck (y=0). */
 export function led() {
   const g = new THREE.Group();
@@ -507,6 +548,13 @@ export function assemblePedal(spec) {
     part.position.set(spec.powerJack.x, spec.powerJack.y, z);
     group.add(part); parts.push(part);
     anchors.push({ id: 'power', kind: 'powerJack', x: spec.powerJack.x, z, obj: part });
+  }
+  if (spec.ibanezPlate) {
+    const ip = spec.ibanezPlate;
+    seat(
+      ibanezPlate({ w: ip.w ?? 2.145, d: ip.d ?? 0.733, border: ip.border ?? 0.06 }),
+      ip.x ?? 0, ip.z ?? 0.345, 'ibanez-plate', 'plate'
+    );
   }
 
   return { group, spec, decks, anchors, parts, enclosureMesh };

@@ -61,14 +61,18 @@ const A = assemblePedal(spec);
 A.group.position.y = 0.02;
 S.scene.add(A.group);
 
-new THREE.TextureLoader().load(spec.decal,
-  (tex) => {
-    applyDecal(A, tex, { anisotropy: S.renderer.capabilities.getMaxAnisotropy() });
-    document.getElementById('loader').style.opacity = '0';
-  },
-  undefined,
-  () => { document.getElementById('loader').style.opacity = '0'; } // green top is fine without it
-);
+if (spec.decal) {
+  new THREE.TextureLoader().load(spec.decal,
+    (tex) => {
+      applyDecal(A, tex, { anisotropy: S.renderer.capabilities.getMaxAnisotropy() });
+      document.getElementById('loader').style.opacity = '0';
+    },
+    undefined,
+    () => { document.getElementById('loader').style.opacity = '0'; }
+  );
+} else {
+  document.getElementById('loader').style.opacity = '0';
+}
 
 S.start();
 </script>
