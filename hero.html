@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>TS9 Hero — part-library proof of concept</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #060607;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, Helvetica, Arial, sans-serif;
+    -webkit-user-select: none; user-select: none; }
+  #app { position: fixed; inset: 0; }
+  canvas { display: block; }
+  .hud { position: fixed; z-index: 10; pointer-events: none; color: #e8e9ec; }
+  #title { top: max(18px, env(safe-area-inset-top)); left: 20px; }
+  #title h1 { margin: 0; font-size: clamp(22px, 5.5vw, 34px); font-weight: 700; letter-spacing: -0.02em; }
+  #title h1 .green { color: #7fb75c; }
+  #title p { margin: 6px 0 0; font-size: clamp(12px, 3.2vw, 14px); color: #9aa0ab; font-weight: 500; }
+  #hint { bottom: max(20px, env(safe-area-inset-bottom)); left: 0; right: 0; text-align: center;
+    font-size: clamp(12px, 3.2vw, 14px); color: #7c828d; font-weight: 500;
+    transition: opacity 1.2s ease; }
+  #badge { top: max(18px, env(safe-area-inset-top)); right: 20px; text-align: right;
+    font-size: clamp(11px, 3vw, 12px); color: #6b7078; font-weight: 600; letter-spacing: 0.08em; }
+  #badge .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: #ff2a18; margin-right: 6px; box-shadow: 0 0 8px #ff2a18; vertical-align: 1px; }
+  #loader { top: 50%; left: 0; right: 0; text-align: center; color: #6b7078;
+    font-size: 14px; font-weight: 500; transition: opacity 0.6s ease; }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app"></div>
+<div class="hud" id="title">
+  <h1><span class="green">Ibanez</span> TS9</h1>
+  <p>Tube Screamer &middot; parametric part-library proof of concept</p>
+</div>
+<div class="hud" id="badge"><span class="dot"></span>HERO&nbsp;MODEL&nbsp;01</div>
+<div class="hud" id="hint">drag to orbit &nbsp;&middot;&nbsp; pinch or scroll to zoom</div>
+<div class="hud" id="loader">warming up the tubes&hellip;</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+/* ============================================================
+   TS9 HERO — parametric part-library spike for pedalboard-3d
+   Dimensions (in): W 3.0 x D 4.9 x H 2.09 (mfr 74x124x53mm).
+   Wedge: back 2.09 -> front 1.20, from TS9 side-profile photos
+   (front height estimated; back height is manufacturer spec).
+   Knob/switch/LED layout measured from the PedalPlayground
+   top-down photo (ibanez-ts9.png), image-top = pedal back.
+   ============================================================ */
+const W = 3.0, D = 4.9, H_BACK = 2.09, H_FRONT = 1.20;
+const SLOPE = Math.atan2(H_BACK - H_FRONT, D);          // ~10.3 deg
+const topY = (z) => H_BACK - ((z + D / 2) / D) * (H_BACK - H_FRONT);
+
+// measured layout (inches, origin = board center, -z = back)
+const KNOBS = [
+  { x: -0.746, z: -1.815, rot:  0.30 },
+  { x:  0.000, z: -1.815, rot: -0.18 },
+  { x:  0.746, z: -1.815, rot:  0.14 },
+];
+const LED_POS = { x: 0, z: -2.298 };
+const SWITCH = { x: 0, z: 1.522, w: 2.046, d: 1.382 };
+
+/* ---------------- renderer / scene ---------------- */
+const app = document.getElementById('app');
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.12;
+app.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+
+// dark studio backdrop: soft radial gradient, near-black edges
+{
+  const c = document.createElement('canvas'); c.width = c.height = 512;
+  const g = c.getContext('2d');
+  const grad = g.createRadialGradient(256, 200, 40, 256, 256, 380);
+  grad.addColorStop(0, '#2b2d33'); grad.addColorStop(0.55, '#141518'); grad.addColorStop(1, '#060607');
+  g.fillStyle = grad; g.fillRect(0, 0, 512, 512);
+  const bg = new THREE.CanvasTexture(c);
+  bg.colorSpace = THREE.SRGBColorSpace;
+  scene.background = bg;
+}
+
+const camera = new THREE.PerspectiveCamera(34, window.innerWidth / window.innerHeight, 0.1, 120);
+camera.position.set(6.4, 4.8, 8.8);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 1.25, 0);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance = 4; controls.maxDistance = 22;
+controls.maxPolarAngle = 1.52;
+controls.autoRotate = true; controls.autoRotateSpeed = 0.9;
+let rotTimer = null;
+controls.addEventListener('start', () => { controls.autoRotate = false; clearTimeout(rotTimer); });
+controls.addEventListener('end', () => {
+  clearTimeout(rotTimer);
+  rotTimer = setTimeout(() => { controls.autoRotate = true; }, 2500);
+});
+
+// studio reflections for PBR materials
+{
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  pmrem.dispose();
+}
+
+/* ---------------- lights ---------------- */
+const key = new THREE.DirectionalLight(0xffffff, 3.0);
+key.position.set(5, 8, 5);
+key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+key.shadow.camera.left = -7; key.shadow.camera.right = 7;
+key.shadow.camera.top = 7; key.shadow.camera.bottom = -7;
+key.shadow.camera.near = 1; key.shadow.camera.far = 30;
+key.shadow.bias = -0.0004; key.shadow.normalBias = 0.02;
+scene.add(key);
+
+const rim = new THREE.DirectionalLight(0x9db8ff, 2.0);
+rim.position.set(-6, 5, -7);
+scene.add(rim);
+scene.add(new THREE.HemisphereLight(0x8a93a8, 0x050505, 0.55));
+
+/* ---------------- procedural micro-textures ---------------- */
+function stripeTexture({ horizontal = true, stripes = 24, size = 256 } = {}) {
+  const c = document.createElement('canvas'); c.width = c.height = size;
+  const g = c.getContext('2d');
+  g.fillStyle = '#808080'; g.fillRect(0, 0, size, size);
+  const step = size / stripes;
+  for (let i = 0; i < stripes; i++) {
+    g.fillStyle = i % 2 ? '#5a5a5a' : '#a6a6a6';
+    if (horizontal) g.fillRect(0, Math.round(i * step), size, Math.max(1, Math.round(step / 2)));
+    else g.fillRect(Math.round(i * step), 0, Math.max(1, Math.round(step / 2)), size);
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  return t;
+}
+
+/* ---------------- materials (the part library's finishes) ---------------- */
+const GREEN_SAMPLE = 0x7fb75c; // median enclosure green, sampled from the face photo
+const matGreen = new THREE.MeshPhysicalMaterial({
+  color: GREEN_SAMPLE, roughness: 0.38, metalness: 0.0,
+  clearcoat: 0.55, clearcoatRoughness: 0.28, envMapIntensity: 0.85,
+});
+const matBlackPlastic = new THREE.MeshStandardMaterial({
+  color: 0x121215, roughness: 0.55, metalness: 0.0, envMapIntensity: 0.6,
+});
+const matKnobRib = new THREE.MeshStandardMaterial({
+  color: 0x141416, roughness: 0.5, metalness: 0.05, envMapIntensity: 0.7,
+  bumpMap: stripeTexture({ horizontal: false, stripes: 26 }), bumpScale: 0.6,
+});
+matKnobRib.bumpMap.repeat.set(3, 1);
+const matChrome = new THREE.MeshStandardMaterial({
+  color: 0xf4f4f6, roughness: 0.22, metalness: 1.0, envMapIntensity: 1.35,
+});
+const matPlateRib = new THREE.MeshStandardMaterial({
+  color: 0xf4f4f6, roughness: 0.26, metalness: 1.0, envMapIntensity: 1.35,
+  bumpMap: stripeTexture({ horizontal: true, stripes: 30 }), bumpScale: 0.35,
+});
+const matSilverCap = new THREE.MeshStandardMaterial({
+  color: 0xd9d9de, roughness: 0.32, metalness: 0.9, envMapIntensity: 1.1,
+});
+const matPointer = new THREE.MeshStandardMaterial({
+  color: 0xf2f2f2, roughness: 0.4, metalness: 0.0,
+  emissive: 0xffffff, emissiveIntensity: 0.25,
+});
+const matLed = new THREE.MeshPhysicalMaterial({
+  color: 0x2a0505, roughness: 0.25, metalness: 0.0,
+  emissive: 0xff2015, emissiveIntensity: 2.4, clearcoat: 1.0, envMapIntensity: 0.8,
+});
+const matDarkMetal = new THREE.MeshStandardMaterial({
+  color: 0x2a2a2e, roughness: 0.45, metalness: 0.85, envMapIntensity: 0.8,
+});
+
+/* ---------------- pedal group ---------------- */
+const pedal = new THREE.Group();
+pedal.position.y = 0.02;
+scene.add(pedal);
+const shadowed = (m) => { m.castShadow = true; m.receiveShadow = true; return m; };
+
+/* enclosure: extruded wedge side-profile, beveled */
+{
+  const b = 0.05; // bevel compensation
+  const s = new THREE.Shape();
+  s.moveTo(-D / 2 + b, b);
+  s.lineTo(D / 2 - b, b);
+  s.lineTo(D / 2 - b, H_BACK - b);
+  s.lineTo(-D / 2 + b, H_FRONT - b);
+  s.closePath();
+  const geo = new THREE.ExtrudeGeometry(s, {
+    depth: W - 2 * b, bevelEnabled: true,
+    bevelThickness: b, bevelSize: b, bevelSegments: 4, steps: 1,
+  });
+  geo.translate(0, 0, -(W - 2 * b) / 2);
+  const body = shadowed(new THREE.Mesh(geo, matGreen));
+  body.rotation.y = Math.PI / 2; // shape +x (tall end) -> world -z (back)
+  pedal.add(body);
+
+  // black base plate
+  const base = shadowed(new THREE.Mesh(new THREE.BoxGeometry(W - 0.12, 0.09, D - 0.12), matBlackPlastic));
+  base.position.y = 0.045;
+  pedal.add(base);
+}
+
+/* sloped-top group: everything mounted on the wedge surface.
+   rotation.x = +SLOPE tips local +y to the surface normal. */
+const topGroup = new THREE.Group();
+topGroup.position.set(0, topY(0), 0);
+topGroup.rotation.x = SLOPE;
+pedal.add(topGroup);
+
+/* faceplate decal: lighting-normalized real photo, top face only */
+{
+  const loader = new THREE.TextureLoader();
+  loader.load('./ts9-top-decal.png',
+    (tex) => {
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      const decal = new THREE.Mesh(
+        new THREE.PlaneGeometry(W, D),
+        new THREE.MeshStandardMaterial({
+          map: tex, transparent: true, roughness: 0.42, metalness: 0.05,
+          envMapIntensity: 0.7, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
+        })
+      );
+      decal.rotation.x = -Math.PI / 2; // texture-top (v=1) -> -z (back)
+      decal.position.y = 0.008;
+      decal.receiveShadow = true;
+      topGroup.add(decal);
+      document.getElementById('loader').style.opacity = '0';
+    },
+    undefined,
+    () => { document.getElementById('loader').style.opacity = '0'; } // green top is fine without it
+  );
+}
+
+/* knobs: ribbed black skirt + silver cap + white pointer */
+function makeKnob(pointerRot) {
+  const k = new THREE.Group();
+  const skirt = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.295, 0.33, 0.40, 48), matKnobRib));
+  skirt.position.y = 0.20;
+  const cap = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.05, 48), matSilverCap));
+  cap.position.y = 0.425;
+  const pointer = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.014, 0.19), matPointer);
+  pointer.position.set(0, 0.452, -0.055);
+  const pg = new THREE.Group(); pg.add(pointer); pg.rotation.y = pointerRot;
+  k.add(skirt, cap, pg);
+  return k;
+}
+for (const { x, z, rot } of KNOBS) {
+  const k = makeKnob(rot);
+  k.position.set(x, 0, z);
+  topGroup.add(k);
+}
+
+/* LED: chrome bezel + glowing red dome */
+{
+  const g = new THREE.Group();
+  const bezel = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.098, 0.06, 32), matChrome));
+  bezel.position.y = 0.03;
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(0.062, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2), matLed);
+  dome.position.y = 0.055;
+  const glow = new THREE.PointLight(0xff2a18, 0.9, 2.6, 2);
+  glow.position.y = 0.35;
+  g.add(bezel, dome, glow);
+  g.position.set(LED_POS.x, 0, LED_POS.z);
+  topGroup.add(g);
+}
+
+/* footswitch: black bezel + ribbed chrome stomp plate */
+{
+  const g = new THREE.Group();
+  const bezel = shadowed(new THREE.Mesh(new RoundedBoxGeometry(SWITCH.w + 0.26, 0.12, SWITCH.d + 0.26, 4, 0.06), matBlackPlastic));
+  bezel.position.y = 0.05;
+  const plate = shadowed(new THREE.Mesh(new RoundedBoxGeometry(SWITCH.w, 0.16, SWITCH.d, 4, 0.05), matPlateRib));
+  plate.position.y = 0.13;
+  g.add(bezel, plate);
+  g.position.set(SWITCH.x, 0, SWITCH.z);
+  topGroup.add(g);
+}
+
+/* side jacks: hex nut + barrel + socket (input right, output left) */
+function makeJack(side) {
+  const g = new THREE.Group();
+  const nut = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.155, 0.155, 0.09, 6), matChrome));
+  nut.rotation.z = Math.PI / 2;
+  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.10, 0.12, 24), matDarkMetal);
+  barrel.rotation.z = Math.PI / 2;
+  const hole = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.062, 0.062, 0.13, 20),
+    new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.9 })
+  );
+  hole.rotation.z = Math.PI / 2;
+  nut.position.x = side * 0.045; barrel.position.x = side * 0.01;
+  g.add(nut, barrel, hole);
+  return g;
+}
+for (const side of [1, -1]) {
+  const j = makeJack(side);
+  j.position.set(side * (W / 2 - 0.01), 0.78, 0.10);
+  pedal.add(j);
+}
+
+/* rear power jack */
+{
+  const g = new THREE.Group();
+  const housing = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.088, 0.088, 0.09, 24), matBlackPlastic));
+  housing.rotation.x = Math.PI / 2;
+  const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.10, 12), matDarkMetal);
+  pin.rotation.x = Math.PI / 2;
+  g.add(housing, pin);
+  g.position.set(0.75, 1.02, -(D / 2 - 0.02));
+  pedal.add(g);
+}
+
+/* ---------------- studio floor ---------------- */
+{
+  const floor = new THREE.Mesh(
+    new THREE.CircleGeometry(30, 64),
+    new THREE.MeshStandardMaterial({ color: 0x0c0c0e, roughness: 0.42, metalness: 0.15, envMapIntensity: 0.5 })
+  );
+  floor.rotation.x = -Math.PI / 2;
+  floor.receiveShadow = true;
+  scene.add(floor);
+}
+
+/* ---------------- loop / resize ---------------- */
+function onResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+window.addEventListener('resize', onResize);
+
+renderer.setAnimationLoop(() => {
+  controls.update();
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>
