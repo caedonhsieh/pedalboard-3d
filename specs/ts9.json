@@ -11,22 +11,31 @@
     "bevel": 0.07,
     "color": "#7fb75c",
     "frontLean": 0.06,
-    "notes": "CORRECTED 2026-09-28 from Sweetwater true-side-view photo (edge-traced): the side wall's top edge is ONE STRAIGHT LINE rear-to-front (1.0px max deviation over a 370px run) \u2014 the earlier 'subtle bend at 40%' was a misread of a 3/4-view photo, and the old front height 1.08 was ~0.3in too short. Straight wedge: rear 2.09in (mfr spec 53mm) to front 1.39in (photo-measured, +/-0.1). Back/front = 1.50x. Front face has a visibly rounded top corner; bevel 0.07 approximates it.",
+    "notes": "CORRECTED 2026-09-28 from Sweetwater true-side-view photo (full silhouette trace): the body is an IRREGULAR HEXAGON in side profile, not a wedge. Six sides: vertical rear face, flat rear top (y=1.55), short upslope to a peak ridge (y=2.09 at z=0, the 53mm spec height), long deck slope down to front (y=1.46), vertical front face. The earlier 'straight wedge' was wrong \u2014 it missed the rear flat + upslope + peak.",
     "points": [
       [
         -2.45,
-        2.09
+        1.55
+      ],
+      [
+        -0.77,
+        1.55
       ],
       [
         0.0,
-        1.74
+        2.09
+      ],
+      [
+        2.37,
+        1.46
       ],
       [
         2.45,
-        1.39
+        0.0
       ]
     ],
-    "type": "profile"
+    "type": "profile",
+    "smooth": false
   },
   "faceImage": "https://raw.githubusercontent.com/PedalPlayground/pedalplayground/master/public/images/pedals/ibanez-ts9.png",
   "footswitch": {

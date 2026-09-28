@@ -110,16 +110,23 @@ export function boxEnclosure({ w, d, h, edgeRadius = 0.06, material = FIN.green 
  * overshoot on the TS9.)
  * Shape +x (tall end) maps to world -z (back) after rotation.y.
  */
-export function profileEnclosure({ w, d, points, bevel = 0.05, frontLean = 0, material = FIN.green } = {}) {
+export function profileEnclosure({ w, d, points, bevel = 0.05, frontLean = 0, material = FIN.green, smooth = true } = {}) {
   const b = bevel;
   const X = (z) => -z; // shape-x from board-z
   // Densify the spec polyline through a centripetal Catmull-Rom so the deck
   // renders as one smooth surface. The spec points stay the source of truth;
   // without this the 7 straight facets show visible crease lines under studio
   // lighting even though the silhouette is correct.
-  const curve = new THREE.CatmullRomCurve3(
-    points.map(([z, y]) => new THREE.Vector3(X(z), y, 0)), false, 'centripetal');
-  const dense = curve.getPoints(72);
+  // For sharp polygons (e.g. TS9 irregular hexagon), set smooth=false to use
+  // the raw polyline with crisp corners.
+  let dense;
+  if (smooth) {
+    const curve = new THREE.CatmullRomCurve3(
+      points.map(([z, y]) => new THREE.Vector3(X(z), y, 0)), false, 'centripetal');
+    dense = curve.getPoints(72);
+  } else {
+    dense = points.map(([z, y]) => new THREE.Vector3(X(z), y, 0));
+  }
   const n = dense.length;
   const s = new THREE.Shape();
   s.moveTo(dense[n - 1].x + b + frontLean, b);
@@ -446,6 +453,7 @@ export function assemblePedal(spec) {
     : profileEnclosure({
         w, d, points: enc.points,
         bevel: enc.bevel ?? 0.05, frontLean: enc.frontLean ?? 0, material,
+        smooth: enc.smooth ?? true,
       });
   group.add(enclosureMesh);
   group.add(basePlate({ w, d }));
