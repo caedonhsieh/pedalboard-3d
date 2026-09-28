@@ -179,12 +179,14 @@ export function knob(style = 'ts9', pointerRot = 0) {
     const pg = new THREE.Group(); pg.add(pointer); pg.rotation.y = pointerRot;
     k.add(body, top, pg);
   } else { // 'ts9'
-    const skirt = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.295, 0.33, 0.40, 48), FIN.knobRib));
-    skirt.position.y = 0.20;
+    // Measured from side photo: visible knob >0.65" (photo crops top, true height taller).
+    // Davies-style TS9 knobs ~0.70" total. Skirt 0.60 + cap 0.05 + pointer.
+    const skirt = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.295, 0.33, 0.60, 48), FIN.knobRib));
+    skirt.position.y = 0.30;
     const cap = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.05, 48), FIN.silverCap));
-    cap.position.y = 0.425;
+    cap.position.y = 0.625;
     const pointer = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.014, 0.19), FIN.pointer);
-    pointer.position.set(0, 0.452, -0.055);
+    pointer.position.set(0, 0.652, -0.055);
     const pg = new THREE.Group(); pg.add(pointer); pg.rotation.y = pointerRot;
     k.add(skirt, cap, pg);
   }

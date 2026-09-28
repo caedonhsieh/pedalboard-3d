@@ -111,31 +111,27 @@ def silhouette_error(points, photo):
 def knob_error(points, recess, photo, spec_knobs):
     """
     Compare model knob top height vs photo.
-    Model knob top = deck_y(at knob z) - recess + knob_visible_height.
-    We measure the visible knob height from photo and solve for recess.
-    Returns list of (measured_visible_px, model_visible_px) and error.
+    Returns (rms_error, details). If knobs are cropped in the photo
+    (top_y < 15px from image top), returns (None, 'cropped') to signal
+    that validation is impossible from this photo.
     """
-    # Knob geometry from parts.js ts9Knob: skirt 0.40" tall, cap on top
-    # Visible height above deck = 0.40 - recess + cap_height
-    # For simplicity, measure total visible from photo and compare to model
-    # Model: deck_y_px - recess_px ... knob top = deck - recess + knob_h
-    # Photo: knob_top_y, deck_y → visible_px = deck_y - knob_top_y
-    KNOB_H_IN = 0.55  # total knob height above base (skirt 0.40 + cap ~0.15)
+    # Check for cropping: if any knob top is within 15px of image top,
+    # the photo is cropped and we cannot measure true height.
+    for km in photo['knobs']:
+        if km['top_y'] < 15:
+            return None, 'cropped'
+    KNOB_H_IN = 0.65  # total knob height (skirt 0.60 + cap 0.05)
     errs = []
     for i, km in enumerate(photo['knobs']):
         if i >= len(spec_knobs):
             break
         sk = spec_knobs[i]
-        # deck height at knob z from profile
         z = sk['z']
-        # interpolate profile y at z
         zs = [p[0] for p in points]
         ys = [p[1] for p in points]
         deck_y_in = np.interp(z, zs, ys)
         deck_py = y_to_py(deck_y_in)
-        # model knob top
         model_top_py = deck_py - (KNOB_H_IN - recess) / IN_H * (PX_BOT - PX_TOP)
-        # photo knob top
         photo_top_py = km['top_y']
         errs.append(model_top_py - photo_top_py)
     if not errs:
@@ -163,9 +159,12 @@ def main():
     print(f"Starting recess: {recess}")
 
     err0, _, _ = silhouette_error(points, photo)
-    kerr0, _ = knob_error(points, recess, photo, spec['knobs'])
+    kerr0, k_detail0 = knob_error(points, recess, photo, spec['knobs'])
     print(f"\nInitial silhouette RMS: {err0:.2f}px")
-    print(f"Initial knob RMS: {kerr0:.2f}px")
+    if k_detail0 == 'cropped':
+        print(f"Initial knob RMS: SKIPPED (cropped photo)")
+    else:
+        print(f"Initial knob RMS: {kerr0:.2f}px")
 
     # --- Coordinate descent on profile ---
     # Params: y of points[0], y of points[1], z of points[1], z of points[2],
@@ -212,30 +211,44 @@ def main():
     print(f"Silhouette RMS: {err0:.2f} -> {best_err:.2f}px")
 
     # --- Fix knob recess from measured heights ---
-    # Solve for recess that minimizes knob error
-    best_recess = recess
-    kerr_best, _ = knob_error(best, best_recess, photo, spec['knobs'])
-    for r_try in np.arange(0.0, 0.30, 0.005):
-        ke, _ = knob_error(best, r_try, photo, spec['knobs'])
-        if ke < kerr_best:
-            kerr_best = ke
-            best_recess = r_try
-    print(f"\nKnob recess: {recess:.3f} -> {best_recess:.3f}")
-    print(f"Knob RMS: {kerr0:.2f} -> {kerr_best:.2f}px")
+    # Skip if photo is cropped (cannot measure true knob height)
+    kerr_best, k_detail = knob_error(best, recess, photo, spec['knobs'])
+    if k_detail == 'cropped':
+        print(f"\nKnob validation: SKIPPED (photo crops knobs at image top, cannot measure true height)")
+        print(f"Knob recess kept at: {recess:.3f}")
+        best_recess = recess
+        kerr0 = kerr_best = 0.0  # don't report invalid numbers
+    else:
+        # Solve for recess that minimizes knob error
+        best_recess = recess
+        for r_try in np.arange(0.0, 0.30, 0.005):
+            ke, _ = knob_error(best, r_try, photo, spec['knobs'])
+            if ke is not None and ke < kerr_best:
+                kerr_best = ke
+                best_recess = r_try
+        print(f"\nKnob recess: {recess:.3f} -> {best_recess:.3f}")
+        print(f"Knob RMS: {kerr0:.2f} -> {kerr_best:.2f}px")
 
     # --- Validate ---
     print(f"\n=== VALIDATION ===")
     print(f"Silhouette: {err0:.2f}px -> {best_err:.2f}px {'PASS' if best_err < 3.0 else 'FAIL'} (threshold 3px)")
-    print(f"Knobs: {kerr0:.2f}px -> {kerr_best:.2f}px {'PASS' if kerr_best < 5.0 else 'FAIL'} (threshold 5px)")
+    if k_detail == 'cropped':
+        print(f"Knobs: SKIPPED (cropped photo — need uncropped side view for validation)")
+    else:
+        print(f"Knobs: {kerr0:.2f}px -> {kerr_best:.2f}px {'PASS' if kerr_best < 5.0 else 'FAIL'} (threshold 5px)")
 
     if args.write:
         spec['enclosure']['points'] = [[round(v, 4) for v in p] for p in best]
-        for k in spec['knobs']:
-            k['recess'] = round(float(best_recess), 4)
+        if k_detail != 'cropped':
+            for k in spec['knobs']:
+                k['recess'] = round(float(best_recess), 4)
+            knob_note = f"knob recess {best_recess:.3f}in from measured heights."
+        else:
+            knob_note = "knob recess NOT auto-fit (photo crops knobs)."
         spec['enclosure']['notes'] = (
             spec['enclosure'].get('notes', '') +
             f" [AUTO-FIT 2026-09-28: profile optimized against side-photo silhouette "
-            f"(RMS {best_err:.1f}px), knob recess {best_recess:.3f}in from measured heights.]"
+            f"(RMS {best_err:.1f}px). {knob_note}]"
         )
         with open(SPEC, 'w') as f:
             json.dump(spec, f, indent=2)
