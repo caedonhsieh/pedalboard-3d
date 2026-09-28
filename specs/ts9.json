@@ -43,11 +43,11 @@
   },
   "faceImage": "https://raw.githubusercontent.com/PedalPlayground/pedalplayground/master/public/images/pedals/ibanez-ts9.png",
   "footswitch": {
-    "d": 1.382,
+    "d": 1.198,
     "style": "plate",
-    "w": 2.046,
-    "x": 0,
-    "z": 1.522
+    "w": 2.087,
+    "x": -0.026,
+    "z": 1.4
   },
   "id": "ibanez-ts9",
   "jacks": [
@@ -70,8 +70,8 @@
       "note": "z verified vs face photo (Kasa circle fit); height seats via profile sampling",
       "rot": 0.3,
       "style": "ts9",
-      "x": -0.822,
-      "z": -1.837,
+      "x": -0.764,
+      "z": -1.832,
       "recess": 0.035
     },
     {
@@ -79,8 +79,8 @@
       "note": "z verified vs face photo; sits ~0.55in forward of the DRIVE/LEVEL row; height seats via profile sampling",
       "rot": -0.18,
       "style": "ts9",
-      "x": 0.002,
-      "z": -1.279,
+      "x": 0.018,
+      "z": -1.287,
       "recess": 0.035
     },
     {
@@ -88,15 +88,15 @@
       "note": "z verified vs face photo; height seats via profile sampling",
       "rot": 0.14,
       "style": "ts9",
-      "x": 0.822,
-      "z": -1.837,
+      "x": 0.792,
+      "z": -1.827,
       "recess": 0.035
     }
   ],
   "led": {
-    "note": "measurement says z=-2.202 (0.096in off); kept -2.298 pending re-measurement \u2014 below visible threshold",
-    "x": 0,
-    "z": -2.298
+    "note": "measured from top view 2026-09-28",
+    "x": 0.009,
+    "z": -2.174
   },
   "name": "TS9 Tube Screamer",
   "notes": "Profile corrected 2026-09-28 (see enclosure.notes) \u2014 the first real spec-edit-not-remodel fix. Knob x/z verified against the face photo. ALL part heights seat by sampling the enclosure profile at their z (the surfaceAt rule in PROCESS.md) \u2014 no hardcoded y values anywhere, so profile edits reseat parts automatically.",
