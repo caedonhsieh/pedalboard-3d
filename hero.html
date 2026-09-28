@@ -235,7 +235,7 @@ pedal.add(topGroup);
 /* faceplate decal: lighting-normalized real photo, top face only */
 {
   const loader = new THREE.TextureLoader();
-  loader.load('./ts9-top-decal.png',
+  loader.load('./ts9-top-decal.png?v=2',
     (tex) => {
       tex.colorSpace = THREE.SRGBColorSpace;
       tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
