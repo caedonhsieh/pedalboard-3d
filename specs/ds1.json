@@ -20,15 +20,15 @@
       ],
       [
         -2.5394,
-        1.4173
+        1.437
       ],
       [
         -1.0343,
-        1.4173
+        1.437
       ],
       [
         2.5394,
-        1.0236
+        1.0276
       ],
       [
         2.5394,
@@ -47,7 +47,7 @@
       "style": "boss",
       "size": "large",
       "rot": 0.3,
-      "note": "MEASURED from ds1_top.png: 16.3mm left of center, 16.9mm from back, 19.6mm dia.",
+      "note": "MEASURED from ds1_top.png: 16.3mm left of center, 16.9mm from back, 19.6mm dia. Scale 1.45 for 18mm height (V3 measured).",
       "measured": true
     },
     {
@@ -57,7 +57,7 @@
       "style": "boss",
       "size": "large",
       "rot": -0.2,
-      "note": "MEASURED from ds1_top.png: 16.5mm right of center, 17.1mm from back, 19.8mm dia.",
+      "note": "MEASURED from ds1_top.png: 16.5mm right of center, 17.1mm from back, 19.8mm dia. Scale 1.45 for 18mm height (V3 measured).",
       "measured": true
     },
     {
