@@ -266,7 +266,7 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
     // set by the spec's footswitch.z).
     // Treadle extends FORWARD (+z) from the hinge.
     const hinge = new THREE.Group();
-    hinge.position.y = 0.05; // plate sits close to deck; hinge just clears it
+    hinge.position.y = 0.13; // plate bottom at deck surface at hinge (plateT/2=0.1085 + 0.02 clearance)
     // hinge at origin; treadle children positioned forward
 
     // Treadle subgroup (plate + pad)
