@@ -758,10 +758,15 @@ export function assemblePedal(spec) {
   if (spec.powerJack) {
     const part = powerJack();
     const z = -(d / 2 - 0.02);
-    // Derive y from surfaceAt. Measured from side photo: power jack center
-    // is 0.474" below the top surface at the back wall (y=0.986").
-    const { y: surfY } = surfaceAt(decks, z);
-    const y = surfY - 0.474;
+    // y: use explicit spec value when measured; otherwise derive from surfaceAt
+    // (legacy 0.474" offset below top surface at back wall).
+    let y;
+    if (spec.powerJack.y != null) {
+      y = spec.powerJack.y;
+    } else {
+      const { y: surfY } = surfaceAt(decks, z);
+      y = surfY - 0.474;
+    }
     part.position.set(spec.powerJack.x, y, z);
     group.add(part); parts.push(part);
     anchors.push({ id: 'power', kind: 'powerJack', x: spec.powerJack.x, z, obj: part });

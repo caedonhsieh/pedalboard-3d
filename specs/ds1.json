@@ -110,11 +110,12 @@
       "h": 0.12
     },
     {
-      "text": "INPUT \u2192",
+      "text": "INPUT \u2190",
       "x": 0.55,
       "z": -0.72,
       "w": 0.45,
-      "h": 0.12
+      "h": 0.12,
+      "note": "Arrow points left (signal flow). Sweetwater front."
     },
     {
       "text": "Distortion",
@@ -157,5 +158,10 @@
       "note": "INPUT jack: 55mm from front, 26mm up. Measured."
     }
   ],
-  "notes": "Boss DS-1 hero model #02. Knob positions measured from PedalPlayground top reference."
+  "notes": "Boss DS-1 hero model #02. Knob positions measured from PedalPlayground top reference.",
+  "powerJack": {
+    "x": 0,
+    "y": 0.75,
+    "note": "DC 9V in, centered on back face, 19mm up. GC back view."
+  }
 }
