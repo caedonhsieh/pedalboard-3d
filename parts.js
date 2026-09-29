@@ -613,7 +613,7 @@ export function assemblePedal(spec) {
     // Tick ring flat on the deck around the knob
     if (k.tickRing !== false) {
       const trScale = k.tickRingScale || 1;
-      const ring = tickRing({ innerR: 0.377 * trScale, outerR: 0.485 * trScale, wedges: 11 });
+      const ring = tickRing({ innerR: 0.32 * trScale, outerR: 0.485 * trScale, wedges: 11 });
       const { y, pitch, deck } = surfaceAt(decks, k.z);
       // Stagger Y by knob index (0.001" steps) so overlapping tick rings
       // don't z-fight — later knobs render on top. Invisible to the eye.
