@@ -627,10 +627,10 @@ export function assemblePedal(spec) {
     const part = jack();
     const x = (j.side === 'left' ? -1 : 1) * (w / 2 - 0.06);
     if (j.side === 'left') part.rotation.y = Math.PI;
-    // Derive y from surfaceAt (no hardcoded values). Jacks sit on the side
-    // wall, ~0.35" below the top surface at their z position.
+    // Derive y from surfaceAt. Measured from side photo: jack center is
+    // 0.641" below the top surface at its z (jack y=1.340" at z=-0.20).
     const { y: surfY } = surfaceAt(decks, j.z);
-    const y = j.y !== undefined ? j.y : surfY - 0.35;
+    const y = j.y !== undefined ? j.y : surfY - 0.641;
     part.position.set(x, y, j.z);
     group.add(part); parts.push(part);
     anchors.push({ id: j.id || `jack-${j.side}`, kind: 'jack', x, z: j.z, obj: part });
@@ -638,9 +638,10 @@ export function assemblePedal(spec) {
   if (spec.powerJack) {
     const part = powerJack();
     const z = -(d / 2 - 0.02);
-    // Derive y from surfaceAt (no hardcoded values)
+    // Derive y from surfaceAt. Measured from side photo: power jack center
+    // is 0.474" below the top surface at the back wall (y=0.986").
     const { y: surfY } = surfaceAt(decks, z);
-    const y = spec.powerJack.y !== undefined ? spec.powerJack.y : surfY - 0.35;
+    const y = spec.powerJack.y !== undefined ? spec.powerJack.y : surfY - 0.474;
     part.position.set(spec.powerJack.x, y, z);
     group.add(part); parts.push(part);
     anchors.push({ id: 'power', kind: 'powerJack', x: spec.powerJack.x, z, obj: part });
