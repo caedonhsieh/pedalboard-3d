@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TS9 Visual Validator — headless render target</title>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<style>
+  html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+  #app { position: fixed; inset: 0; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script type="module">
+import * as THREE from 'three';
+import { assemblePedal, FIN } from './parts.js';
+
+const spec = await (await fetch('./specs/ts9.json')).json();
+const { w, d, h } = spec.dims;
+
+// --- Renderer (no antialias for crisp mask edges in ID mode) ---
+const urlParams = new URLSearchParams(window.location.search);
+const mode = urlParams.get('mode') || 'beauty'; // 'beauty' or 'id'
+const view = urlParams.get('view') || 'top';    // 'top', 'side', 'threequarter'
+
+const renderer = new THREE.WebGLRenderer({ antialias: mode === 'beauty', preserveDrawingBuffer: true });
+const SIZE = 1200;
+renderer.setSize(SIZE, SIZE);
+renderer.setClearColor(0x000000, 1);
+document.getElementById('app').appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+
+// --- Lighting ---
+if (mode === 'beauty') {
+  // Studio-like lighting for visual comparison
+  const key = new THREE.DirectionalLight(0xffffff, 2.0);
+  key.position.set(5, 8, 6);
+  scene.add(key);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.6);
+  fill.position.set(-6, 3, -4);
+  scene.add(fill);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+} else {
+  // Flat lighting for ID mode — pure color, no shading variation
+  scene.add(new THREE.AmbientLight(0xffffff, 3.0));
+}
+
+// --- Build pedal ---
+const A = assemblePedal(spec);
+scene.add(A.group);
+
+// --- ID mode: replace all materials with flat ID colors ---
+// Green (enclosure) = #00FF00, Black (plastic) = #000000... wait, black on black bg won't work.
+// Use: Green = pure green, Black parts = pure red, Silver/metal = pure blue, Other = magenta
+if (mode === 'id') {
+  const idMats = {
+    green: new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
+    black: new THREE.MeshBasicMaterial({ color: 0xff0000 }),
+    silver: new THREE.MeshBasicMaterial({ color: 0x0000ff }),
+    other: new THREE.MeshBasicMaterial({ color: 0xff00ff }),
+  };
+  // Background: white (distinct from all ID colors)
+  renderer.setClearColor(0xffffff, 1);
+
+  A.group.traverse((obj) => {
+    if (obj.isMesh) {
+      const mat = obj.material;
+      const color = mat.color ? mat.color.getHex() : 0;
+      // Classify by material color/properties
+      let idMat;
+      if (color === 0x7fb75c || (mat.isMeshPhysicalMaterial && mat.clearcoat > 0)) {
+        idMat = idMats.green; // enclosure (powder coat)
+      } else if (mat.metalness > 0.5) {
+        idMat = idMats.silver; // chrome/metal
+      } else if (color < 0x303030 || mat.map) {
+        idMat = idMats.black; // black plastic OR textured artwork (tick rings, labels)
+      } else {
+        idMat = idMats.other;
+      }
+      // Preserve texture as alpha for canvas-texture artwork (tick rings, labels)
+      if (mat.map && mat.transparent) {
+        obj.material = new THREE.MeshBasicMaterial({
+          color: idMat.color,
+          alphaMap: mat.map,
+          transparent: true,
+        });
+      } else {
+        obj.material = idMat;
+      }
+    }
+  });
+}
+
+// --- Camera: orthographic for true measurement ---
+const pad = 0.3; // inches of padding around pedal
+let camW, camH, camPos, camUp;
+
+if (view === 'top') {
+  // Looking down -Y, X = width, Z = depth
+  camW = w + pad * 2;
+  camH = d + pad * 2;
+  camPos = [0, 10, 0];
+  camUp = [0, 0, -1]; // -Z is up in the image (back of pedal at top)
+} else if (view === 'side') {
+  // Looking from +X (right side), Z = depth (horizontal), Y = height (vertical)
+  camW = d + pad * 2;
+  camH = h + pad * 2;
+  camPos = [10, h / 2, 0];
+  camUp = [0, 1, 0];
+} else {
+  // Three-quarter beauty shot (perspective)
+  camPos = [6.4, 4.8, 8.8];
+}
+
+let camera;
+if (view === 'threequarter') {
+  camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+  camera.position.set(...camPos);
+  camera.lookAt(0, h / 2, 0);
+} else {
+  camera = new THREE.OrthographicCamera(-camW/2, camW/2, camH/2, -camH/2, 0.1, 50);
+  camera.position.set(...camPos);
+  camera.up.set(...camUp);
+  // For top view: look at center. For side view: look at center height.
+  const lookY = view === 'top' ? 0 : h / 2;
+  camera.lookAt(0, lookY, 0);
+}
+
+// --- Render and expose capture ---
+renderer.render(scene, camera);
+
+// Signal ready and expose capture function
+window.__renderDone = true;
+window.__capture = () => {
+  return renderer.domElement.toDataURL('image/png');
+};
+window.__viewInfo = { view, mode, camW, camH, size: SIZE, dims: { w, d, h } };
+</script>
+</body>
+</html>
