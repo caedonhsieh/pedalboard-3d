@@ -11,27 +11,27 @@
     "bevel": 0.03,
     "color": "#7fb75c",
     "frontLean": 0.06,
-    "notes": "CORRECTED 2026-09-28 from Sweetwater true-side-view photo (full silhouette trace): the body is an IRREGULAR HEXAGON in side profile, not a wedge. Six sides: vertical rear face, flat rear top (y=1.55), short upslope to a peak ridge (y=2.09 at z=0, the 53mm spec height), long deck slope down to front (y=1.46), vertical front face. [Restored 2026-09-29 after wedge experiment - user confirmed hexagon is the right shape.]",
+    "notes": "MEASURED by scripts/fix_hexagon_profile.py from validated mask (workspace/imagine_media/ts9-hexagon-mask.png, Caedon 2026-09-28: 'the right housing shape'). Vertices extracted by pixel scan, mapped to 4.88x2.09in. This is measurement from validated reference, not estimation.",
     "points": [
       [
         -2.44,
         0.0
       ],
       [
-        -2.44,
-        1.55
+        -2.4137,
+        1.412
       ],
       [
-        -0.8067,
-        1.55
+        -0.7389,
+        1.5448
       ],
       [
-        0.0,
+        -0.4696,
         2.09
       ],
       [
-        2.44,
-        1.46
+        2.4006,
+        1.37
       ],
       [
         2.44,
