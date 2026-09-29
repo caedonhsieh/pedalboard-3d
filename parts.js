@@ -286,7 +286,7 @@ export function tickRing({ innerR = 0.32, outerR = 0.485, wedges = 11 } = {}) {
   // 11 positions, 9 wedges rendered (2-trapezoid gap centered at bottom)
   // Canvas angle: -π/2=top, π/2=bottom. Skip the 2 wedges straddling the bottom.
   const step = (Math.PI * 2) / wedges;
-  const wedgeAngular = step * 0.62;  // wedge covers 62% of step, gap 38%
+  const wedgeAngular = step * 0.72;  // wedge covers 72% of step, gap 28%
   for (let i = 0; i < wedges; i++) {
     const centerA = (i / wedges) * Math.PI * 2 - Math.PI / 2;  // start at top
     // Skip the 2 wedges centered around the bottom (angle ≈ π/2)

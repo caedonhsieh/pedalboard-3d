@@ -1,134 +1,136 @@
 {
-  "brand": "Ibanez",
-  "decal": null,
-  "dims": {
-    "d": 4.88,
-    "h": 2.09,
-    "source": "manufacturer spec 74 x 124 x 53 mm",
-    "w": 2.91
-  },
-  "enclosure": {
-    "bevel": 0.05,
-    "color": "#7fb75c",
-    "frontLean": 0.06,
-    "notes": "MEASURED by scripts/fix_hexagon_profile.py from validated mask (workspace/imagine_media/ts9-hexagon-mask.png, Caedon 2026-09-28: 'the right housing shape'). Vertices extracted by pixel scan, mapped to 4.88x2.09in. This is measurement from validated reference, not estimation.",
-    "points": [
-      [
-        -2.44,
-        0.0
-      ],
-      [
-        -2.4137,
-        1.412
-      ],
-      [
-        -0.7389,
-        1.5448
-      ],
-      [
-        -0.4696,
-        2.09
-      ],
-      [
-        2.4006,
-        1.37
-      ],
-      [
-        2.44,
-        0.0
-      ]
+    "brand": "Ibanez",
+    "decal": null,
+    "dims": {
+        "d": 4.88,
+        "h": 2.09,
+        "source": "manufacturer spec 74 x 124 x 53 mm",
+        "w": 2.91
+    },
+    "enclosure": {
+        "bevel": 0.05,
+        "color": "#7fb75c",
+        "frontLean": 0.06,
+        "notes": "MEASURED by scripts/fix_hexagon_profile.py from validated mask (workspace/imagine_media/ts9-hexagon-mask.png, Caedon 2026-09-28: 'the right housing shape'). Vertices extracted by pixel scan, mapped to 4.88x2.09in. This is measurement from validated reference, not estimation.",
+        "points": [
+            [
+                -2.44,
+                0.0
+            ],
+            [
+                -2.4137,
+                1.412
+            ],
+            [
+                -0.7389,
+                1.5448
+            ],
+            [
+                -0.4696,
+                2.09
+            ],
+            [
+                2.4006,
+                1.37
+            ],
+            [
+                2.44,
+                0.0
+            ]
+        ],
+        "type": "profile",
+        "smooth": false
+    },
+    "faceImage": "https://raw.githubusercontent.com/PedalPlayground/pedalplayground/master/public/images/pedals/ibanez-ts9.png",
+    "footswitch": {
+        "d": 1.235,
+        "style": "plate",
+        "w": 2.215,
+        "x": 0.0,
+        "z": 1.499
+    },
+    "id": "ibanez-ts9",
+    "jacks": [
+        {
+            "id": "jack-in",
+            "side": "right",
+            "z": -0.2
+        },
+        {
+            "id": "jack-out",
+            "side": "left",
+            "z": -0.2
+        }
     ],
-    "type": "profile",
-    "smooth": false
-  },
-  "faceImage": "https://raw.githubusercontent.com/PedalPlayground/pedalplayground/master/public/images/pedals/ibanez-ts9.png",
-  "footswitch": {
-    "d": 1.235,
-    "style": "plate",
-    "w": 2.215,
-    "x": 0.0,
-    "z": 1.499
-  },
-  "id": "ibanez-ts9",
-  "jacks": [
-    {
-      "id": "jack-in",
-      "side": "right",
-      "z": -0.2
+    "knobs": [
+        {
+            "id": "drive",
+            "note": "z verified vs face photo (Kasa circle fit); height seats via profile sampling",
+            "rot": 0.3,
+            "style": "ts9",
+            "x": -0.7975,
+            "z": -1.8379,
+            "recess": 0.035
+        },
+        {
+            "id": "tone",
+            "note": "z verified vs face photo; sits ~0.55in forward of the DRIVE/LEVEL row; height seats via profile sampling",
+            "rot": -0.18,
+            "style": "ts9",
+            "x": 0.018,
+            "z": -1.282,
+            "recess": 0.035,
+            "scale": 0.9,
+            "tickRingScale": 0.9
+        },
+        {
+            "id": "level",
+            "note": "z verified vs face photo; height seats via profile sampling",
+            "rot": 0.14,
+            "style": "ts9",
+            "x": 0.8188,
+            "z": -1.8218,
+            "recess": 0.035
+        }
+    ],
+    "led": {
+        "note": "measured from top view 2026-09-28",
+        "x": 0.009,
+        "z": -2.165
     },
-    {
-      "id": "jack-out",
-      "side": "left",
-      "z": -0.2
-    }
-  ],
-  "knobs": [
-    {
-      "id": "drive",
-      "note": "z verified vs face photo (Kasa circle fit); height seats via profile sampling",
-      "rot": 0.3,
-      "style": "ts9",
-      "x": -0.7975,
-      "z": -1.8379,
-      "recess": 0.035
+    "name": "TS9 Tube Screamer",
+    "notes": "Profile corrected 2026-09-28 (see enclosure.notes) \u2014 the first real spec-edit-not-remodel fix. Knob x/z verified against the face photo. ALL part heights seat by sampling the enclosure profile at their z (the surfaceAt rule in PROCESS.md) \u2014 no hardcoded y values anywhere, so profile edits reseat parts automatically.",
+    "powerJack": {
+        "x": 0.75
     },
-    {
-      "id": "tone",
-      "note": "z verified vs face photo; sits ~0.55in forward of the DRIVE/LEVEL row; height seats via profile sampling",
-      "rot": -0.18,
-      "style": "ts9",
-      "x": 0.018,
-      "z": -1.282,
-      "recess": 0.035
+    "ibanezPlate": {
+        "x": 0.0,
+        "z": 0.294,
+        "w": 2.27,
+        "d": 0.905,
+        "border": 0.06
     },
-    {
-      "id": "level",
-      "note": "z verified vs face photo; height seats via profile sampling",
-      "rot": 0.14,
-      "style": "ts9",
-      "x": 0.8188,
-      "z": -1.8218,
-      "recess": 0.035
-    }
-  ],
-  "led": {
-    "note": "measured from top view 2026-09-28",
-    "x": 0.009,
-    "z": -2.165
-  },
-  "name": "TS9 Tube Screamer",
-  "notes": "Profile corrected 2026-09-28 (see enclosure.notes) \u2014 the first real spec-edit-not-remodel fix. Knob x/z verified against the face photo. ALL part heights seat by sampling the enclosure profile at their z (the surfaceAt rule in PROCESS.md) \u2014 no hardcoded y values anywhere, so profile edits reseat parts automatically.",
-  "powerJack": {
-    "x": 0.75
-  },
-  "ibanezPlate": {
-    "x": 0.0,
-    "z": 0.294,
-    "w": 2.27,
-    "d": 0.905,
-    "border": 0.06
-  },
-  "labels": [
-    {
-      "text": "DRIVE",
-      "x": -0.799,
-      "z": -1.32,
-      "w": 0.32,
-      "h": 0.14
-    },
-    {
-      "text": "TONE",
-      "x": 0.003,
-      "z": -1.85,
-      "w": 0.28,
-      "h": 0.1
-    },
-    {
-      "text": "LEVEL",
-      "x": 0.779,
-      "z": -1.3,
-      "w": 0.32,
-      "h": 0.14
-    }
-  ]
+    "labels": [
+        {
+            "text": "DRIVE",
+            "x": -0.799,
+            "z": -1.32,
+            "w": 0.32,
+            "h": 0.14
+        },
+        {
+            "text": "TONE",
+            "x": 0.003,
+            "z": -1.85,
+            "w": 0.25,
+            "h": 0.09
+        },
+        {
+            "text": "LEVEL",
+            "x": 0.779,
+            "z": -1.3,
+            "w": 0.32,
+            "h": 0.14
+        }
+    ]
 }
