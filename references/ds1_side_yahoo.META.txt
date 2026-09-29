@@ -1,0 +1,8 @@
+DS-1 Side Profile Reference
+Source: https://auctions.afimg.jp/p1111186981/ya/image/p1111186981.6.jpg
+Retrieved: 2026-09-29
+Dimensions: 600x450
+View: True side profile (left=front, right=back of pedal)
+Landmarks: Wedge enclosure profile, footswitch plate + gap, thumb screw, jack, knobs
+Physical: 129mm depth spans frame; used for enclosure profile extraction
+Note: Slight perspective (camera above); heights provisional, shape definitive
