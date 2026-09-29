@@ -2,21 +2,32 @@
 """Fetch multi-view product reference images for hero pedals.
 
 Backends (in priority order):
-  1. ebay      — eBay Browse API: up to 24 images per listing, used-gear
+  1. sweetwater-cdn — image-search skill finds Sweetwater CDN URLs (with tokens),
+                 downloads directly from media.sweetwater.com (CDN not bot-blocked,
+                 only HTML pages are). Closeups follow 750-{SKU}_detail{N}.jpg pattern.
+  2. ebay      — eBay Browse API: up to 24 images per listing, used-gear
                  listings show every angle. Needs EBAY_CLIENT_ID and
                  EBAY_CLIENT_SECRET env vars (one-time developer signup).
-  2. pedalplayground — PedalPlayground GitHub catalog: 8000+ pedals, single
+  3. pedalplayground — PedalPlayground GitHub catalog: 8000+ pedals, single
                  top-down view each. No key needed. Good for layout, not form.
-  3. manual    — direct URLs supplied on the command line (for one-offs found
+  4. manual    — direct URLs supplied on the command line (for one-offs found
                  via image search).
 
 Usage:
+  python3 fetch_views.py --pedal ds1 --query "Boss DS-1 Distortion" --backend sweetwater-cdn
   python3 fetch_views.py --pedal ds1 --query "Boss DS-1 Distortion" --backend ebay
   python3 fetch_views.py --pedal ds1 --backend pedalplayground
   python3 fetch_views.py --pedal ds1 --url <img> --url <img> ...
 
 Output: references/<pedal>_<view>.jpg + .META.txt per image.
 Views are labeled by asking the operator (or --views to supply them).
+
+Sweetwater CDN notes (2026-09-29):
+  - Product pages are PerimeterX-blocked; use image-search instead.
+  - CDN URLs: media.sweetwater.com/m/products/image/{32-char-id}.jpg?ha=...
+  - Closeups: media.sweetwater.com/api/i/version-{hash}__{params}__hmac-{hash}/images/closeup/750-{SKU}_detail{N}.jpg
+  - Tokens cannot be guessed; must come from image search or page HTML.
+  - Image search query: "site:sweetwater.com {product name} closeup"
 """
 import argparse
 import base64
