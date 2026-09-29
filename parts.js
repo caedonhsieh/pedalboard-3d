@@ -249,9 +249,9 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
     // MEASURED from ds1_side_yahoo.jpg (2026-09-29 Hough):
     //   Treadle bottom: -4deg from horizontal (image)
     //   Body top slope: 14.2deg (39.4mm->16.7mm over 89.5mm)
-    //   Difference: ~10deg — treadle is shallower, creating the gap.
-    //   This creates the visible gap — the treadle is a separate button, not fused.
-    const lift = 0.418; // tan(10deg) * plateD — raises front to ~4deg vs 14deg body
+    //   The treadle sits CLOSE to the body with a small visible gap.
+    //   Reduced lift for visual match — the treadle is a button, not floating.
+    const lift = 0.25; // ~6deg — creates a small gap, treadle close to body
 
     // Treadle plate gets its own material (not global powderCoat): the plate is a
     // large horizontal surface that catches the key light directly. The shared
@@ -266,7 +266,7 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
     // set by the spec's footswitch.z).
     // Treadle extends FORWARD (+z) from the hinge.
     const hinge = new THREE.Group();
-    hinge.position.y = 0.12; // plate is 0.217" thick; hinge at 0.12 clears the deck
+    hinge.position.y = 0.05; // plate sits close to deck; hinge just clears it
     // hinge at origin; treadle children positioned forward
 
     // Treadle subgroup (plate + pad)
