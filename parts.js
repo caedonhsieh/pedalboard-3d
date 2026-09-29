@@ -305,7 +305,7 @@ export function tickRing({ innerR = 0.377, outerR = 0.485, wedges = 11 } = {}) {
   tex.anisotropy = 8;
   const m = new THREE.Mesh(
     new THREE.PlaneGeometry(outerR * 2, outerR * 2),
-    new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -1 })
+    new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 })
   );
   m.rotation.x = -Math.PI / 2;
   const g = new THREE.Group();
@@ -314,22 +314,23 @@ export function tickRing({ innerR = 0.377, outerR = 0.485, wedges = 11 } = {}) {
 }
 
 /** Flat text label on the deck. Clean vector text via canvas. */
-export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', font = '600 48px Arial, sans-serif' } = {}) {
+export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', font = '600 96px Arial, sans-serif' } = {}) {
   const canvas = document.createElement('canvas');
-  canvas.width = 256; canvas.height = 128;
+  canvas.width = 512; canvas.height = 256;
   const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, 256, 128);
+  ctx.clearRect(0, 0, 512, 256);
   ctx.fillStyle = color;
   ctx.font = font;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(text, 128, 68);
+  // Letter-spacing for the TS9 label style (wide-tracked caps)
+  ctx.fillText(text.split('').join('\u2009'), 256, 136);
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
   const m = new THREE.Mesh(
     new THREE.PlaneGeometry(w, h),
-    new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -1 })
+    new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 })
   );
   m.rotation.x = -Math.PI / 2;
   const g = new THREE.Group();
@@ -603,13 +604,13 @@ export function assemblePedal(spec) {
     if (k.tickRing !== false) {
       const ring = tickRing({ innerR: 0.377, outerR: 0.485, wedges: 11 });
       const { y, pitch, deck } = surfaceAt(decks, k.z);
-      ring.position.y = 0.005;  // just above deck surface
+      ring.position.y = 0.012;  // just above deck surface
       if (deck.group) {
         deck.group.add(ring);
-        ring.position.set(k.x, 0.005, (k.z - deck.zc) / Math.cos(pitch));
+        ring.position.set(k.x, 0.012, (k.z - deck.zc) / Math.cos(pitch));
       } else {
         group.add(ring);
-        ring.position.set(k.x, y + 0.005, k.z);
+        ring.position.set(k.x, y + 0.012, k.z);
       }
       parts.push(ring);
     }
@@ -650,10 +651,10 @@ export function assemblePedal(spec) {
     const { y, pitch, deck } = surfaceAt(decks, lb.z);
     if (deck.group) {
       deck.group.add(part);
-      part.position.set(lb.x, 0.005, (lb.z - deck.zc) / Math.cos(pitch));
+      part.position.set(lb.x, 0.012, (lb.z - deck.zc) / Math.cos(pitch));
     } else {
       group.add(part);
-      part.position.set(lb.x, y + 0.005, lb.z);
+      part.position.set(lb.x, y + 0.012, lb.z);
     }
     parts.push(part);
     anchors.push({ id: `label-${lb.text.toLowerCase()}`, kind: 'label', x: lb.x, z: lb.z, obj: part });
