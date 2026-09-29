@@ -45,15 +45,28 @@ PIXEL_TOLERANCE = 2
 def render_view(view='top', mode='id'):
     """Render the actual production code. Returns (PIL Image, view_info)."""
     from playwright.sync_api import sync_playwright
+    import os
 
-    url = f"file://{RENDER_PAGE}?view={view}&mode={mode}"
+    url = f"http://localhost:8901/validate-render.html?view={view}&mode={mode}"
+
+    # Use our manually-installed Chromium
+    chrome_path = os.path.expanduser(
+        "~/.cache/ms-playwright/chromium-1243/chrome-linux/chrome-linux64/chrome"
+    )
+    # Fallback: check the workspace copy
+    if not os.path.exists(chrome_path):
+        chrome_path = os.path.expanduser("~/workspace/chromium/chrome-linux64/chrome")
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(args=[
-            '--use-gl=swiftshader',
-            '--enable-unsafe-swiftshader',
-            '--disable-gpu',
-        ])
+        browser = p.chromium.launch(
+            executable_path=chrome_path,
+            args=[
+                '--use-gl=swiftshader',
+                '--enable-unsafe-swiftshader',
+                '--disable-gpu',
+                '--no-sandbox',
+            ]
+        )
         page = browser.new_page(viewport={'width': 1200, 'height': 1200})
         page.goto(url)
         # Wait for render to complete
@@ -134,22 +147,49 @@ def extract_masks_photo(img):
 # Mask comparison
 # ----------------------------------------------------------------------------
 
-def compare_masks(render_masks, photo_masks, view_name):
+def compare_masks(render_masks, photo_masks, view_name, view_info):
     """
     Compare masks with zero tolerance (beyond antialiasing).
+    Crops the render to the pedal bounds (removing padding) before comparing.
     Returns dict of {color: {iou, max_gap_px, mismatch_px, pass}}.
     """
+    # Crop render masks to pedal bounds (remove padding)
+    # view_info has camW, camH, canvasW, canvasH, dims, pad
+    camW = view_info['camW']
+    camH = view_info['camH']
+    canvasW = view_info['canvasW']
+    canvasH = view_info['canvasH']
+    dims = view_info['dims']
+    pad = view_info['pad']
+
+    if view_name == 'top':
+        pedal_w_in, pedal_h_in = dims['w'], dims['d']
+    else:  # side
+        pedal_w_in, pedal_h_in = dims['d'], dims['h']
+
+    # Pedal size in pixels (centered in canvas)
+    pedal_w_px = (pedal_w_in / camW) * canvasW
+    pedal_h_px = (pedal_h_in / camH) * canvasH
+    x0 = int((canvasW - pedal_w_px) / 2)
+    y0 = int((canvasH - pedal_h_px) / 2)
+    x1 = int(x0 + pedal_w_px)
+    y1 = int(y0 + pedal_h_px)
+
     results = {}
     for color in ['green', 'black', 'silver', 'white']:
         rm = render_masks[color]
         pm = photo_masks[color]
 
-        # Resize to match (render is 1200px, photo is at 200px/in)
-        # For now, compare at photo resolution
-        if rm.shape != pm.shape:
-            rm_img = Image.fromarray(rm.astype(np.uint8) * 255)
+        # Crop render to pedal bounds
+        rm_cropped = rm[y0:y1, x0:x1]
+
+        # Resize cropped render to match photo size
+        if rm_cropped.shape != pm.shape:
+            rm_img = Image.fromarray(rm_cropped.astype(np.uint8) * 255)
             rm_img = rm_img.resize((pm.shape[1], pm.shape[0]), Image.NEAREST)
             rm = np.array(rm_img) > 127
+        else:
+            rm = rm_cropped
 
         # IoU
         intersection = (rm & pm).sum()
@@ -219,7 +259,7 @@ def validate_view(view_name):
 
     # Compare
     print(f"    Comparing color masks...")
-    results = compare_masks(render_masks, photo_masks, view_name)
+    results = compare_masks(render_masks, photo_masks, view_name, view_info)
 
     return results
 

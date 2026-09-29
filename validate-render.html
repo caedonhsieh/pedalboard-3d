@@ -6,8 +6,8 @@
 <script type="importmap">
 {
   "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    "three": "./vendor/three/three.module.js",
+    "three/addons/": "./vendor/three/addons/"
   }
 }
 </script>
@@ -32,8 +32,23 @@ const mode = urlParams.get('mode') || 'beauty'; // 'beauty' or 'id'
 const view = urlParams.get('view') || 'top';    // 'top', 'side', 'threequarter'
 
 const renderer = new THREE.WebGLRenderer({ antialias: mode === 'beauty', preserveDrawingBuffer: true });
-const SIZE = 1200;
-renderer.setSize(SIZE, SIZE);
+// Use aspect-correct canvas size to avoid distorting the orthographic camera.
+// The camera frustum is camW x camH; the canvas must match that aspect.
+const BASE = 1200;
+const pad = 0.3; // inches of padding around pedal
+let canvasW = BASE, canvasH = BASE;
+// (camW/camH computed after camera setup below; we set size then. For now,
+// compute from view type and dims.)
+if (view === 'top') {
+  const aspect = (w + pad * 2) / (d + pad * 2);
+  if (aspect < 1) { canvasW = Math.round(BASE * aspect); canvasH = BASE; }
+  else { canvasW = BASE; canvasH = Math.round(BASE / aspect); }
+} else if (view === 'side') {
+  const aspect = (d + pad * 2) / (h + pad * 2);
+  if (aspect < 1) { canvasW = Math.round(BASE * aspect); canvasH = BASE; }
+  else { canvasW = BASE; canvasH = Math.round(BASE / aspect); }
+}
+renderer.setSize(canvasW, canvasH);
 renderer.setClearColor(0x000000, 1);
 document.getElementById('app').appendChild(renderer.domElement);
 
@@ -96,10 +111,23 @@ if (mode === 'id') {
         idMat = idMats.other;
       }
       // Preserve texture as alpha for canvas-texture artwork (tick rings, labels)
+      // The canvas has opaque artwork on transparent bg. We need a proper
+      // alpha mask: create a white-on-black version for use as alphaMap.
       if (mat.map && mat.transparent) {
+        const srcCanvas = mat.map.image;
+        const alphaCanvas = document.createElement('canvas');
+        alphaCanvas.width = srcCanvas.width;
+        alphaCanvas.height = srcCanvas.height;
+        const actx = alphaCanvas.getContext('2d');
+        // Draw the original, then use its alpha to mask white
+        actx.drawImage(srcCanvas, 0, 0);
+        actx.globalCompositeOperation = 'source-in';
+        actx.fillStyle = '#ffffff';
+        actx.fillRect(0, 0, alphaCanvas.width, alphaCanvas.height);
+        const alphaTex = new THREE.CanvasTexture(alphaCanvas);
         obj.material = new THREE.MeshBasicMaterial({
           color: idMat.color,
-          alphaMap: mat.map,
+          alphaMap: alphaTex,
           transparent: true,
         });
       } else {
@@ -129,7 +157,6 @@ if (mode === 'id') {
 }
 
 // --- Camera: orthographic for true measurement ---
-const pad = 0.3; // inches of padding around pedal
 let camW, camH, camPos, camUp;
 
 if (view === 'top') {
@@ -171,7 +198,7 @@ window.__renderDone = true;
 window.__capture = () => {
   return renderer.domElement.toDataURL('image/png');
 };
-window.__viewInfo = { view, mode, camW, camH, size: SIZE, dims: { w, d, h } };
+window.__viewInfo = { view, mode, camW, camH, canvasW, canvasH, dims: { w, d, h }, pad };
 </script>
 </body>
 </html>
