@@ -307,7 +307,7 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
     // wide at the front. The treadle is like a diving board, raised at the front.
     // Deck pitch is +4deg (down toward front). Treadle world angle ~ -6deg (up).
     // Hinge relative rotation = -10deg.
-    hinge.rotation.x = -0.140;
+    hinge.rotation.x = -0.127;
     hinge.add(treadle);
     g.add(hinge);
   } else {
