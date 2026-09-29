@@ -23,20 +23,21 @@
         2.3228
       ],
       [
-        -0.47,
+        -0.0315,
         2.3228
       ],
       [
         2.5394,
-        1.1417
+        1.1142
       ],
       [
         2.5394,
         0.0
       ]
     ],
-    "notes": "Boss compact wedge, MEASURED 2026-09-28 (TS9 lesson: never guess a profile). Back 59mm (mfr spec, confirmed 211px in ds1_sw_detail3.jpg). Front 29mm (measured from body front face, was wrongly 47mm). Flat top under knobs to hinge breakpoint z=-12mm (photo, medium confidence). See references/ds1_side_profile.json.",
-    "measured": true
+    "notes": "Boss compact side profile, MEASURED 2026-09-28 from ds1_sw_detail3.jpg (TS9 method: measured polygon, not guessed wedge). 5 vertices: back 59mm, flat top to z=-0.8mm, slope to front 28.3mm. Vertical scale from back face (59mm mfr spec). See references/ds1_side_polygon.json.",
+    "measured": true,
+    "polygon_source": "references/ds1_side_polygon.json"
   },
   "knobs": [
     {
