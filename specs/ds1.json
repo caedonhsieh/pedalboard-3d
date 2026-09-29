@@ -20,22 +20,22 @@
       ],
       [
         -2.5394,
-        2.3228
+        1.5512
       ],
       [
         -0.9843,
-        2.3228
+        1.5512
       ],
       [
         2.5394,
-        1.1142
+        0.6575
       ],
       [
         2.5394,
         0.0
       ]
     ],
-    "notes": "Boss compact side profile, MEASURED 2026-09-28 from ds1_sw_detail3.jpg (TS9 method: measured polygon, not guessed wedge). 5 vertices: back 59mm, flat top to z=-0.8mm, slope to front 28.3mm. Vertical scale from back face (59mm mfr spec). See references/ds1_side_polygon.json.",
+    "notes": "CORRECTED 2026-09-29: Body alone is 39.4mm back / 16.7mm front. The 59mm published is TOTAL (body+treadle). Measured from ds1_side_yahoo.jpg.",
     "measured": true,
     "polygon_source": "references/ds1_side_polygon.json"
   },
@@ -158,14 +158,14 @@
   "footswitch": {
     "style": "boss-pedal",
     "x": 0,
-    "z": 0.217,
+    "z": -0.094,
     "frameColor": "#e85d10",
     "plateW": 2.677,
     "plateD": 2.322,
     "padW": 2.564,
     "padD": 1.703,
     "padCz": 1.537,
-    "note": "CORRECTED 2026-09-29 from ds1_sw_detail3.jpg: plate 5.5mm thick, hinge at 70mm from back (z=+0.217\"), plate front flush with body. Gap ~2mm.",
+    "note": "CORRECTED 2026-09-29: hinge at z=-2.4mm (-0.094\") from ds1_side_yahoo.jpg (was +0.217\", too far forward).",
     "padW_measured": true,
     "padD_measured": true,
     "padCz_measured": true
