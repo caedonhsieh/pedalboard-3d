@@ -15,19 +15,23 @@
     "points": [
       [
         -2.44,
-        1.46
+        0.0
+      ],
+      [
+        -2.44,
+        1.55
       ],
       [
         -0.8067,
+        1.55
+      ],
+      [
+        0.0,
+        2.09
+      ],
+      [
+        2.44,
         1.46
-      ],
-      [
-        -0.498,
-        2.05
-      ],
-      [
-        2.4214,
-        1.37
       ],
       [
         2.44,
@@ -39,11 +43,11 @@
   },
   "faceImage": "https://raw.githubusercontent.com/PedalPlayground/pedalplayground/master/public/images/pedals/ibanez-ts9.png",
   "footswitch": {
-    "d": 1.198,
+    "d": 1.235,
     "style": "plate",
-    "w": 2.087,
-    "x": -0.026,
-    "z": 1.394
+    "w": 2.215,
+    "x": -0.036,
+    "z": 1.499
   },
   "id": "ibanez-ts9",
   "jacks": [
@@ -64,8 +68,8 @@
       "note": "z verified vs face photo (Kasa circle fit); height seats via profile sampling",
       "rot": 0.3,
       "style": "ts9",
-      "x": -0.764,
-      "z": -1.825,
+      "x": -0.7975,
+      "z": -1.8379,
       "recess": 0.035
     },
     {
@@ -82,8 +86,8 @@
       "note": "z verified vs face photo; height seats via profile sampling",
       "rot": 0.14,
       "style": "ts9",
-      "x": 0.792,
-      "z": -1.82,
+      "x": 0.8188,
+      "z": -1.8218,
       "recess": 0.035
     }
   ],
@@ -98,31 +102,31 @@
     "x": 0.75
   },
   "ibanezPlate": {
-    "x": 0.006,
-    "z": 0.301,
-    "w": 2.164,
-    "d": 0.816,
+    "x": 0.005,
+    "z": 0.294,
+    "w": 2.27,
+    "d": 0.905,
     "border": 0.06
   },
   "labels": [
     {
       "text": "DRIVE",
       "x": -0.799,
-      "z": -1.378,
+      "z": -1.2179,
       "w": 0.32,
       "h": 0.14
     },
     {
       "text": "TONE",
       "x": 0.003,
-      "z": -1.724,
+      "z": -1.902,
       "w": 0.28,
       "h": 0.1
     },
     {
       "text": "LEVEL",
       "x": 0.779,
-      "z": -1.377,
+      "z": -1.2018,
       "w": 0.32,
       "h": 0.14
     }

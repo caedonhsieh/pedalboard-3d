@@ -167,7 +167,7 @@ export function basePlate({ w, d, h = 0.09 } = {}) {
  * pointerRot: rotation of the pointer, radians.
  * Origin at the knob base (sits on the deck at y=0).
  */
-export function knob(style = 'ts9', pointerRot = 0) {
+export function knob(style = 'ts9', pointerRot = 0, scale = 1) {
   const k = new THREE.Group();
   if (style === 'mxr') {
     const body = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.27, 0.31, 0.42, 32), FIN.knobRib));
@@ -192,6 +192,7 @@ export function knob(style = 'ts9', pointerRot = 0) {
     k.add(skirt, cap, pg);
   }
   k.userData.knobStyle = style;
+  if (scale !== 1) k.scale.setScalar(scale);
   return k;
 }
 
@@ -267,7 +268,7 @@ export function ibanezPlate({ w = 2.145, d = 0.733, border = 0.06 } = {}) {
 /** Tick ring: black wedge segments around a knob. Flat on deck.
  *  Measured from reference: 11 positions around circle, 10 trapezoidal wedges
  *  rendered (gap at bottom). Inner r=0.377", outer r=0.485". Clean vector — no photo paste. */
-export function tickRing({ innerR = 0.27, outerR = 0.375, wedges = 11 } = {}) {
+export function tickRing({ innerR = 0.377, outerR = 0.485, wedges = 11 } = {}) {
   const size = 512;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = size;
@@ -595,14 +596,15 @@ export function assemblePedal(spec) {
   }
 
   for (const k of spec.knobs || []) {
-    const part = seat(knob(k.style || 'ts9', k.rot || 0), k.x, k.z, k.id || 'knob', 'knob');
+    const part = seat(knob(k.style || 'ts9', k.rot || 0, k.scale || 1), k.x, k.z, k.id || 'knob', 'knob');
     // Recessed knobs (e.g. TS9): sink the skirt into the deck so the knob
     // emerges from the surface instead of perching on top of it.
     const recess = k.recess ?? 0;
     if (recess) part.position.y -= recess;
     // Tick ring flat on the deck around the knob
     if (k.tickRing !== false) {
-      const ring = tickRing({ innerR: 0.27, outerR: 0.375, wedges: 11 });
+      const trScale = k.tickRingScale || 1;
+      const ring = tickRing({ innerR: 0.377 * trScale, outerR: 0.485 * trScale, wedges: 11 });
       const { y, pitch, deck } = surfaceAt(decks, k.z);
       ring.position.y = 0.012;  // just above deck surface
       if (deck.group) {
@@ -629,9 +631,9 @@ export function assemblePedal(spec) {
     if (j.side === 'left') part.rotation.y = Math.PI;
     // Derive y from surfaceAt. Measured from side photo at jack x: jack
     // center at y-pixel 113, housing y[21,305]=2.09" -> y=1.413".
-    // Offset from surface: 0.568" below top at its z.
+    // Offset from surface: 0.278" below top at its z.
     const { y: surfY } = surfaceAt(decks, j.z);
-    const y = j.y !== undefined ? j.y : surfY - 0.568;
+    const y = surfY - 0.278;
     part.position.set(x, y, j.z);
     group.add(part); parts.push(part);
     anchors.push({ id: j.id || `jack-${j.side}`, kind: 'jack', x, z: j.z, obj: part });
@@ -642,7 +644,7 @@ export function assemblePedal(spec) {
     // Derive y from surfaceAt. Measured from side photo: power jack center
     // is 0.474" below the top surface at the back wall (y=0.986").
     const { y: surfY } = surfaceAt(decks, z);
-    const y = spec.powerJack.y !== undefined ? spec.powerJack.y : surfY - 0.474;
+    const y = surfY - 0.474;
     part.position.set(spec.powerJack.x, y, z);
     group.add(part); parts.push(part);
     anchors.push({ id: 'power', kind: 'powerJack', x: spec.powerJack.x, z, obj: part });
