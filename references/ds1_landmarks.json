@@ -1,6 +1,6 @@
 {
   "source": "references/ds1_top.png (PedalPlayground top-down, 350x621)",
-  "method": "cv2 detection: orange minAreaRect for scale; dark-blob centroids for knobs; largest dark component bbox for pad. Verified via /tmp/ds1_landmarks_overlay.png.",
+  "method": "cv2 detection: orange minAreaRect for scale; dark-blob centroids for knobs; largest dark component bbox for pad. Verified via /tmp/ds1_landmarks_overlay.png. CORRECTED 2026-09-28: LEVEL/DIST were swapped; LEVEL is right/rear, DIST is center/lower.",
   "footprint_mm": {
     "w": 73.0,
     "d": 129.0
@@ -20,22 +20,22 @@
     },
     "level": {
       "px": [
-        175.0,
-        144.0
-      ],
-      "mm": [
-        -0.0,
-        -34.34
-      ]
-    },
-    "dist": {
-      "px": [
         254.2,
         82.3
       ],
       "mm": [
         17.66,
         -48.1
+      ]
+    },
+    "dist": {
+      "px": [
+        175.0,
+        144.0
+      ],
+      "mm": [
+        -0.0,
+        -34.34
       ]
     }
   },

@@ -52,8 +52,8 @@
     },
     {
       "id": "level",
-      "x": 0.0,
-      "z": -1.352,
+      "x": 0.695,
+      "z": -1.894,
       "style": "boss",
       "size": "large",
       "rot": -0.2,
@@ -62,13 +62,14 @@
     },
     {
       "id": "dist",
-      "x": 0.695,
-      "z": -1.894,
+      "x": 0.0,
+      "z": -1.352,
       "style": "boss",
       "size": "small",
       "rot": 0.1,
       "note": "MEASURED from ds1_top.png: centered, 29.9mm from back, 14.3mm dia (smaller).",
-      "measured": true
+      "measured": true,
+      "scale": 0.72
     }
   ],
   "led": {
@@ -94,15 +95,15 @@
     },
     {
       "text": "LEVEL",
-      "x": 0.65,
-      "z": -1.45,
+      "x": 0.0,
+      "z": -1.75,
       "w": 0.4,
       "h": 0.12
     },
     {
       "text": "DIST",
-      "x": -0.008,
-      "z": -1.05,
+      "x": 0.65,
+      "z": -1.45,
       "w": 0.3,
       "h": 0.12
     },
