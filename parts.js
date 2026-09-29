@@ -270,11 +270,11 @@ export function ibanezPlate({ w = 2.145, d = 0.733, border = 0.06 } = {}) {
 }
 
 /** Tick ring: black wedge segments around a knob. Flat on deck.
- *  Real TS9: 11 positions around circle, 9 trapezoidal wedges rendered
+ *  Real TS9: 10 positions around circle, 8 trapezoidal wedges rendered
  *  (2-trapezoid gap centered at bottom). Wedges tuck slightly under the knob
  *  base (inner r=0.32" vs knob base 0.33") so they're flush with no gap.
  *  Outer r=0.485". Clean vector — no photo paste. */
-export function tickRing({ innerR = 0.32, outerR = 0.485, wedges = 11 } = {}) {
+export function tickRing({ innerR = 0.32, outerR = 0.485, wedges = 10 } = {}) {
   const size = 512;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = size;
@@ -283,12 +283,13 @@ export function tickRing({ innerR = 0.32, outerR = 0.485, wedges = 11 } = {}) {
   ctx.fillStyle = '#111';
   const c = size / 2;
   const px = (r) => r / outerR * (size / 2);
-  // 11 positions, 9 wedges rendered (2-trapezoid gap centered at bottom)
+  // 10 positions, 8 wedges rendered (2-trapezoid gap centered at bottom)
   // Canvas angle: -π/2=top, π/2=bottom. Skip the 2 wedges straddling the bottom.
   const step = (Math.PI * 2) / wedges;
   const wedgeAngular = step * 0.72;  // wedge covers 72% of step, gap 28%
   for (let i = 0; i < wedges; i++) {
-    const centerA = (i / wedges) * Math.PI * 2 - Math.PI / 2;  // start at top
+    // Half-step offset so the 2-wedge gap lands symmetric around the bottom
+    const centerA = (i / wedges) * Math.PI * 2 - Math.PI / 2 + step / 2;
     // Skip the 2 wedges centered around the bottom (angle ≈ π/2)
     let normA = centerA;
     while (normA > Math.PI) normA -= Math.PI * 2;
@@ -613,7 +614,7 @@ export function assemblePedal(spec) {
     // Tick ring flat on the deck around the knob
     if (k.tickRing !== false) {
       const trScale = k.tickRingScale || 1;
-      const ring = tickRing({ innerR: 0.32 * trScale, outerR: 0.485 * trScale, wedges: 11 });
+      const ring = tickRing({ innerR: 0.32 * trScale, outerR: 0.485 * trScale, wedges: 10 });
       const { y, pitch, deck } = surfaceAt(decks, k.z);
       // Stagger Y by knob index (0.001" steps) so overlapping tick rings
       // don't z-fight — later knobs render on top. Invisible to the eye.
