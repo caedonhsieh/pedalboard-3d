@@ -246,7 +246,12 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
     // padCz is passed hinge-relative (spec padCz minus spec footswitch.z)
     // Default: pad center z=+1.333", hinge at +0.217" → relative 1.116"
     const padRelZ = specPadCz ?? 1.116;
-    const lift = 0.0; // no lift — plate follows body slope exactly
+    // MEASURED from ds1_side_yahoo.jpg (2026-09-29 Hough):
+    //   Treadle bottom: (59,129)->(346,109), -4deg from horizontal
+    //   Body top slope: (50,203)->(344,151), -10deg (19deg in 3D due to perspective)
+    //   The treadle is ~15deg shallower than the body slope, hinged at back.
+    //   This creates the visible gap — the treadle is a separate button, not fused.
+    const lift = 0.622; // tan(15deg) * plateD — raises front to 4deg vs 19deg body
 
     // Treadle plate gets its own material (not global powderCoat): the plate is a
     // large horizontal surface that catches the key light directly. The shared
