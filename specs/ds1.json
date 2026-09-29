@@ -135,11 +135,11 @@
   "footswitch": {
     "style": "boss-pedal",
     "x": 0,
-    "z": 0.95,
+    "z": 1.36,
     "w": 2.583,
     "d": 2.362,
     "frameColor": "#f96712",
-    "note": "Black rubber pad 65.6mm wide in orange chassis frame. Sweetwater measured."
+    "note": "Black rubber pad 65.6mm wide, 60mm long, in orange frame. Hinge at back (z=+0.18). Sweetwater measured."
   },
   "jacks": [
     {
