@@ -778,6 +778,24 @@ export function assemblePedal(spec) {
       ip.x ?? 0, ip.z ?? 0.345, 'ibanez-plate', 'plate'
     );
   }
+  if (spec.thumbscrew) {
+    // Battery-compartment thumb screw on the front (toe) face. Black knurled knob.
+    const ts = spec.thumbscrew;
+    const screw = new THREE.Group();
+    const knob = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.18, 20), FIN.blackPlastic));
+    knob.rotation.x = Math.PI / 2;
+    // Knurling: small boxes around the rim
+    for (let i = 0; i < 12; i++) {
+      const k = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.19), FIN.blackPlastic);
+      const a = (i / 12) * Math.PI * 2;
+      k.position.set(Math.cos(a) * 0.28, Math.sin(a) * 0.28, 0);
+      screw.add(k);
+    }
+    screw.add(knob);
+    screw.position.set(ts.x, ts.y, ts.z);
+    group.add(screw); parts.push(screw);
+    anchors.push({ id: 'thumbscrew', kind: 'thumbscrew', x: ts.x, z: ts.z, obj: screw });
+  }
   // Knob labels (DRIVE/TONE/LEVEL) — flat text on deck
   for (const lb of spec.labels || []) {
     const part = textLabel({ text: lb.text, w: lb.w ?? 0.3, h: lb.h ?? 0.12, spaced: lb.spaced ?? true });

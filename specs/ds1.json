@@ -163,5 +163,11 @@
     "x": 0,
     "y": 0.75,
     "note": "DC 9V in, centered on back face, 19mm up. GC back view."
+  },
+  "thumbscrew": {
+    "x": 0,
+    "z": 2.5394,
+    "y": 0.6,
+    "note": "Battery compartment thumb screw, front center. Sweetwater detail5."
   }
 }
