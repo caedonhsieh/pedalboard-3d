@@ -225,42 +225,37 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate' } = {}) {
 /** Ibanez logo plate: black border + white plate + blue "Ibanez" text.
  *  Physical 3D element on the downslope deck. Origin at deck (y=0). */
 export function ibanezPlate({ w = 2.145, d = 0.733, border = 0.06 } = {}) {
-  const g = new THREE.Group();
-  // Black border (slightly larger, thin)
-  const borderMesh = shadowed(new THREE.Mesh(
-    new RoundedBoxGeometry(w + border*2, 0.04, d + border*2, 2, 0.02),
-    FIN.blackPlastic
-  ));
-  borderMesh.position.y = 0.02;
-  // White plate on top
-  const plateMesh = shadowed(new THREE.Mesh(
-    new RoundedBoxGeometry(w, 0.04, d, 2, 0.02),
-    new THREE.MeshStandardMaterial({ color: 0xf5f5f5, roughness: 0.35, metalness: 0.0 })
-  ));
-  plateMesh.position.y = 0.05;
-  g.add(borderMesh, plateMesh);
-  // "Ibanez" text via canvas texture — bright cyan-blue, bold rounded italic
+  // Flat printed artwork (not a raised box) — black border, white fill,
+  // cyan Ibanez logo. All in one canvas texture, flat on the deck.
   const canvas = document.createElement('canvas');
-  canvas.width = 1024; canvas.height = 256;
+  canvas.width = 1024; canvas.height = 384;
   const ctx = canvas.getContext('2d');
+  // Black border (full canvas)
+  ctx.fillStyle = '#111';
+  ctx.fillRect(0, 0, 1024, 384);
+  // White inner (inset by border proportion)
+  const bx = Math.round(border / (w + border*2) * 1024);
+  const by = Math.round(border / (d + border*2) * 384);
   ctx.fillStyle = '#f5f5f5';
-  ctx.fillRect(0, 0, 1024, 256);
+  ctx.fillRect(bx, by, 1024 - bx*2, 384 - by*2);
+  // "Ibanez" text — bright cyan-blue, bold rounded italic
   ctx.fillStyle = '#31B4F7';  // sampled from reference photo 2026-09-28
   ctx.font = 'italic 900 150px "Arial Rounded MT Bold", Arial, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  // Slight letter spacing to match the flowing logo style
-  ctx.fillText('Ibanez', 512, 140);
+  ctx.fillText('Ibanez', 512, 200);
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
-  const textMesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(w * 0.85, d * 0.55),
-    new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.35 })
+  const mesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(w + border*2, d + border*2),
+    new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.35,
+      polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 })
   );
-  textMesh.rotation.x = -Math.PI / 2;
-  textMesh.position.y = 0.071;
-  g.add(textMesh);
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.position.y = 0.012;  // flat on deck, no z-fight
+  const g = new THREE.Group();
+  g.add(mesh);
   return g;
 }
 
