@@ -20,22 +20,22 @@
       ],
       [
         -2.5394,
-        1.1811
+        1.378
       ],
       [
         -0.9843,
-        1.1811
+        1.378
       ],
       [
         2.5394,
-        0.5512
+        1.0236
       ],
       [
         2.5394,
         0.0
       ]
     ],
-    "notes": "REBUILT 2026-09-29 from component alignment: body back 30mm / front 14mm (body only). Old 39.4/16.7 included the treadle. Slope 10.1 deg.",
+    "notes": "ITERATION: body 35/26mm from V3 Sweetwater side view. Slope 4deg.",
     "measured": true,
     "polygon_source": "references/ds1_side_polygon.json"
   },

@@ -240,7 +240,7 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
     // Origin at hinge (spec footswitch.z).
     const plateD = specPlateD ?? 2.322;
     const plateW = specPlateW ?? 2.677;
-    const plateT = 0.217; // 5.5mm — measured from ds1_sw_detail3.jpg (was 2mm, too thin)
+    const plateT = 0.217; // 5.5mm — thin treadle plate (V3 confirms)
     const padD = specPadD ?? 1.594;
     const padW = specPadW ?? 2.425;
     const padT = 0.12;
@@ -264,7 +264,7 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
     // set by the spec's footswitch.z).
     // Treadle extends FORWARD (+z) from the hinge.
     const hinge = new THREE.Group();
-    hinge.position.y = 0.148; // plate center 3.75mm above deck: 1mm gap + 2.75mm half-thickness
+    hinge.position.y = 0.20; // plate center 3.75mm above deck: 1mm gap + 2.75mm half-thickness
     // hinge at origin; treadle children positioned forward
 
     // Treadle subgroup (plate + pad)
@@ -302,11 +302,12 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
     logo.position.set(0, plateT/2 + padT + 0.001, padRelZ);
     treadle.add(logo);
 
-    // Hinge rotation: the footswitch is a child of the sloped deck group.
-    // REBUILT 2026-09-29: the treadle plate is HORIZONTAL in world space.
-    // Cancel the deck pitch exactly so the plate does not inherit the body slope.
-    // The wedge gap forms because the BODY slopes down beneath the level plate.
-    hinge.rotation.x = -deckPitch;
+    // Hinge rotation: V3 shows the treadle tilting UP toward the front,
+    // OPPOSITE to the body slope. The gap is a WEDGE: thin at the hinge (back),
+    // wide at the front. The treadle is like a diving board, raised at the front.
+    // Deck pitch is +4deg (down toward front). Treadle world angle ~ -6deg (up).
+    // Hinge relative rotation = -10deg.
+    hinge.rotation.x = -0.140;
     hinge.add(treadle);
     g.add(hinge);
   } else {
