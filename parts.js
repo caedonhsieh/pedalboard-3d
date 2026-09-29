@@ -635,10 +635,10 @@ export function assemblePedal(spec) {
     const x = (j.side === 'left' ? -1 : 1) * (w / 2 - 0.018);
     if (j.side === 'left') part.rotation.y = Math.PI;
     // Derive y from surfaceAt. Measured from front product photo: jack
-    // center at ~55% height from bottom = y=1.15". With wedge profile,
-    // surface at z=-0.2 is y=1.635", so offset = 0.485" below surface.
+    // center at ~60% height from bottom = y=1.25". With hexagon profile,
+    // surface at z=-0.2 is y=1.956", so offset = 0.706" below surface.
     const { y: surfY } = surfaceAt(decks, j.z);
-    const y = surfY - 0.485;
+    const y = surfY - 0.706;
     part.position.set(x, y, j.z);
     group.add(part); parts.push(part);
     anchors.push({ id: j.id || `jack-${j.side}`, kind: 'jack', x, z: j.z, obj: part });

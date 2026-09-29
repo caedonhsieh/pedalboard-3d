@@ -11,7 +11,7 @@
     "bevel": 0.03,
     "color": "#7fb75c",
     "frontLean": 0.06,
-    "notes": "WEDGE profile (user feedback 2026-09-29): high at back (2.09in, 53mm spec), sloping down to front (1.10in). The 'irregular hexagon with peak at z=0' was wrong.",
+    "notes": "CORRECTED 2026-09-28 from Sweetwater true-side-view photo (full silhouette trace): the body is an IRREGULAR HEXAGON in side profile, not a wedge. Six sides: vertical rear face, flat rear top (y=1.55), short upslope to a peak ridge (y=2.09 at z=0, the 53mm spec height), long deck slope down to front (y=1.46), vertical front face. [Restored 2026-09-29 after wedge experiment - user confirmed hexagon is the right shape.]",
     "points": [
       [
         -2.44,
@@ -19,11 +19,19 @@
       ],
       [
         -2.44,
+        1.55
+      ],
+      [
+        -0.8067,
+        1.55
+      ],
+      [
+        0.0,
         2.09
       ],
       [
         2.44,
-        1.1
+        1.46
       ],
       [
         2.44,
