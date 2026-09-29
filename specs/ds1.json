@@ -8,10 +8,9 @@
     "h": 2.323,
     "source": "manufacturer spec 73 x 129 x 59 mm"
   },
-  "faceImage": "https://raw.githubusercontent.com/PedalPlayground/pedalplayground/master/public/images/pedals/boss-ds1.png",
   "enclosure": {
     "type": "profile",
-    "color": "#f96712",
+    "color": "#e85d10",
     "bevel": 0.05,
     "smooth": false,
     "points": [
@@ -36,109 +35,131 @@
         0.0
       ]
     ],
-    "notes": "MEASURED Boss compact wedge: 59mm back, 47mm front, slope over 89mm, 40mm flat panel. From ds1_side_yahoo.jpg + Sweetwater ds1_sw_front.jpg. Color #f96712 sampled from Sweetwater studio shot. smooth=false: crisp bent-metal wedge, Catmull-Rom was ballooning the profile."
+    "notes": "Boss compact wedge: 59mm back, 47mm front. Color deepened from #f96712 (washed out under studio lights)."
   },
   "knobs": [
     {
       "id": "tone",
-      "x": -0.7418,
-      "z": -1.8268,
+      "x": -0.642,
+      "z": -1.874,
       "style": "boss",
       "size": "large",
       "rot": 0.3,
-      "note": "TONE knob, left. Black with silver cap."
+      "note": "MEASURED from ds1_top.png: 16.3mm left of center, 16.9mm from back, 19.6mm dia."
     },
     {
       "id": "level",
-      "x": 0.725,
-      "z": -1.8268,
+      "x": 0.65,
+      "z": -1.873,
       "style": "boss",
       "size": "large",
       "rot": -0.2,
-      "note": "LEVEL knob, right. Black with silver cap."
+      "note": "MEASURED from ds1_top.png: 16.5mm right of center, 17.1mm from back, 19.8mm dia."
     },
     {
       "id": "dist",
-      "x": -0.0042,
-      "z": -1.2124,
+      "x": -0.008,
+      "z": -1.362,
       "style": "boss",
       "size": "small",
       "rot": 0.1,
-      "note": "DIST knob, center lower. Smaller."
+      "note": "MEASURED from ds1_top.png: centered, 29.9mm from back, 14.3mm dia (smaller)."
     }
   ],
   "led": {
-    "x": -0.0042,
-    "z": -2.1135,
+    "x": 0.0,
+    "z": -2.1,
     "label": "CHECK",
-    "note": "Red CHECK indicator, top center"
+    "note": "Red CHECK indicator, top center between TONE and LEVEL"
   },
   "labels": [
     {
       "text": "CHECK",
-      "x": -0.0042,
-      "z": -2.3757,
+      "x": 0.0,
+      "z": -2.3,
       "w": 0.4,
       "h": 0.1
     },
     {
       "text": "TONE",
-      "x": -0.7418,
-      "z": -0.9011,
+      "x": -0.642,
+      "z": -1.45,
       "w": 0.35,
       "h": 0.12
     },
     {
       "text": "LEVEL",
-      "x": -0.0042,
-      "z": -1.72,
+      "x": 0.65,
+      "z": -1.45,
       "w": 0.4,
       "h": 0.12
     },
     {
       "text": "DIST",
-      "x": 0.725,
-      "z": -0.9011,
+      "x": -0.008,
+      "z": -1.05,
       "w": 0.3,
       "h": 0.12
     },
     {
-      "text": "\u2190 OUTPUT",
-      "x": -0.55,
-      "z": -0.72,
+      "text": "OUTPUT",
+      "x": -0.9,
+      "z": -0.55,
       "w": 0.55,
-      "h": 0.12
+      "h": 0.12,
+      "arrow": "left"
     },
     {
-      "text": "INPUT \u2190",
-      "x": 0.55,
-      "z": -0.72,
+      "text": "INPUT",
+      "x": 0.9,
+      "z": -0.55,
       "w": 0.45,
       "h": 0.12,
-      "note": "Arrow points left (signal flow). Sweetwater front."
+      "arrow": "right"
     },
     {
       "text": "Distortion",
-      "x": -0.1,
-      "z": -0.62,
-      "w": 1.4,
-      "h": 0.25,
-      "spaced": false
+      "x": 0.0,
+      "z": -0.22,
+      "w": 1.8,
+      "h": 0.35,
+      "script": true
     },
     {
       "text": "DS-1",
-      "x": 0.35,
-      "z": -0.42,
-      "w": 0.5,
-      "h": 0.18
+      "x": 0.0,
+      "z": 0.15,
+      "w": 0.8,
+      "h": 0.3,
+      "bold": true
+    },
+    {
+      "id": "psa",
+      "text": "USE BOSS PSA\nADAPTOR ONLY\n(9V DC)",
+      "face": "back",
+      "x": -0.7,
+      "y": 0.7,
+      "w": 1.0,
+      "h": 0.65,
+      "size": 0.09,
+      "color": "#cc0000",
+      "bg": "#ffffff",
+      "align": "center",
+      "note": "Added 2026-09-29 from ds1_sw_detail2.jpg. White label with red text, right of DC jack.",
+      "spaced": false
     }
   ],
   "footswitch": {
     "style": "boss-pedal",
     "x": 0,
-    "z": -0.965,
-    "frameColor": "#f96712",
-    "note": "REBUILT 2026-09-29: solid orange plate 89mm (hinge z=-0.965 to front), black pad 60mm front-biased. Hinge pivot at slope/control-panel junction. Front lift 8mm."
+    "z": 0.217,
+    "frameColor": "#e85d10",
+    "plateW": 2.677,
+    "plateD": 2.322,
+    "padW": 2.425,
+    "padD": 1.594,
+    "padCz": 1.333,
+    "note": "CORRECTED 2026-09-29 from ds1_sw_detail3.jpg: plate 5.5mm thick, hinge at 70mm from back (z=+0.217\"), plate front flush with body. Gap ~2mm."
   },
   "jacks": [
     {
@@ -146,26 +167,27 @@
       "z": 0.374,
       "y": 1.024,
       "id": "output",
-      "note": "OUTPUT jack: 55mm from front, 26mm up. Measured."
+      "note": "OUTPUT jack"
     },
     {
       "side": "right",
       "z": 0.374,
       "y": 1.024,
       "id": "input",
-      "note": "INPUT jack: 55mm from front, 26mm up. Measured."
+      "note": "INPUT jack"
     }
   ],
-  "notes": "Boss DS-1 hero model #02. Knob positions measured from PedalPlayground top reference.",
   "powerJack": {
     "x": 0,
     "y": 0.75,
-    "note": "DC 9V in, centered on back face, 19mm up. GC back view."
+    "note": "DC 9V in, centered on back face"
   },
   "thumbscrew": {
     "x": 0,
     "z": 2.5394,
     "y": 0.394,
-    "note": "Battery compartment thumb screw, front center. Sweetwater detail5."
-  }
+    "r": 0.2,
+    "note": "Battery compartment thumb screw, front center. Reduced from 0.295\" (was oversized)."
+  },
+  "notes": "REBUILT 2026-09-29: all positions measured from ds1_top.png via pixel analysis. Pad was 60mm deep (wrong), now 40.5mm. Knob x/z corrected. Treadle hinge moved forward to z=+0.413\"."
 }

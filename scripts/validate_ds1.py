@@ -120,7 +120,9 @@ def silhouette_iou(render_path, ref_path):
     def get_normalized_mask(path, size=(400, 400)):
         im = Image.open(path).convert('L')
         arr = np.array(im)
-        # Threshold: pixel < 200 is "pedal" (excludes light shadows, watermarks)
+        # Threshold: pixel < 200 is "pedal" (excludes white bg, includes shadows)
+        # Shadows are part of the reference silhouette; our renders have none,
+        # so this is a conservative (strict) comparison.
         mask = arr < 200
         # Find bounding box
         rows = np.any(mask, axis=1)
@@ -154,8 +156,10 @@ def silhouette_iou(render_path, ref_path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--views', default='front,back,left,right,top,angle')
-    ap.add_argument('--threshold', type=float, default=0.80)
-    # Threshold 0.80: realistic for photo-vs-orthographic-render comparison.
+    ap.add_argument('--threshold', type=float, default=0.90)
+    # Threshold 0.90: strict. The model must genuinely match the reference
+    # silhouette. Photo-vs-render differences (perspective, lighting) are
+    # normalized by the bounding-box crop; 0.90 requires real geometric agreement.
     # Differences are perspective, lighting, shadows — not geometry.
     args = ap.parse_args()
 

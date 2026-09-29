@@ -71,8 +71,8 @@ FIN.knobRib.bumpMap.repeat.set(3, 1);
 /** Powder-coat enclosure finish in any color (same PBR recipe as the TS9 green). */
 export function powderCoat(color) {
   return new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color(color), roughness: 0.38, metalness: 0.0,
-    clearcoat: 0.55, clearcoatRoughness: 0.28, envMapIntensity: 0.85,
+    color: new THREE.Color(color), roughness: 0.52, metalness: 0.0,
+    clearcoat: 0.25, clearcoatRoughness: 0.45, envMapIntensity: 0.45,
   });
 }
 
@@ -213,7 +213,9 @@ export function knob(style = 'ts9', pointerRot = 0, scale = 1) {
  *  - 'round': MXR-style round chrome button + washer
  * {w, d} = plate size in inches (ignored for 'round'). Origin at deck (y=0).
  */
-export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor = null } = {}) {
+export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor = null,
+  plateW: specPlateW = null, plateD: specPlateD = null,
+  padW: specPadW = null, padD: specPadD = null, padCz: specPadCz = null } = {}) {
   const g = new THREE.Group();
   if (style === 'round') {
     const washer = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.30, 0.30, 0.04, 32), FIN.chrome));
@@ -222,32 +224,34 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
     btn.position.y = 0.14;
     g.add(washer, btn);
   } else if (style === 'boss-pedal') {
-    // Boss compact footswitch: SOLID orange plate (not a frame), hinged at back,
-    // with black rubber pad inset on top (front-biased).
-    // MEASURED from Sweetwater closeups:
-    //   Plate: 89mm deep (3.504"), 66mm wide (2.6"), 2mm thick. Spans z=-0.965" (hinge)
-    //          to z=+2.539" (front). Center z=+0.787".
-    //   Pad: 60mm deep (2.362"), 62mm wide, 3mm thick. Front-biased: center z=+1.36",
-    //        spans z=+0.18" to +2.54". Orange border visible on all sides.
-    //   Hinge: pivot at z=-0.965", y=plate top. Front lifted ~8mm (0.315").
-    // Origin at deck (y=0).
-    const plateD = 3.504;  // 89mm
-    const plateW = 2.6;    // 66mm
-    const plateT = 0.08;   // 2mm
-    const plateCz = 0.787; // center: (-0.965 + 2.539)/2
-    const padD = 2.362;    // 60mm
-    const padW = 2.44;     // 62mm
-    const padT = 0.12;     // 3mm
-    const padCz = 1.36;    // front-biased
-    const hingeZ = -0.965;  // pivot at slope/control-panel junction
-    const lift = 0.22;     // 5.6mm front lift (was 3.5mm, reference shows higher)
+    // Boss compact footswitch: SOLID orange plate, hinged at back,
+    // with black rubber pad on top.
+    // MEASURED from ds1_top.png (2026-09-29 pixel analysis):
+    //   Pad: 61.6mm wide (2.425"), 40.5mm deep (1.594"), center z=+1.333".
+    //   Plate: 68mm wide (2.677"), 55mm deep (2.165"). Hinge at z=+0.413".
+    // Origin at hinge (spec footswitch.z).
+    const plateD = specPlateD ?? 2.322;
+    const plateW = specPlateW ?? 2.677;
+    const plateT = 0.217; // 5.5mm — measured from ds1_sw_detail3.jpg (was 2mm, too thin)
+    const padD = specPadD ?? 1.594;
+    const padW = specPadW ?? 2.425;
+    const padT = 0.12;
+    // padCz is passed hinge-relative (spec padCz minus spec footswitch.z)
+    // Default: pad center z=+1.333", hinge at +0.217" → relative 1.116"
+    const padRelZ = specPadCz ?? 1.116;
+    const lift = 0.0; // no lift — plate follows body slope exactly
 
+    // Treadle plate uses the SAME powderCoat as the body (frameColor).
+    // If it renders lighter, that's the studio top-light on a horizontal
+    // surface — physically correct, and it matches the reference where the
+    // treadle is the same orange powder-coat as the enclosure.
     const fmat = frameColor ? powderCoat(frameColor) : FIN.green;
 
     // Hinge group at the part origin (which is the hinge point in pedal coords,
-    // set by the spec's footswitch.z = -0.965).
+    // set by the spec's footswitch.z).
     // Treadle extends FORWARD (+z) from the hinge.
     const hinge = new THREE.Group();
+    hinge.position.y = 0.12; // plate is 0.217" thick; hinge at 0.12 clears the deck
     // hinge at origin; treadle children positioned forward
 
     // Treadle subgroup (plate + pad)
@@ -259,10 +263,7 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
     plate.position.set(0, 0, plateD / 2);
     treadle.add(plate);
 
-    // Pad: black rubber, on top of plate, front-biased.
-    // Pad center in pedal coords: z=+1.36". Hinge at z=-0.965".
-    // Pad center relative to hinge: 1.36 - (-0.965) = 2.325".
-    const padRelZ = 2.325;
+    // Pad: black rubber, on top of plate. padRelZ is hinge-relative (from spec).
     const pad = shadowed(new THREE.Mesh(
       new RoundedBoxGeometry(padW, padT, padD, 4, 0.06), FIN.blackPlastic
     ));
@@ -288,13 +289,11 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
     logo.position.set(0, plateT/2 + padT + 0.001, padRelZ);
     treadle.add(logo);
 
-    // Hinge rotation: follow the slope down toward the front, plus the 8mm lift.
-    // Slope drops 0.473" over 3.504" = 7.69° front-down.
-    // Lift raises front 0.315" over 3.504" = 5.14° front-up.
-    // Net: 2.55° front-down from horizontal.
-    const slopePitch = Math.atan2(0.473, plateD);  // front-down positive
+    // Hinge rotation: the footswitch is already a child of the sloped deck group,
+    // so it inherits the body slope. The hinge only applies the front LIFT
+    // (negative rotation.x raises the +z front upward).
     const liftAngle = Math.atan2(lift, plateD);    // front-up
-    hinge.rotation.x = slopePitch - liftAngle;
+    hinge.rotation.x = -liftAngle;
     hinge.add(treadle);
     g.add(hinge);
   } else {
@@ -440,18 +439,34 @@ export function tickRing({ innerR = 0.32, outerR = 0.485, wedges = 12 } = {}) {
 }
 
 /** Flat text label on the deck. Clean vector text via canvas. */
-export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', font = '600 115px Arial, sans-serif', spaced = true } = {}) {
+export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', bg = null, font = null, spaced = true, arrow = null, script = false, bold = false } = {}) {
   const canvas = document.createElement('canvas');
   canvas.width = 512; canvas.height = 256;
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, 512, 256);
+  // Optional solid background (e.g. white PSA label)
+  if (bg) { ctx.fillStyle = bg; ctx.fillRect(0, 0, 512, 256); }
   ctx.fillStyle = color;
+  // Font selection: script (italic serif), bold, or standard
+  if (!font) {
+    if (script) font = 'italic 700 130px Georgia, serif';
+    else if (bold) font = '800 140px Arial, sans-serif';
+    else font = '600 115px Arial, sans-serif';
+  }
   ctx.font = font;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   // Letter-spacing for the TS9 label style (wide-tracked caps); disable for script words
-  const render = spaced ? text.split('').join('\u2009') : text;
-  ctx.fillText(render, 256, 136);
+  let render = spaced && !script ? text.split('').join('\u2009') : text;
+  // Add arrow symbol if specified
+  if (arrow === 'left') render = '\u2190 ' + render;
+  else if (arrow === 'right') render = render + ' \u2192';
+  // Multi-line support: split on \n and stack vertically
+  const lines = render.split('\n');
+  const lineH = 256 / (lines.length + 0.5);
+  lines.forEach((ln, i) => {
+    ctx.fillText(ln, 256, lineH * (i + 0.75));
+  });
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
@@ -472,7 +487,7 @@ export function led() {
   bezel.position.y = 0.03;
   const dome = new THREE.Mesh(new THREE.SphereGeometry(0.062, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2), FIN.led);
   dome.position.y = 0.055;
-  const glow = new THREE.PointLight(0xff2a18, 0.9, 2.6, 2);
+  const glow = new THREE.PointLight(0xff2a18, 0.9, 0.8, 2);
   glow.position.y = 0.35;
   g.add(bezel, dome, glow);
   return g;
@@ -617,7 +632,7 @@ export function studioScene(container, {
   key.shadow.camera.near = 1; key.shadow.camera.far = 30;
   key.shadow.bias = -0.0004; key.shadow.normalBias = 0.02;
   scene.add(key);
-  const rim = new THREE.DirectionalLight(0x9db8ff, 2.0); rim.position.set(-6, 5, -7); scene.add(rim);
+  const rim = new THREE.DirectionalLight(0xffffff, 0.7); rim.position.set(-6, 5, -7); scene.add(rim);
   scene.add(new THREE.HemisphereLight(0x8a93a8, 0x050505, 0.55));
 
   const floor = new THREE.Mesh(
@@ -764,7 +779,9 @@ export function assemblePedal(spec) {
     const fs = spec.footswitch;
     seat(
       footswitch({ w: fs.w ?? 2.046, d: fs.d ?? 1.382, style: fs.style || 'plate',
-                   frameColor: fs.frameColor || enc.color || null }),
+                   frameColor: fs.frameColor || enc.color || null,
+                   plateW: fs.plateW, plateD: fs.plateD,
+                   padW: fs.padW, padD: fs.padD, padCz: fs.padCz != null ? fs.padCz - fs.z : null }),
       fs.x, fs.z, 'footswitch', 'footswitch'
     );
   }
@@ -812,10 +829,9 @@ export function assemblePedal(spec) {
   }
   if (spec.thumbscrew) {
     // Battery-compartment thumb screw on the front (toe) face. Black knurled knob.
-    // MEASURED: ~15mm diameter, center ~10mm up from base, protrudes ~8mm.
     const ts = spec.thumbscrew;
     const screw = new THREE.Group();
-    const r = 0.295, h = 0.16;  // 15mm dia, 4mm thick
+    const r = ts.r ?? 0.20, h = 0.16;
     const knob = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 24), FIN.blackPlastic));
     knob.rotation.x = Math.PI / 2;
     // Knurling: small boxes around the rim, subtle
@@ -830,19 +846,30 @@ export function assemblePedal(spec) {
     group.add(screw); parts.push(screw);
     anchors.push({ id: 'thumbscrew', kind: 'thumbscrew', x: ts.x, z: ts.z, obj: screw });
   }
-  // Knob labels (DRIVE/TONE/LEVEL) — flat text on deck
+  // Knob labels (DRIVE/TONE/LEVEL) — flat text on deck; face:"back" labels go on rear wall
   for (const lb of spec.labels || []) {
-    const part = textLabel({ text: lb.text, w: lb.w ?? 0.3, h: lb.h ?? 0.12, spaced: lb.spaced ?? true });
-    const { y, pitch, deck } = surfaceAt(decks, lb.z);
-    if (deck.group) {
-      deck.group.add(part);
-      part.position.set(lb.x, 0.012, (lb.z - deck.zc) / Math.cos(pitch));
-    } else {
+    const part = textLabel({ text: lb.text, w: lb.w ?? 0.3, h: lb.h ?? 0.12, spaced: lb.spaced ?? true,
+                             arrow: lb.arrow ?? null, script: lb.script ?? false, bold: lb.bold ?? false,
+                             color: lb.color ?? '#1a1a1a', bg: lb.bg ?? null });
+    if (lb.face === 'back') {
+      // Rear wall: the textLabel mesh is pre-rotated -90° x for deck use;
+      // reset it to face -z (out the back).
+      part.children[0].rotation.set(0, Math.PI, 0);
       group.add(part);
-      part.position.set(lb.x, y + 0.012, lb.z);
+      const backZ = -(spec.dims?.d ?? 5.079) / 2 - 0.005;
+      part.position.set(lb.x ?? 0, lb.y ?? 0.75, backZ);
+    } else {
+      const { y, pitch, deck } = surfaceAt(decks, lb.z);
+      if (deck.group) {
+        deck.group.add(part);
+        part.position.set(lb.x, 0.012, (lb.z - deck.zc) / Math.cos(pitch));
+      } else {
+        group.add(part);
+        part.position.set(lb.x, y + 0.012, lb.z);
+      }
     }
     parts.push(part);
-    anchors.push({ id: `label-${lb.text.toLowerCase()}`, kind: 'label', x: lb.x, z: lb.z, obj: part });
+    anchors.push({ id: `label-${(lb.id || lb.text).toLowerCase()}`, kind: 'label', x: lb.x, z: lb.z, obj: part });
   }
 
   return { group, spec, decks, anchors, parts, enclosureMesh };
