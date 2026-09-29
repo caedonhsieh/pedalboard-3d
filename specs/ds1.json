@@ -162,10 +162,10 @@
     "frameColor": "#e85d10",
     "plateW": 2.677,
     "plateD": 2.322,
-    "padW": 2.564,
-    "padD": 1.703,
+    "padW": 2.456692913385827,
+    "padD": 1.4488188976377951,
     "padCz": 1.537,
-    "note": "CORRECTED 2026-09-29: hinge at z=-2.4mm (-0.094\") from ds1_side_yahoo.jpg (was +0.217\", too far forward).",
+    "note": "CORRECTED 2026-09-29 from ds1_top.png: pad 62.4x36.8mm (was 65.1x43.3).",
     "padW_measured": true,
     "padD_measured": true,
     "padCz_measured": true
