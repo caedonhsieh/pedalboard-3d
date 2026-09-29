@@ -320,7 +320,7 @@ export function tickRing({ innerR = 0.33, outerR = 0.485, wedges = 11 } = {}) {
 }
 
 /** Flat text label on the deck. Clean vector text via canvas. */
-export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', font = '600 96px Arial, sans-serif' } = {}) {
+export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', font = '600 115px Arial, sans-serif' } = {}) {
   const canvas = document.createElement('canvas');
   canvas.width = 512; canvas.height = 256;
   const ctx = canvas.getContext('2d');
