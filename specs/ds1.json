@@ -20,22 +20,22 @@
       ],
       [
         -2.5394,
-        1.5512
+        1.1811
       ],
       [
         -0.9843,
-        1.5512
+        1.1811
       ],
       [
         2.5394,
-        0.6575
+        0.5512
       ],
       [
         2.5394,
         0.0
       ]
     ],
-    "notes": "CORRECTED 2026-09-29: Body alone is 39.4mm back / 16.7mm front. The 59mm published is TOTAL (body+treadle). Measured from ds1_side_yahoo.jpg.",
+    "notes": "REBUILT 2026-09-29 from component alignment: body back 30mm / front 14mm (body only). Old 39.4/16.7 included the treadle. Slope 10.1 deg.",
     "measured": true,
     "polygon_source": "references/ds1_side_polygon.json"
   },
@@ -158,14 +158,14 @@
   "footswitch": {
     "style": "boss-pedal",
     "x": 0,
-    "z": -0.094,
+    "z": -0.1969,
     "frameColor": "#e85d10",
     "plateW": 2.677,
-    "plateD": 2.322,
+    "plateD": 2.5197,
     "padW": 2.456692913385827,
     "padD": 1.4488188976377951,
-    "padCz": 1.537,
-    "note": "CORRECTED 2026-09-29 from ds1_top.png: pad 62.4x36.8mm (was 65.1x43.3).",
+    "padCz": 1.1811,
+    "note": "REBUILT 2026-09-29: plate 68x64x5.5mm, hinge z=-5mm. Plate is HORIZONTAL; wedge gap from body slope.",
     "padW_measured": true,
     "padD_measured": true,
     "padCz_measured": true

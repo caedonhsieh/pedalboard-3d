@@ -221,7 +221,8 @@ export function knob(style = 'ts9', pointerRot = 0, scale = 1) {
  */
 export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor = null,
   plateW: specPlateW = null, plateD: specPlateD = null,
-  padW: specPadW = null, padD: specPadD = null, padCz: specPadCz = null } = {}) {
+  padW: specPadW = null, padD: specPadD = null, padCz: specPadCz = null,
+  deckPitch = 0 } = {}) {
   const g = new THREE.Group();
   if (style === 'round') {
   g.userData.kind = 'treadle';
@@ -246,12 +247,9 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
     // padCz is passed hinge-relative (spec padCz minus spec footswitch.z)
     // Default: pad center z=+1.333", hinge at +0.217" → relative 1.116"
     const padRelZ = specPadCz ?? 1.116;
-    // MEASURED from ds1_side_yahoo.jpg (2026-09-29 Hough):
-    //   Treadle bottom: -4deg from horizontal (image)
-    //   Body top slope: 14.2deg (39.4mm->16.7mm over 89.5mm)
-    //   The treadle sits CLOSE to the body with a small visible gap.
-    //   Reduced lift for visual match — the treadle is a button, not floating.
-    const lift = 0.25; // ~6deg — creates a small gap, treadle close to body
+    // REBUILT 2026-09-29 from component alignment:
+    // The treadle plate is HORIZONTAL. The wedge gap comes from the body sloping
+    // down beneath it (10.1 deg), not from tilting the plate.
 
     // Treadle plate gets its own material (not global powderCoat): the plate is a
     // large horizontal surface that catches the key light directly. The shared
@@ -266,7 +264,7 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
     // set by the spec's footswitch.z).
     // Treadle extends FORWARD (+z) from the hinge.
     const hinge = new THREE.Group();
-    hinge.position.y = 0.13; // plate bottom at deck surface at hinge (plateT/2=0.1085 + 0.02 clearance)
+    hinge.position.y = 0.148; // plate center 3.75mm above deck: 1mm gap + 2.75mm half-thickness
     // hinge at origin; treadle children positioned forward
 
     // Treadle subgroup (plate + pad)
@@ -304,11 +302,11 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
     logo.position.set(0, plateT/2 + padT + 0.001, padRelZ);
     treadle.add(logo);
 
-    // Hinge rotation: the footswitch is already a child of the sloped deck group,
-    // so it inherits the body slope. The hinge only applies the front LIFT
-    // (negative rotation.x raises the +z front upward).
-    const liftAngle = Math.atan2(lift, plateD);    // front-up
-    hinge.rotation.x = -liftAngle;
+    // Hinge rotation: the footswitch is a child of the sloped deck group.
+    // REBUILT 2026-09-29: the treadle plate is HORIZONTAL in world space.
+    // Cancel the deck pitch exactly so the plate does not inherit the body slope.
+    // The wedge gap forms because the BODY slopes down beneath the level plate.
+    hinge.rotation.x = -deckPitch;
     hinge.add(treadle);
     g.add(hinge);
   } else {
@@ -798,11 +796,14 @@ export function assemblePedal(spec) {
   if (spec.led) seat(led(), spec.led.x, spec.led.z, 'led', 'led');
   if (spec.footswitch) {
     const fs = spec.footswitch;
+    // Get the deck pitch so the treadle can cancel it (stay horizontal)
+    const { pitch: fsPitch } = surfaceAt(decks, fs.z);
     seat(
       footswitch({ w: fs.w ?? 2.046, d: fs.d ?? 1.382, style: fs.style || 'plate',
                    frameColor: fs.frameColor || enc.color || null,
                    plateW: fs.plateW, plateD: fs.plateD,
-                   padW: fs.padW, padD: fs.padD, padCz: fs.padCz != null ? fs.padCz - fs.z : null }),
+                   padW: fs.padW, padD: fs.padD, padCz: fs.padCz != null ? fs.padCz - fs.z : null,
+                   deckPitch: fsPitch }),
       fs.x, fs.z, 'footswitch', 'footswitch'
     );
   }
