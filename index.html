@@ -47,6 +47,20 @@
     background:rgba(10,10,12,.7); padding:4px 10px; border-radius:14px; pointer-events:none; }
   #loader { position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
     color:var(--dim); font-size:13px; background:var(--bg); z-index:5; }
+  /* Mobile: stack viewport over controls, compact header */
+  @media (max-width: 768px) {
+    #main { flex-direction:column; }
+    #viewport { flex:1; min-height:0; }
+    #side { width:auto; border-left:none; border-top:1px solid var(--line);
+      max-height:38vh; padding:10px 12px; }
+    header { padding:8px 12px; gap:10px; }
+    header h1 { font-size:14px; }
+    header p { display:none; }
+    header .prov { font-size:10px; padding:1px 6px; }
+    #hint { display:none; }
+    #info { width:200px; top:8px; right:8px; padding:10px; }
+    button { padding:10px 14px; font-size:14px; } /* bigger touch targets */
+  }
 </style>
 <script type="importmap">
 {
@@ -74,7 +88,14 @@
         <div class="src" id="info-src"></div>
         <button id="info-close">Close</button>
       </div>
-      <div id="hint">drag&nbsp;·&nbsp;rotate&nbsp;&nbsp;&nbsp;right-drag&nbsp;·&nbsp;pan&nbsp;&nbsp;&nbsp;scroll&nbsp;·&nbsp;zoom&nbsp;&nbsp;&nbsp;click a pedal&nbsp;·&nbsp;details</div>
+      <div id="hint"></div>
+      <script>
+        // Touch-aware hint text
+        document.getElementById('hint').innerHTML =
+          ('ontouchstart' in window)
+            ? 'drag&nbsp;·&nbsp;rotate&nbsp;&nbsp;&nbsp;pinch&nbsp;·&nbsp;zoom&nbsp;&nbsp;&nbsp;tap a pedal&nbsp;·&nbsp;details'
+            : 'drag&nbsp;·&nbsp;rotate&nbsp;&nbsp;&nbsp;right-drag&nbsp;·&nbsp;pan&nbsp;&nbsp;&nbsp;scroll&nbsp;·&nbsp;zoom&nbsp;&nbsp;&nbsp;click a pedal&nbsp;·&nbsp;details';
+      </script>
     </div>
     <div id="side">
       <h2>Camera</h2>

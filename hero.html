@@ -24,6 +24,18 @@
     background: #ff2a18; margin-right: 6px; box-shadow: 0 0 8px #ff2a18; vertical-align: 1px; }
   #loader { top: 50%; left: 0; right: 0; text-align: center; color: #6b7078;
     font-size: 14px; font-weight: 500; transition: opacity 0.6s ease; }
+  canvas { touch-action: none; }
+  /* Mobile: tighten HUD, hide subtitle on short screens */
+  @media (max-width: 600px) {
+    #title { left: 16px; }
+    #title h1 { font-size: 24px; }
+    #badge { right: 16px; font-size: 10px; }
+    #hint { font-size: 12px; bottom: max(14px, env(safe-area-inset-bottom)); }
+  }
+  @media (max-height: 500px) {
+    #title p { display: none; }
+    #hint { display: none; }
+  }
 </style>
 <script type="importmap">
 {
@@ -53,8 +65,17 @@ import { studioScene, assemblePedal, applyDecal } from './parts.js';
    stages the studio, assembles the spec, and applies the decal. */
 const spec = await (await fetch('./specs/ts9.json')).json();
 
+// Responsive camera: on narrow/portrait screens move closer so the pedal
+// fills the frame instead of sitting tiny in the middle.
+const aspect = window.innerWidth / window.innerHeight;
+let cameraPos = [6.4, 4.8, 8.8];
+if (aspect < 1) {
+  const s = 0.55 + 0.45 * aspect; // aspect 0.5 → 0.78x distance
+  cameraPos = cameraPos.map(v => v * s);
+}
+
 const S = studioScene(document.getElementById('app'), {
-  cameraPos: [6.4, 4.8, 8.8], target: [0, 1.25, 0], autoRotate: true,
+  cameraPos, target: [0, 1.25, 0], autoRotate: true,
 });
 
 const A = assemblePedal(spec);
