@@ -157,9 +157,10 @@ export function profileEnclosure({ w, d, points, bevel = 0.05, frontLean = 0, ma
 export function basePlate({ w, d, h = 0.09 } = {}) {
   const m = shadowed(new THREE.Mesh(new THREE.BoxGeometry(w - 0.12, h, d - 0.12), FIN.blackPlastic));
   m.position.y = h / 2;
-  const g = new THREE.Group(); g.add(m); return g;
+  const g = new THREE.Group(); g.add(m);
+  g.userData.kind = 'base';
+  return g;
 }
-g.userData.kind = 'base';
 
 /* ---------------- parts ---------------- */
 
