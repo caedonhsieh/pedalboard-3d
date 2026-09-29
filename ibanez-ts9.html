@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Ibanez TS9 Hero — pedalboard-3d</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #060607;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, Helvetica, Arial, sans-serif;
+    -webkit-user-select: none; user-select: none; }
+  #app { position: fixed; inset: 0; }
+  canvas { display: block; }
+  .hud { position: fixed; z-index: 10; pointer-events: none; color: #e8e9ec; }
+  #title { top: max(18px, env(safe-area-inset-top)); left: 20px; }
+  #title h1 { margin: 0; font-size: clamp(22px, 5.5vw, 34px); font-weight: 700; letter-spacing: -0.02em; }
+  #title h1 .accent { color: #7fb75c; }
+  #title p { margin: 6px 0 0; font-size: clamp(12px, 3.2vw, 14px); color: #9aa0ab; font-weight: 500; }
+  #hint { bottom: max(20px, env(safe-area-inset-bottom)); left: 0; right: 0; text-align: center;
+    font-size: clamp(12px, 3.2vw, 14px); color: #7c828d; font-weight: 500;
+    transition: opacity 1.2s ease; }
+  #badge { top: max(18px, env(safe-area-inset-top)); right: 20px; text-align: right;
+    font-size: clamp(11px, 3vw, 12px); color: #6b7078; font-weight: 600; letter-spacing: 0.08em; }
+  #badge .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: #ff2a18; margin-right: 6px; box-shadow: 0 0 8px #ff2a18; vertical-align: 1px; }
+  #loader { top: 50%; left: 0; right: 0; text-align: center; color: #6b7078;
+    font-size: 14px; font-weight: 500; transition: opacity 0.6s ease; }
+  canvas { touch-action: none; }
+  @media (max-width: 600px) {
+    #title { left: 16px; }
+    #title h1 { font-size: 24px; }
+    #badge { right: 16px; font-size: 10px; }
+    #hint { font-size: 12px; bottom: max(14px, env(safe-area-inset-bottom)); }
+  }
+  @media (max-height: 500px) {
+    #title p { display: none; }
+    #hint { display: none; }
+  }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/three.module.js",
+    "three/addons/": "./vendor/three/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app"></div>
+<div class="hud" id="title">
+  <h1><span class="accent">Ibanez</span> TS9</h1>
+  <p>Tube Screamer &middot; parametric part-library proof of concept</p>
+</div>
+<div class="hud" id="badge"><span class="dot"></span>HERO&nbsp;MODEL&nbsp;01</div>
+<div class="hud" id="hint">drag to orbit &nbsp;&middot;&nbsp; pinch or scroll to zoom</div>
+<div class="hud" id="loader">warming up the tubes&hellip;</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { studioScene, assemblePedal, applyDecal } from './parts.js';
+
+/* Ibanez TS9 HERO — thin consumer of the shared part library.
+   All geometry lives in specs/ts9.json + parts.js; this page only
+   stages the studio, assembles the spec, and applies the decal. */
+const spec = await (await fetch('./specs/ts9.json')).json();
+
+// Responsive camera: on narrow/portrait screens move closer so the pedal
+// fills the frame instead of sitting tiny in the middle.
+const aspect = window.innerWidth / window.innerHeight;
+let cameraPos = [6.4, 4.8, 8.8];
+if (aspect < 1) {
+  const s = 0.55 + 0.45 * aspect; // aspect 0.5 → 0.78x distance
+  cameraPos = cameraPos.map(v => v * s);
+}
+
+const S = studioScene(document.getElementById('app'), {
+  cameraPos, target: [0, 1.25, 0], autoRotate: true,
+});
+
+const A = assemblePedal(spec);
+A.group.position.y = 0.02;
+S.scene.add(A.group);
+
+if (spec.decal) {
+  new THREE.TextureLoader().load(spec.decal,
+    (tex) => {
+      applyDecal(A, tex, { anisotropy: S.renderer.capabilities.getMaxAnisotropy() });
+      document.getElementById('loader').style.opacity = '0';
+    },
+    undefined,
+    () => { document.getElementById('loader').style.opacity = '0'; }
+  );
+} else {
+  document.getElementById('loader').style.opacity = '0';
+}
+
+S.start();
+</script>
+</body>
+</html>
