@@ -239,17 +239,18 @@ export function ibanezPlate({ w = 2.145, d = 0.733, border = 0.06 } = {}) {
   ));
   plateMesh.position.y = 0.05;
   g.add(borderMesh, plateMesh);
-  // "Ibanez" text via canvas texture
+  // "Ibanez" text via canvas texture — bright cyan-blue, bold rounded italic
   const canvas = document.createElement('canvas');
   canvas.width = 1024; canvas.height = 256;
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = '#f5f5f5';
   ctx.fillRect(0, 0, 1024, 256);
-  ctx.fillStyle = '#1a8cd8';  // Ibanez blue
-  ctx.font = 'italic bold 140px Arial, sans-serif';
+  ctx.fillStyle = '#31B4F7';  // sampled from reference photo 2026-09-28
+  ctx.font = 'italic 900 150px "Arial Rounded MT Bold", Arial, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('Ibanez', 512, 138);
+  // Slight letter spacing to match the flowing logo style
+  ctx.fillText('Ibanez', 512, 140);
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
@@ -295,6 +296,30 @@ export function tickRing({ outerR = 0.49, innerR = 0.35, ticks = 11 } = {}) {
   tex.anisotropy = 8;
   const m = new THREE.Mesh(
     new THREE.PlaneGeometry(outerR * 2, outerR * 2),
+    new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -1 })
+  );
+  m.rotation.x = -Math.PI / 2;
+  const g = new THREE.Group();
+  g.add(m);
+  return g;
+}
+
+/** Flat text label on the deck. Clean vector text via canvas. */
+export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', font = '600 48px Arial, sans-serif' } = {}) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256; canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, 256, 128);
+  ctx.fillStyle = color;
+  ctx.font = font;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, 128, 68);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  const m = new THREE.Mesh(
+    new THREE.PlaneGeometry(w, h),
     new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -1 })
   );
   m.rotation.x = -Math.PI / 2;
@@ -609,6 +634,20 @@ export function assemblePedal(spec) {
       ibanezPlate({ w: ip.w ?? 2.145, d: ip.d ?? 0.733, border: ip.border ?? 0.06 }),
       ip.x ?? 0, ip.z ?? 0.345, 'ibanez-plate', 'plate'
     );
+  }
+  // Knob labels (DRIVE/TONE/LEVEL) — flat text on deck
+  for (const lb of spec.labels || []) {
+    const part = textLabel({ text: lb.text, w: lb.w ?? 0.3, h: lb.h ?? 0.12 });
+    const { y, pitch, deck } = surfaceAt(decks, lb.z);
+    if (deck.group) {
+      deck.group.add(part);
+      part.position.set(lb.x, 0.005, (lb.z - deck.zc) / Math.cos(pitch));
+    } else {
+      group.add(part);
+      part.position.set(lb.x, y + 0.005, lb.z);
+    }
+    parts.push(part);
+    anchors.push({ id: `label-${lb.text.toLowerCase()}`, kind: 'label', x: lb.x, z: lb.z, obj: part });
   }
 
   return { group, spec, decks, anchors, parts, enclosureMesh };
