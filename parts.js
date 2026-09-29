@@ -253,7 +253,7 @@ export function ibanezPlate({ w = 2.145, d = 0.733, border = 0.06 } = {}) {
   // Real Ibanez logo is bold and elongated — stretch horizontally
   ctx.save();
   ctx.translate(512, 140);
-  ctx.scale(1.7, 1);
+  ctx.scale(1.45, 1);
   ctx.fillText('Ibanez', 0, 0);
   ctx.restore();
   const tex = new THREE.CanvasTexture(canvas);
