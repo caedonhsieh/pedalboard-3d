@@ -286,7 +286,7 @@ export function tickRing({ innerR = 0.32, outerR = 0.485, wedges = 12 } = {}) {
   // 12 positions, 10 wedges rendered (2-trapezoid gap centered at bottom)
   // Canvas angle: -π/2=top, π/2=bottom. Skip the 2 wedges straddling the bottom.
   const step = (Math.PI * 2) / wedges;
-  const wedgeAngular = step * 0.72;  // wedge covers 72% of step, gap 28%
+  const wedgeAngular = step * 0.8;  // wedge covers 80% of step, gap 20%
   for (let i = 0; i < wedges; i++) {
     // Half-step offset so the 2-wedge gap lands symmetric around the bottom
     const centerA = (i / wedges) * Math.PI * 2 - Math.PI / 2 + step / 2;
@@ -311,7 +311,7 @@ export function tickRing({ innerR = 0.32, outerR = 0.485, wedges = 12 } = {}) {
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
   const m = new THREE.Mesh(
-    new THREE.PlaneGeometry(outerR * 2, outerR * 2),
+    new THREE.CircleGeometry(outerR, 48),
     new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 })
   );
   m.rotation.x = -Math.PI / 2;
