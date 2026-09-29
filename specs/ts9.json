@@ -8,7 +8,7 @@
     "w": 2.91
   },
   "enclosure": {
-    "bevel": 0.03,
+    "bevel": 0.05,
     "color": "#7fb75c",
     "frontLean": 0.06,
     "notes": "MEASURED by scripts/fix_hexagon_profile.py from validated mask (workspace/imagine_media/ts9-hexagon-mask.png, Caedon 2026-09-28: 'the right housing shape'). Vertices extracted by pixel scan, mapped to 4.88x2.09in. This is measurement from validated reference, not estimation.",
