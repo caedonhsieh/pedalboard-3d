@@ -247,11 +247,15 @@ export function ibanezPlate({ w = 2.145, d = 0.733, border = 0.06 } = {}) {
   ctx.fillStyle = '#f5f5f5';
   ctx.fillRect(0, 0, 1024, 256);
   ctx.fillStyle = '#31B4F7';  // sampled from reference photo 2026-09-28
-  ctx.font = 'italic 900 150px "Arial Rounded MT Bold", Arial, sans-serif';
+  ctx.font = 'italic 900 175px "Arial Rounded MT Bold", Arial, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  // Reference shows text shifted left of plate center (starts ~15% from left edge)
-  ctx.fillText('Ibanez', 430, 140);
+  // Real Ibanez logo is bold and elongated — stretch horizontally
+  ctx.save();
+  ctx.translate(512, 140);
+  ctx.scale(1.7, 1);
+  ctx.fillText('Ibanez', 0, 0);
+  ctx.restore();
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
