@@ -263,6 +263,46 @@ export function ibanezPlate({ w = 2.145, d = 0.733, border = 0.06 } = {}) {
   return g;
 }
 
+/** Tick ring: black dashed circle around a knob. Flat on deck.
+ *  Clean vector dashes via canvas — no photo paste. */
+export function tickRing({ outerR = 0.49, innerR = 0.35, ticks = 11 } = {}) {
+  const size = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, size, size);
+  ctx.strokeStyle = '#111';
+  ctx.lineWidth = 10;
+  ctx.lineCap = 'butt';
+  const c = size / 2;
+  // Map inches to pixels: outerR -> size/2
+  const px = (r) => r / outerR * (size / 2);
+  for (let i = 0; i < ticks; i++) {
+    const a = (i / ticks) * Math.PI * 2 - Math.PI / 2;  // start at top
+    // Gap at bottom (where the knob pointer area is) — TS9 has a gap
+    // Actually TS9 ticks go all around; keep full circle.
+    const x1 = c + Math.cos(a) * px(innerR);
+    const y1 = c + Math.sin(a) * px(innerR);
+    const x2 = c + Math.cos(a) * px(outerR);
+    const y2 = c + Math.sin(a) * px(outerR);
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  }
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  const m = new THREE.Mesh(
+    new THREE.PlaneGeometry(outerR * 2, outerR * 2),
+    new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -1 })
+  );
+  m.rotation.x = -Math.PI / 2;
+  const g = new THREE.Group();
+  g.add(m);
+  return g;
+}
+
 /** LED with chrome bezel + emissive dome + glow light. Origin at deck (y=0). */
 export function led() {
   const g = new THREE.Group();
@@ -525,6 +565,20 @@ export function assemblePedal(spec) {
     // emerges from the surface instead of perching on top of it.
     const recess = k.recess ?? 0;
     if (recess) part.position.y -= recess;
+    // Tick ring flat on the deck around the knob
+    if (k.tickRing !== false) {
+      const ring = tickRing({ outerR: 0.49, innerR: 0.35, ticks: 11 });
+      const { y, pitch, deck } = surfaceAt(decks, k.z);
+      ring.position.y = 0.005;  // just above deck surface
+      if (deck.group) {
+        deck.group.add(ring);
+        ring.position.set(k.x, 0.005, (k.z - deck.zc) / Math.cos(pitch));
+      } else {
+        group.add(ring);
+        ring.position.set(k.x, y + 0.005, k.z);
+      }
+      parts.push(ring);
+    }
   }
   if (spec.led) seat(led(), spec.led.x, spec.led.z, 'led', 'led');
   if (spec.footswitch) {
