@@ -340,8 +340,137 @@ def fix_from_measurements(spec, measured):
     return spec, changed
 
 # ----------------------------------------------------------------------------
-# Main
+# Spec consistency checks (must pass before image validation)
 # ----------------------------------------------------------------------------
+
+def check_spec_consistency(spec):
+    """Check spec for known bugs. Returns (passed, issues, fixes)."""
+    print("\n  [Consistency] Checking spec...")
+    issues = []
+    fixes = {}
+
+    # 1. Duplicate z in profile (causes division by zero)
+    pts = spec['enclosure']['points']
+    zs = [p[0] for p in pts]
+    dupes = [z for z in set(zs) if zs.count(z) > 1]
+    if dupes:
+        issues.append(f"Duplicate z in profile: {dupes} (causes NaN in interpolation)")
+        # Fix: remove the duplicate (keep the one with higher y, the top edge)
+        # Actually: the profile should go from back-bottom to front-bottom via top.
+        # The duplicate z=-2.45 has y=0.0 and y=1.46. The y=0.0 is the bottom
+        # which is already handled by profileEnclosure(). Remove it.
+        fixes['remove_dupe_z'] = dupes[0]
+
+    # 2. Dimensions must match published specs
+    dims = spec['dims']
+    expected = {'w': 2.91, 'd': 4.88, 'h': 2.09}
+    for k, v in expected.items():
+        if abs(dims[k] - v) > 0.001:
+            issues.append(f"Dim {k}={dims[k]} != published {v}")
+            fixes[f'dim_{k}'] = v
+
+    # 3. No hardcoded y for jacks (must use surfaceAt)
+    # Check if jacks have 'y' in spec (they shouldn't - should be derived)
+    for jack in spec.get('jacks', []):
+        if 'y' in jack:
+            issues.append(f"Jack {jack.get('id')} has hardcoded y={jack['y']} (must use surfaceAt)")
+            fixes[f"jack_{jack.get('id')}_y"] = True
+
+    # 3b. No hardcoded y for powerJack
+    if 'powerJack' in spec and 'y' in spec['powerJack']:
+        issues.append(f"powerJack has hardcoded y={spec['powerJack']['y']} (must use surfaceAt)")
+        fixes['powerJack_y'] = True
+
+    # 4. Tick ring wedge count consistency
+    # (Check parts.js for hardcoded values - done in code checks)
+
+    passed = len(issues) == 0
+    for issue in issues:
+        print(f"      FAIL: {issue}")
+    if passed:
+        print(f"      All consistency checks passed.")
+    return passed, issues, fixes
+
+def apply_consistency_fixes(spec, fixes):
+    """Apply automatic fixes. Returns (spec, changed)."""
+    changed = False
+
+    if 'remove_dupe_z' in fixes:
+        dupe_z = fixes['remove_dupe_z']
+        pts = spec['enclosure']['points']
+        # Remove the point with dupe z and y=0 (the bottom, handled by enclosure)
+        new_pts = [p for p in pts if not (p[0] == dupe_z and p[1] == 0.0)]
+        if len(new_pts) < len(pts):
+            print(f"    Fix: removed duplicate z={dupe_z} y=0 point")
+            spec['enclosure']['points'] = new_pts
+            changed = True
+
+    for k in ['w', 'd', 'h']:
+        fk = f'dim_{k}'
+        if fk in fixes:
+            old = spec['dims'][k]
+            new = fixes[fk]
+            print(f"    Fix: dim {k} {old} → {new}")
+            # Rescale z-coordinates if depth changed
+            if k == 'd':
+                scale = new / old
+                for p in spec['enclosure']['points']:
+                    p[0] = round(p[0] * scale, 4)
+                # Rescale part z positions too
+                for kpart in spec.get('knobs', []):
+                    kpart['z'] = round(kpart['z'] * scale, 3)
+                for key in ['footswitch', 'led', 'ibanezPlate']:
+                    if key in spec and 'z' in spec[key]:
+                        spec[key]['z'] = round(spec[key]['z'] * scale, 3)
+                for lbl in spec.get('labels', []):
+                    lbl['z'] = round(lbl['z'] * scale, 3)
+                print(f"    Fix: rescaled z-coords by {scale:.4f}")
+            spec['dims'][k] = new
+            changed = True
+
+    for jack in spec.get('jacks', []):
+        fk = f"jack_{jack.get('id')}_y"
+        if fk in fixes and 'y' in jack:
+            print(f"    Fix: removed hardcoded y from jack {jack.get('id')}")
+            del jack['y']
+            changed = True
+
+    if 'powerJack_y' in fixes and 'y' in spec.get('powerJack', {}):
+        print(f"    Fix: removed hardcoded y from powerJack")
+        del spec['powerJack']['y']
+        changed = True
+
+    return spec, changed
+
+# ----------------------------------------------------------------------------
+# Code checks (parts.js)
+# ----------------------------------------------------------------------------
+
+def check_code():
+    """Check parts.js for known issues. Returns (passed, issues)."""
+    print("\n  [Code] Checking parts.js...")
+    issues = []
+
+    with open(REPO / "parts.js") as f:
+        code = f.read()
+
+    # 1. Hardcoded y for jacks
+    # Look for jack positioning that doesn't use surfaceAt
+    if 'y: 1.275' in code or 'y=1.275' in code:
+        issues.append("parts.js has hardcoded jack y=1.275 (must use surfaceAt)")
+
+    # 2. Tick ring wedge count consistency
+    # Code uses 11 positions with 1 skipped = 10 rendered wedges (gap at bottom).
+    # This matches the real pedal. Check that the comment is accurate.
+    if 'wedges = 11' in code and '10 trapezoidal wedges' not in code:
+        issues.append("Tick ring: comment should clarify 11 positions = 10 rendered wedges")
+
+    passed = len(issues) == 0
+    for issue in issues:
+        print(f"      FAIL: {issue}")
+    if passed:
+        print(f"      All code checks passed.")
+    return passed, issues
 
 def main():
     fix = '--fix' in sys.argv
@@ -353,7 +482,25 @@ def main():
     spec = load_spec()
     print(f"Spec: {spec['id']}")
 
-    # Segment top once, reuse for validation and fixing
+    # 0. Consistency + code checks (must pass first)
+    consist_pass, consist_issues, consist_fixes = check_spec_consistency(spec)
+    code_pass, code_issues = check_code()
+
+    if fix and not consist_pass:
+        print("\n  [Fix] Applying consistency fixes...")
+        spec, changed = apply_consistency_fixes(spec, consist_fixes)
+        if changed:
+            save_spec(spec)
+            print("  Spec updated. Re-run to verify.")
+            return 1
+
+    if not consist_pass or not code_pass:
+        print("\n" + "=" * 60)
+        print("SUMMARY: FAIL — fix consistency/code issues first (run with --fix)")
+        print("=" * 60)
+        return 1
+
+    # 1. Image validation (only if consistency passes)
     print("\n  [Top] Segmenting...")
     measured_top = segment_top()
 

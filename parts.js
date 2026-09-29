@@ -265,8 +265,8 @@ export function ibanezPlate({ w = 2.145, d = 0.733, border = 0.06 } = {}) {
 }
 
 /** Tick ring: black wedge segments around a knob. Flat on deck.
- *  Measured from reference: 11 trapezoidal wedges, gap at bottom.
- *  Inner r=0.377", outer r=0.485". Clean vector — no photo paste. */
+ *  Measured from reference: 11 positions around circle, 10 trapezoidal wedges
+ *  rendered (gap at bottom). Inner r=0.377", outer r=0.485". Clean vector — no photo paste. */
 export function tickRing({ innerR = 0.377, outerR = 0.485, wedges = 11 } = {}) {
   const size = 512;
   const canvas = document.createElement('canvas');
@@ -276,7 +276,7 @@ export function tickRing({ innerR = 0.377, outerR = 0.485, wedges = 11 } = {}) {
   ctx.fillStyle = '#111';
   const c = size / 2;
   const px = (r) => r / outerR * (size / 2);
-  // 11 wedges, gap at bottom (270° in canvas coords where 0°=right, 90°=down)
+  // 11 positions, 10 wedges rendered (gap at bottom, 270° in canvas coords where 0°=right, 90°=down)
   // Skip the wedge that would be at the bottom
   const step = (Math.PI * 2) / wedges;
   const wedgeAngular = step * 0.62;  // wedge covers 62% of step, gap 38%
@@ -627,14 +627,21 @@ export function assemblePedal(spec) {
     const part = jack();
     const x = (j.side === 'left' ? -1 : 1) * (w / 2 - 0.06);
     if (j.side === 'left') part.rotation.y = Math.PI;
-    part.position.set(x, j.y, j.z);
+    // Derive y from surfaceAt (no hardcoded values). Jacks sit on the side
+    // wall, ~0.35" below the top surface at their z position.
+    const { y: surfY } = surfaceAt(decks, j.z);
+    const y = j.y !== undefined ? j.y : surfY - 0.35;
+    part.position.set(x, y, j.z);
     group.add(part); parts.push(part);
     anchors.push({ id: j.id || `jack-${j.side}`, kind: 'jack', x, z: j.z, obj: part });
   }
   if (spec.powerJack) {
     const part = powerJack();
     const z = -(d / 2 - 0.02);
-    part.position.set(spec.powerJack.x, spec.powerJack.y, z);
+    // Derive y from surfaceAt (no hardcoded values)
+    const { y: surfY } = surfaceAt(decks, z);
+    const y = spec.powerJack.y !== undefined ? spec.powerJack.y : surfY - 0.35;
+    part.position.set(spec.powerJack.x, y, z);
     group.add(part); parts.push(part);
     anchors.push({ id: 'power', kind: 'powerJack', x: spec.powerJack.x, z, obj: part });
   }
