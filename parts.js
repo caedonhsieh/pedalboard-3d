@@ -295,7 +295,7 @@ export function tickRing({ innerR = 0.377, outerR = 0.485, wedges = 11 } = {}) {
     if (Math.abs(normA - Math.PI / 2) < step) continue;  // 2-wedge gap at bottom
     const a0 = centerA - wedgeAngular / 2;
     const a1 = centerA + wedgeAngular / 2;
-    // Trapezoid: inner arc to outer arc
+    // Trapezoid: inner arc to outer arc, slightly rounded corners
     ctx.beginPath();
     ctx.moveTo(c + Math.cos(a0) * px(innerR), c + Math.sin(a0) * px(innerR));
     ctx.lineTo(c + Math.cos(a0) * px(outerR), c + Math.sin(a0) * px(outerR));
@@ -304,6 +304,11 @@ export function tickRing({ innerR = 0.377, outerR = 0.485, wedges = 11 } = {}) {
     ctx.arc(c, c, px(innerR), a1, a0, true);
     ctx.closePath();
     ctx.fill();
+    // Slight corner rounding: stroke with round joins in same color
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#111';
+    ctx.lineWidth = 8;
+    ctx.stroke();
   }
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
