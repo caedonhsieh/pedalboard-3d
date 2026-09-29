@@ -271,10 +271,10 @@ export function ibanezPlate({ w = 2.145, d = 0.733, border = 0.06 } = {}) {
 
 /** Tick ring: black wedge segments around a knob. Flat on deck.
  *  Real TS9: 11 positions around circle, 9 trapezoidal wedges rendered
- *  (2-trapezoid gap centered at bottom). Wedges sit tight against the knob
- *  (inner r=0.345" vs knob base r=0.33"). Outer r=0.485".
+ *  (2-trapezoid gap centered at bottom). Wedges meet the knob base
+ *  (inner r=0.33" = knob base radius). Outer r=0.485".
  *  Clean vector — no photo paste. */
-export function tickRing({ innerR = 0.345, outerR = 0.485, wedges = 11 } = {}) {
+export function tickRing({ innerR = 0.33, outerR = 0.485, wedges = 11 } = {}) {
   const size = 512;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = size;
