@@ -60,7 +60,7 @@ export const FIN = {
     emissive: 0xff2015, emissiveIntensity: 2.4, clearcoat: 1.0, envMapIntensity: 0.8,
   }),
   jackChrome: new THREE.MeshStandardMaterial({
-    color: 0xf4f4f6, roughness: 0.30, metalness: 1.0, envMapIntensity: 1.35,
+    color: 0xe8e8ec, roughness: 0.35, metalness: 0.6, envMapIntensity: 1.0,
   }),
   darkMetal: new THREE.MeshStandardMaterial({
     color: 0x2a2a2e, roughness: 0.45, metalness: 0.85, envMapIntensity: 0.8,
@@ -359,20 +359,23 @@ export function led() {
  */
 export function jack() {
   const g = new THREE.Group();
+  // Washer: outer circle, against the enclosure wall
   const washerGeo = new THREE.CylinderGeometry(0.31, 0.31, 0.035, 32);
   washerGeo.rotateZ(Math.PI / 2);
   const washer = shadowed(new THREE.Mesh(washerGeo, FIN.jackChrome));
   washer.position.x = 0.018;
-  const nutGeo = new THREE.CylinderGeometry(0.55 / Math.sqrt(3), 0.55 / Math.sqrt(3), 0.11, 6);
+  // Nut: smaller hex, in front of washer. Reduced from 0.55" to 0.48" so washer rim shows.
+  const nutGeo = new THREE.CylinderGeometry(0.48 / Math.sqrt(3), 0.48 / Math.sqrt(3), 0.09, 6);
   nutGeo.rotateZ(Math.PI / 2);
   nutGeo.rotateX(Math.PI / 6); // flat faces up/down
   const nut = shadowed(new THREE.Mesh(nutGeo, FIN.jackChrome));
-  nut.position.x = 0.035 + 0.055;
-  const boreGeo = new THREE.CylinderGeometry(0.125, 0.125, 0.17, 24);
+  nut.position.x = 0.035 + 0.045;
+  // Bore: dark hole, extends in front of nut face so it's visible
+  const boreGeo = new THREE.CylinderGeometry(0.125, 0.125, 0.20, 24);
   boreGeo.rotateZ(Math.PI / 2);
   const bore = new THREE.Mesh(boreGeo,
     new THREE.MeshStandardMaterial({ color: 0x060606, roughness: 0.9, metalness: 0.2 }));
-  bore.position.x = 0.055;
+  bore.position.x = 0.08; // front face at x=0.18, in front of nut (0.125)
   const ringGeo = new THREE.CylinderGeometry(0.062, 0.062, 0.02, 16);
   ringGeo.rotateZ(Math.PI / 2);
   const contact = new THREE.Mesh(ringGeo, FIN.darkMetal);
@@ -627,13 +630,15 @@ export function assemblePedal(spec) {
   }
   for (const j of spec.jacks || []) {
     const part = jack();
-    const x = (j.side === 'left' ? -1 : 1) * (w / 2 - 0.06);
+    // Position jack so washer sits flush on the wall surface.
+    // Wall at x=±w/2. Washer center at +0.018 relative, so origin at w/2 - 0.018.
+    const x = (j.side === 'left' ? -1 : 1) * (w / 2 - 0.018);
     if (j.side === 'left') part.rotation.y = Math.PI;
-    // Derive y from surfaceAt. Measured from side photo at jack x: jack
-    // center at y-pixel 113, housing y[21,305]=2.09" -> y=1.413".
-    // Offset from surface: 0.278" below top at its z.
+    // Derive y from surfaceAt. Measured from front product photo: jack
+    // center at ~55% height from bottom = y=1.15". With wedge profile,
+    // surface at z=-0.2 is y=1.635", so offset = 0.485" below surface.
     const { y: surfY } = surfaceAt(decks, j.z);
-    const y = surfY - 0.278;
+    const y = surfY - 0.485;
     part.position.set(x, y, j.z);
     group.add(part); parts.push(part);
     anchors.push({ id: j.id || `jack-${j.side}`, kind: 'jack', x, z: j.z, obj: part });
