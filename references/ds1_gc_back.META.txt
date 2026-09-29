@@ -1,0 +1,7 @@
+DS-1 back/rear face reference (DS-1w Waza, same enclosure)
+Source: Guitar Center product image (media.guitarcenter.com/is/image/MMGS7/000000122671880-02-600x600.jpg)
+Retrieved: 2026-09-29 (curl)
+View: straight-on back/rear face, 600x600
+Use: DC power jack position (centered, ~19mm up), back panel geometry.
+Note: Label plate shows DS-1w Waza branding; standard DS-1 label differs.
+Enclosure and jack positions are identical across the compact family.
