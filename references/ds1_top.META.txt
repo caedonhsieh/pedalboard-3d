@@ -1,0 +1,8 @@
+DS-1 Top Reference
+Source: https://raw.githubusercontent.com/PedalPlayground/pedalplayground/master/public/images/pedals/boss-ds1.png
+Retrieved: 2026-09-29
+Dimensions: 350x621
+View: Top-down product photo (PedalPlayground catalog)
+Landmarks: 3 knobs (TONE/LEVEL top, DIST center), CHECK LED, Distortion/DS-1 text, BOSS footswitch
+Physical: 2.875" W x 5.079" D (pedal footprint)
+Note: Camera is orthographic-ish top-down; used for component placement reference

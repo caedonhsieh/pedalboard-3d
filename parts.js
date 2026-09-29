@@ -178,6 +178,17 @@ export function knob(style = 'ts9', pointerRot = 0, scale = 1) {
     pointer.position.set(0, 0.44, -0.055);
     const pg = new THREE.Group(); pg.add(pointer); pg.rotation.y = pointerRot;
     k.add(body, top, pg);
+  } else if (style === 'boss') {
+    // Boss compact knobs: black body with silver aluminum cap, white indicator.
+    // Large: 0.54" dia, Small (DIST): 0.42" dia. Scale via the scale param.
+    const skirt = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.27, 0.45, 32), FIN.knobRib));
+    skirt.position.y = 0.225;
+    const cap = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.19, 0.04, 32), FIN.silverCap));
+    cap.position.y = 0.47;
+    const pointer = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.012, 0.16), FIN.pointer);
+    pointer.position.set(0, 0.495, -0.045);
+    const pg = new THREE.Group(); pg.add(pointer); pg.rotation.y = pointerRot;
+    k.add(skirt, cap, pg);
   } else { // 'ts9'
     // Davies-style TS9 knobs. Overlay vs Sweetwater photo shows the original
     // 0.66" diameter is correct (the 0.34" "fix" was based on a bad measurement).
@@ -210,6 +221,29 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate' } = {}) {
     const btn = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.24, 0.22, 32), FIN.chrome));
     btn.position.y = 0.14;
     g.add(washer, btn);
+  } else if (style === 'boss-pedal') {
+    // Boss compact footswitch: large black pedal, hinged at back, BOSS logo.
+    // Sits on top of the enclosure, covers lower 60% of the deck.
+    const pedal = shadowed(new THREE.Mesh(new RoundedBoxGeometry(w, 0.25, d, 4, 0.08), FIN.blackPlastic));
+    pedal.position.y = 0.125;
+    // BOSS logo embossed on the pedal (simple text)
+    const logoCanvas = document.createElement('canvas');
+    logoCanvas.width = 512; logoCanvas.height = 128;
+    const lctx = logoCanvas.getContext('2d');
+    lctx.clearRect(0, 0, 512, 128);
+    lctx.fillStyle = '#2a2a2e';
+    lctx.font = '700 72px Arial, sans-serif';
+    lctx.textAlign = 'center'; lctx.textBaseline = 'middle';
+    lctx.fillText('BOSS', 256, 64);
+    const logoTex = new THREE.CanvasTexture(logoCanvas);
+    logoTex.colorSpace = THREE.SRGBColorSpace;
+    const logo = new THREE.Mesh(
+      new THREE.PlaneGeometry(w * 0.6, w * 0.15),
+      new THREE.MeshStandardMaterial({ map: logoTex, transparent: true, roughness: 0.6 })
+    );
+    logo.rotation.x = -Math.PI / 2;
+    logo.position.y = 0.255;
+    g.add(pedal, logo);
   } else {
     // TS9-style: black bezel RECESSED into the deck (sunk so only a thin lip
     // shows; the deck occludes the rest), chrome treadle sitting down inside it.
@@ -269,6 +303,38 @@ export function ibanezPlate({ w = 2.145, d = 0.733, border = 0.06 } = {}) {
   return g;
 }
 
+/** Dot ring: small black dots around a Boss knob. Flat on deck.
+ *  Real Boss: dots at knob positions, not wedges. Clean vector. */
+export function dotRing({ r = 0.42, dots = 11, dotR = 0.035 } = {}) {
+  const size = 512;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, size, size);
+  ctx.fillStyle = '#111';
+  const c = size / 2;
+  const px = (rr) => rr / r * (size / 2) * 0.95;
+  for (let i = 0; i < dots; i++) {
+    const a = (i / dots) * Math.PI * 2 - Math.PI / 2;
+    const x = c + Math.cos(a) * px(r);
+    const y = c + Math.sin(a) * px(r);
+    ctx.beginPath();
+    ctx.arc(x, y, px(dotR), 0, Math.PI * 2);
+    ctx.fill();
+  }
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  const m = new THREE.Mesh(
+    new THREE.CircleGeometry(r, 48),
+    new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 })
+  );
+  m.rotation.x = -Math.PI / 2;
+  const g = new THREE.Group();
+  g.add(m);
+  return g;
+}
+
 /** Tick ring: black wedge segments around a knob. Flat on deck.
  *  Real TS9: 12 positions around circle, 10 trapezoidal wedges rendered
  *  (2-trapezoid gap centered at bottom). Wedges tuck slightly under the knob
@@ -321,7 +387,7 @@ export function tickRing({ innerR = 0.32, outerR = 0.485, wedges = 12 } = {}) {
 }
 
 /** Flat text label on the deck. Clean vector text via canvas. */
-export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', font = '600 115px Arial, sans-serif' } = {}) {
+export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', font = '600 115px Arial, sans-serif', spaced = true } = {}) {
   const canvas = document.createElement('canvas');
   canvas.width = 512; canvas.height = 256;
   const ctx = canvas.getContext('2d');
@@ -330,8 +396,9 @@ export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', font = '
   ctx.font = font;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  // Letter-spacing for the TS9 label style (wide-tracked caps)
-  ctx.fillText(text.split('').join('\u2009'), 256, 136);
+  // Letter-spacing for the TS9 label style (wide-tracked caps); disable for script words
+  const render = spaced ? text.split('').join('\u2009') : text;
+  ctx.fillText(render, 256, 136);
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
@@ -611,10 +678,12 @@ export function assemblePedal(spec) {
     // emerges from the surface instead of perching on top of it.
     const recess = k.recess ?? 0;
     if (recess) part.position.y -= recess;
-    // Tick ring flat on the deck around the knob
+    // Tick ring (or dot ring for Boss) flat on the deck around the knob
     if (k.tickRing !== false) {
       const trScale = k.tickRingScale || 1;
-      const ring = tickRing({ innerR: 0.32 * trScale, outerR: 0.485 * trScale, wedges: 12 });
+      const ring = k.style === 'boss'
+        ? dotRing({ r: 0.42 * trScale, dots: 11, dotR: 0.035 * trScale })
+        : tickRing({ innerR: 0.32 * trScale, outerR: 0.485 * trScale, wedges: 12 });
       const { y, pitch, deck } = surfaceAt(decks, k.z);
       // Stagger Y by knob index (0.001" steps) so overlapping tick rings
       // don't z-fight — later knobs render on top. Invisible to the eye.
@@ -673,7 +742,7 @@ export function assemblePedal(spec) {
   }
   // Knob labels (DRIVE/TONE/LEVEL) — flat text on deck
   for (const lb of spec.labels || []) {
-    const part = textLabel({ text: lb.text, w: lb.w ?? 0.3, h: lb.h ?? 0.12 });
+    const part = textLabel({ text: lb.text, w: lb.w ?? 0.3, h: lb.h ?? 0.12, spaced: lb.spaced ?? true });
     const { y, pitch, deck } = surfaceAt(decks, lb.z);
     if (deck.group) {
       deck.group.add(part);

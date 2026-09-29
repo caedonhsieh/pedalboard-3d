@@ -1,0 +1,135 @@
+{
+    "id": "ds1",
+    "brand": "Boss",
+    "name": "DS-1 Distortion",
+    "dims": {
+        "w": 2.875,
+        "d": 5.079,
+        "h": 2.323,
+        "source": "manufacturer spec 73 x 129 x 59 mm"
+    },
+    "faceImage": "https://raw.githubusercontent.com/PedalPlayground/pedalplayground/master/public/images/pedals/boss-ds1.png",
+    "enclosure": {
+        "type": "box",
+        "color": "#e8641b",
+        "edgeRadius": 0.08,
+        "note": "Boss compact: rectangular box, rounded edges, orange powder-coat."
+    },
+    "knobs": [
+        {
+            "id": "tone",
+            "x": -0.7418,
+            "z": -1.8268,
+            "style": "boss",
+            "size": "large",
+            "rot": 0.3,
+            "note": "TONE knob, left. Black with silver cap."
+        },
+        {
+            "id": "level",
+            "x": 0.725,
+            "z": -1.8268,
+            "style": "boss",
+            "size": "large",
+            "rot": -0.2,
+            "note": "LEVEL knob, right. Black with silver cap."
+        },
+        {
+            "id": "dist",
+            "x": -0.0042,
+            "z": -1.2124,
+            "style": "boss",
+            "size": "small",
+            "rot": 0.1,
+            "note": "DIST knob, center lower. Smaller."
+        }
+    ],
+    "led": {
+        "x": -0.0042,
+        "z": -2.1135,
+        "label": "CHECK",
+        "note": "Red CHECK indicator, top center"
+    },
+    "labels": [
+        {
+            "text": "CHECK",
+            "x": -0.0042,
+            "z": -2.3757,
+            "w": 0.4,
+            "h": 0.1
+        },
+        {
+            "text": "TONE",
+            "x": -0.7418,
+            "z": -0.9011,
+            "w": 0.35,
+            "h": 0.12
+        },
+        {
+            "text": "LEVEL",
+            "x": -0.0042,
+            "z": -1.72,
+            "w": 0.4,
+            "h": 0.12
+        },
+        {
+            "text": "DIST",
+            "x": 0.725,
+            "z": -0.9011,
+            "w": 0.3,
+            "h": 0.12
+        },
+        {
+            "text": "OUTPUT",
+            "x": -0.35,
+            "z": -0.639,
+            "w": 0.55,
+            "h": 0.12
+        },
+        {
+            "text": "INPUT",
+            "x": 0.6245,
+            "z": -0.639,
+            "w": 0.45,
+            "h": 0.12
+        },
+        {
+            "text": "Distortion",
+            "x": 0.0,
+            "z": -0.0819,
+            "w": 1.4,
+            "h": 0.25,
+            "spaced": false
+        },
+        {
+            "text": "DS-1",
+            "x": 0.25,
+            "z": 0.2458,
+            "w": 0.5,
+            "h": 0.18
+        }
+    ],
+    "footswitch": {
+        "style": "boss-pedal",
+        "note": "Large black footswitch pedal, lower 60% of top. BOSS logo embossed.",
+        "x": -0.1,
+        "z": 1.39,
+        "w": 2.35,
+        "d": 1.64
+    },
+    "jacks": [
+        {
+            "side": "left",
+            "z": -0.5,
+            "id": "output",
+            "note": "OUTPUT jack, left side"
+        },
+        {
+            "side": "right",
+            "z": -0.5,
+            "id": "input",
+            "note": "INPUT jack, right side"
+        }
+    ],
+    "notes": "Boss DS-1 hero model #02. Knob positions measured from PedalPlayground top reference."
+}
