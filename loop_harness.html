@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Hero Loop Harness</title>
+<style>html,body{margin:0;padding:0;overflow:hidden;background:#fff}canvas{display:block}</style>
+<script type="importmap">
+{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}
+</script>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { assemblePedal } from './parts.js';
+
+window.addEventListener('error', e => {
+  document.title = 'ERROR: ' + e.message;
+  document.body.innerHTML = '<pre style="color:red">' + e.message + '\n' + e.error?.stack + '</pre>';
+});
+
+try {
+
+const q = new URLSearchParams(location.search);
+const specPath = q.get('spec') || './specs/ds1.json';
+const mode = q.get('mode') || 'beauty'; // beauty | silhouette | mask:<kind>
+const camSpec = JSON.parse(q.get('cam') || '{"type":"persp","pos":[4,3,6],"look":[0,0.8,0]}');
+const W = parseInt(q.get('w') || '800'), H = parseInt(q.get('h') || '800');
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setSize(W, H);
+renderer.setClearColor(mode === 'beauty' ? 0x1a1c20 : 0xffffff, 1);
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+if (mode === 'beauty') {
+  scene.background = new THREE.Color(0x1a1c20);
+}
+
+let camera;
+if (camSpec.type === 'ortho') {
+  const s = camSpec.scale; // half-height in inches
+  camera = new THREE.OrthographicCamera(-s * W / H, s * W / H, s, -s, 0.01, 100);
+} else {
+  camera = new THREE.PerspectiveCamera(camSpec.fov || 35, W / H, 0.01, 100);
+}
+camera.position.set(...camSpec.pos);
+camera.lookAt(...camSpec.look);
+
+const resp = await fetch(specPath);
+const spec = await resp.json();
+const A = assemblePedal(spec);
+const heroGroup = A.group;
+scene.add(heroGroup);
+
+// mode handling
+if (mode === 'silhouette' || mode.startsWith('mask')) {
+  const kind = mode.startsWith('mask:') ? mode.slice(5) : null;
+  const colors = { knob: 0xff0000, treadle: 0x00ff00, enclosure: 0x0000ff, jack: 0xffff00, led: 0xff00ff, label: 0x00ffff };
+  heroGroup.traverse(o => {
+    if (o.isMesh) {
+      // kind is tagged on builder groups; inherit from ancestors
+      let k = o.userData.kind;
+      let p = o.parent;
+      while (!k && p && p !== heroGroup) { k = p.userData.kind; p = p.parent; }
+      if (mode === 'silhouette') {
+        // hide transparent/decal materials
+        const m = o.material;
+        const mats = Array.isArray(m) ? m : [m];
+        const isDecal = mats.some(mm => mm.transparent && mm.opacity < 0.99);
+        if (isDecal) { o.visible = false; return; }
+        o.material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+      } else if (kind) {
+        if (k === kind) o.material = new THREE.MeshBasicMaterial({ color: colors[k] || 0xffffff });
+        else o.visible = false;
+      }
+    }
+  });
+  // flat lighting for masks
+  scene.background = new THREE.Color(0xffffff);
+}
+
+renderer.render(scene, camera);
+document.title = 'READY';
+} catch (err) {
+  document.title = 'ERROR: ' + err.message;
+  document.body.innerHTML = '<pre style="color:red">' + err.message + '\n' + err.stack + '</pre>';
+}
+</script>
+</body>
+</html>

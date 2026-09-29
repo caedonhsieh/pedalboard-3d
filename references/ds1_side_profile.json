@@ -1,0 +1,155 @@
+{
+  "source": "references/ds1_sw_detail3.jpg (Sweetwater side, 750x357)",
+  "method": "Canny+Hough edges; vertical scale calibrated from back face = 59mm (mfr spec). Overlay: /tmp/ds1_side_profile_overlay.png; front height from body-top diagonal extrapolated to front face.",
+  "mm_per_px_vertical": 0.3831,
+  "back_height_mm": 59.0,
+  "back_height_source": "manufacturer spec (Boss compact enclosure)",
+  "front_height_mm": 29.1,
+  "front_height_source": "measured: Hough body-top diagonal + front crop, scaled by back face (59mm)",
+  "segments": [
+    {
+      "p1": [
+        24,
+        320
+      ],
+      "p2": [
+        455,
+        320
+      ],
+      "len": 431.0,
+      "ang": 0.0
+    },
+    {
+      "p1": [
+        55,
+        207
+      ],
+      "p2": [
+        454,
+        85
+      ],
+      "len": 417.2,
+      "ang": -17.0
+    },
+    {
+      "p1": [
+        54,
+        208
+      ],
+      "p2": [
+        451,
+        87
+      ],
+      "len": 415.0,
+      "ang": -17.0
+    },
+    {
+      "p1": [
+        67,
+        134
+      ],
+      "p2": [
+        447,
+        60
+      ],
+      "len": 387.1,
+      "ang": -11.0
+    },
+    {
+      "p1": [
+        46,
+        338
+      ],
+      "p2": [
+        373,
+        338
+      ],
+      "len": 327.0,
+      "ang": 0.0
+    },
+    {
+      "p1": [
+        20,
+        50
+      ],
+      "p2": [
+        338,
+        17
+      ],
+      "len": 319.7,
+      "ang": -5.9
+    },
+    {
+      "p1": [
+        428,
+        319
+      ],
+      "p2": [
+        691,
+        319
+      ],
+      "len": 263.0,
+      "ang": 0.0
+    },
+    {
+      "p1": [
+        29,
+        44
+      ],
+      "p2": [
+        273,
+        18
+      ],
+      "len": 245.4,
+      "ang": -6.1
+    },
+    {
+      "p1": [
+        55,
+        32
+      ],
+      "p2": [
+        251,
+        12
+      ],
+      "len": 197.0,
+      "ang": -5.8
+    },
+    {
+      "p1": [
+        267,
+        20
+      ],
+      "p2": [
+        456,
+        1
+      ],
+      "len": 190.0,
+      "ang": -5.7
+    },
+    {
+      "p1": [
+        526,
+        100
+      ],
+      "p2": [
+        689,
+        100
+      ],
+      "len": 163.0,
+      "ang": 0.0
+    },
+    {
+      "p1": [
+        314,
+        20
+      ],
+      "p2": [
+        476,
+        3
+      ],
+      "len": 162.9,
+      "ang": -6.0
+    }
+  ]
+}

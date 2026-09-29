@@ -23,47 +23,51 @@
         2.3228
       ],
       [
-        -0.9646,
+        -0.47,
         2.3228
       ],
       [
         2.5394,
-        1.8504
+        1.1417
       ],
       [
         2.5394,
         0.0
       ]
     ],
-    "notes": "Boss compact wedge: 59mm back, 47mm front. Color deepened from #f96712 (washed out under studio lights)."
+    "notes": "Boss compact wedge, MEASURED 2026-09-28 (TS9 lesson: never guess a profile). Back 59mm (mfr spec, confirmed 211px in ds1_sw_detail3.jpg). Front 29mm (measured from body front face, was wrongly 47mm). Flat top under knobs to hinge breakpoint z=-12mm (photo, medium confidence). See references/ds1_side_profile.json.",
+    "measured": true
   },
   "knobs": [
     {
       "id": "tone",
-      "x": -0.642,
-      "z": -1.874,
+      "x": -0.678,
+      "z": -1.901,
       "style": "boss",
       "size": "large",
       "rot": 0.3,
-      "note": "MEASURED from ds1_top.png: 16.3mm left of center, 16.9mm from back, 19.6mm dia."
+      "note": "MEASURED from ds1_top.png: 16.3mm left of center, 16.9mm from back, 19.6mm dia.",
+      "measured": true
     },
     {
       "id": "level",
-      "x": 0.65,
-      "z": -1.873,
+      "x": 0.0,
+      "z": -1.352,
       "style": "boss",
       "size": "large",
       "rot": -0.2,
-      "note": "MEASURED from ds1_top.png: 16.5mm right of center, 17.1mm from back, 19.8mm dia."
+      "note": "MEASURED from ds1_top.png: 16.5mm right of center, 17.1mm from back, 19.8mm dia.",
+      "measured": true
     },
     {
       "id": "dist",
-      "x": -0.008,
-      "z": -1.362,
+      "x": 0.695,
+      "z": -1.894,
       "style": "boss",
       "size": "small",
       "rot": 0.1,
-      "note": "MEASURED from ds1_top.png: centered, 29.9mm from back, 14.3mm dia (smaller)."
+      "note": "MEASURED from ds1_top.png: centered, 29.9mm from back, 14.3mm dia (smaller).",
+      "measured": true
     }
   ],
   "led": {
@@ -156,10 +160,13 @@
     "frameColor": "#e85d10",
     "plateW": 2.677,
     "plateD": 2.322,
-    "padW": 2.425,
-    "padD": 1.594,
-    "padCz": 1.333,
-    "note": "CORRECTED 2026-09-29 from ds1_sw_detail3.jpg: plate 5.5mm thick, hinge at 70mm from back (z=+0.217\"), plate front flush with body. Gap ~2mm."
+    "padW": 2.564,
+    "padD": 1.703,
+    "padCz": 1.537,
+    "note": "CORRECTED 2026-09-29 from ds1_sw_detail3.jpg: plate 5.5mm thick, hinge at 70mm from back (z=+0.217\"), plate front flush with body. Gap ~2mm.",
+    "padW_measured": true,
+    "padD_measured": true,
+    "padCz_measured": true
   },
   "jacks": [
     {

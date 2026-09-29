@@ -71,8 +71,8 @@ FIN.knobRib.bumpMap.repeat.set(3, 1);
 /** Powder-coat enclosure finish in any color (same PBR recipe as the TS9 green). */
 export function powderCoat(color) {
   return new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color(color), roughness: 0.52, metalness: 0.0,
-    clearcoat: 0.25, clearcoatRoughness: 0.45, envMapIntensity: 0.45,
+    color: new THREE.Color(color), roughness: 0.38, metalness: 0.0,
+    clearcoat: 0.55, clearcoatRoughness: 0.28, envMapIntensity: 0.85,
   });
 }
 
@@ -86,6 +86,7 @@ export function shadowed(m) { m.castShadow = true; m.receiveShadow = true; retur
  */
 export function boxEnclosure({ w, d, h, edgeRadius = 0.06, material = FIN.green } = {}) {
   const g = new THREE.Group();
+  g.userData.kind = 'enclosure';
   const body = shadowed(new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 4, edgeRadius), material));
   body.position.y = h / 2;
   g.add(body);
@@ -145,6 +146,7 @@ export function profileEnclosure({ w, d, points, bevel = 0.05, frontLean = 0, ma
   geo.translate(0, 0, -(w - 2 * b) / 2);
   const g = new THREE.Group();
   const body = shadowed(new THREE.Mesh(geo, material));
+  g.userData.kind = 'enclosure';
   body.rotation.y = Math.PI / 2;
   g.add(body);
   g.userData.dims = { w, d, h: Math.max(...points.map((p) => p[1])) };
@@ -157,6 +159,7 @@ export function basePlate({ w, d, h = 0.09 } = {}) {
   m.position.y = h / 2;
   const g = new THREE.Group(); g.add(m); return g;
 }
+g.userData.kind = 'base';
 
 /* ---------------- parts ---------------- */
 
@@ -168,7 +171,9 @@ export function basePlate({ w, d, h = 0.09 } = {}) {
  * Origin at the knob base (sits on the deck at y=0).
  */
 export function knob(style = 'ts9', pointerRot = 0, scale = 1) {
+  // tagged below
   const k = new THREE.Group();
+  k.userData.kind = 'knob';
   if (style === 'mxr') {
     const body = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.27, 0.31, 0.42, 32), FIN.knobRib));
     body.position.y = 0.21;
@@ -218,6 +223,7 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
   padW: specPadW = null, padD: specPadD = null, padCz: specPadCz = null } = {}) {
   const g = new THREE.Group();
   if (style === 'round') {
+  g.userData.kind = 'treadle';
     const washer = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.30, 0.30, 0.04, 32), FIN.chrome));
     washer.position.y = 0.02;
     const btn = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.24, 0.22, 32), FIN.chrome));
@@ -241,11 +247,14 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
     const padRelZ = specPadCz ?? 1.116;
     const lift = 0.0; // no lift — plate follows body slope exactly
 
-    // Treadle plate uses the SAME powderCoat as the body (frameColor).
-    // If it renders lighter, that's the studio top-light on a horizontal
-    // surface — physically correct, and it matches the reference where the
-    // treadle is the same orange powder-coat as the enclosure.
-    const fmat = frameColor ? powderCoat(frameColor) : FIN.green;
+    // Treadle plate gets its own material (not global powderCoat): the plate is a
+    // large horizontal surface that catches the key light directly. The shared
+    // powderCoat's clearcoat blows it out to white; a flatter standard material
+    // in the same base color renders as the same orange the eye sees on the body.
+    // TS9's global powderCoat is untouched.
+    const fmat = frameColor
+      ? new THREE.MeshStandardMaterial({ color: new THREE.Color(frameColor), roughness: 0.62, metalness: 0.0, envMapIntensity: 0.35 })
+      : FIN.green;
 
     // Hinge group at the part origin (which is the hinge point in pedal coords,
     // set by the spec's footswitch.z).
@@ -314,6 +323,7 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
 export function ibanezPlate({ w = 2.145, d = 0.733, border = 0.06 } = {}) {
   const g = new THREE.Group();
   // Black border (slightly larger, thin)
+  g.userData.kind = 'plate';
   const borderMesh = shadowed(new THREE.Mesh(
     new RoundedBoxGeometry(w + border*2, 0.04, d + border*2, 2, 0.02),
     FIN.blackPlastic
@@ -384,6 +394,7 @@ export function dotRing({ r = 0.42, dots = 11, dotR = 0.035 } = {}) {
   m.rotation.x = -Math.PI / 2;
   const g = new THREE.Group();
   g.add(m);
+  g.userData.kind = 'ring';
   return g;
 }
 
@@ -435,6 +446,7 @@ export function tickRing({ innerR = 0.32, outerR = 0.485, wedges = 12 } = {}) {
   m.rotation.x = -Math.PI / 2;
   const g = new THREE.Group();
   g.add(m);
+  g.userData.kind = 'ring';
   return g;
 }
 
@@ -477,6 +489,7 @@ export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', bg = nul
   m.rotation.x = -Math.PI / 2;
   const g = new THREE.Group();
   g.add(m);
+  g.userData.kind = 'label';
   return g;
 }
 
@@ -484,6 +497,7 @@ export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', bg = nul
 export function led() {
   const g = new THREE.Group();
   const bezel = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.098, 0.06, 32), FIN.chrome));
+  g.userData.kind = 'led';
   bezel.position.y = 0.03;
   const dome = new THREE.Mesh(new THREE.SphereGeometry(0.062, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2), FIN.led);
   dome.position.y = 0.055;
@@ -501,6 +515,7 @@ export function led() {
 export function jack() {
   const g = new THREE.Group();
   // Washer: outer circle, against the enclosure wall
+  g.userData.kind = 'jack';
   const washerGeo = new THREE.CylinderGeometry(0.31, 0.31, 0.035, 32);
   washerGeo.rotateZ(Math.PI / 2);
   const washer = shadowed(new THREE.Mesh(washerGeo, FIN.jackChrome));
