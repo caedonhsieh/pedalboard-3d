@@ -111,6 +111,45 @@ def extract_hexagon_vertices(mask_path):
     
     return vertices_px
 
+
+def extract_hexagon_vertices_from_array(binary):
+    """Extract 6 hexagon vertices from a binary numpy array. Shared."""
+    import numpy as np
+    h, w = binary.shape
+    top_ys = {}
+    for x in range(w):
+        ys = np.where(binary[:, x])[0]
+        if len(ys) > 0:
+            top_ys[x] = ys[0]
+    row_xs = {}
+    for y in range(h):
+        xs = np.where(binary[y, :])[0]
+        if len(xs) > 0:
+            row_xs[y] = (xs[0], xs[-1])
+    if not top_ys or not row_xs:
+        return None
+    peak_x = min(top_ys, key=lambda x: top_ys[x])
+    peak_y = top_ys[peak_x]
+    max_y = max(row_xs.keys())
+    v1_x = min(row_xs[y][0] for y in range(max_y-9, max_y+1) if y in row_xs)
+    v6_x = max(row_xs[y][1] for y in range(max_y-9, max_y+1) if y in row_xs)
+    sorted_x = sorted(top_ys.keys())
+    cands = [x for x in sorted_x if 85 <= top_ys[x] <= 110]
+    v2_x = min(cands) if cands else sorted_x[0]
+    v2_y = top_ys[v2_x]
+    v3_x = next((x for x in sorted_x if x > v2_x and top_ys[x] < 85), peak_x)
+    for x in range(v3_x, v2_x, -1):
+        if x in top_ys and top_ys[x] >= 85:
+            v3_x = x
+            break
+    v3_y = top_ys[v3_x]
+    rs = sorted(top_ys.keys(), reverse=True)
+    v5_x = next((x for x in rs if top_ys[x] <= 110), peak_x)
+    v5_y = top_ys[v5_x]
+    return [(v1_x, max_y), (v2_x, v2_y), (v3_x, v3_y),
+            (peak_x, peak_y), (v5_x, v5_y), (v6_x, max_y)]
+
+
 def pixels_to_physical(vertices_px):
     """
     Map pixel coordinates to physical (z, y) in inches.
