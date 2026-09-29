@@ -13,7 +13,7 @@
     "type": "profile",
     "color": "#f96712",
     "bevel": 0.05,
-    "smooth": true,
+    "smooth": false,
     "points": [
       [
         -2.5394,
@@ -36,7 +36,7 @@
         0.0
       ]
     ],
-    "notes": "MEASURED Boss compact wedge: 59mm back, 47mm front, slope over 89mm, 40mm flat panel. From ds1_side_yahoo.jpg + Sweetwater ds1_sw_front.jpg. Color #f96712 sampled from Sweetwater studio shot."
+    "notes": "MEASURED Boss compact wedge: 59mm back, 47mm front, slope over 89mm, 40mm flat panel. From ds1_side_yahoo.jpg + Sweetwater ds1_sw_front.jpg. Color #f96712 sampled from Sweetwater studio shot. smooth=false: crisp bent-metal wedge, Catmull-Rom was ballooning the profile."
   },
   "knobs": [
     {
@@ -136,11 +136,9 @@
   "footswitch": {
     "style": "boss-pedal",
     "x": 0,
-    "z": 1.36,
-    "w": 2.583,
-    "d": 2.362,
+    "z": -0.965,
     "frameColor": "#f96712",
-    "note": "Black rubber pad 65.6mm wide, 60mm long, in orange frame. Hinge at back (z=+0.18). Sweetwater measured."
+    "note": "REBUILT 2026-09-29: solid orange plate 89mm (hinge z=-0.965 to front), black pad 60mm front-biased. Hinge pivot at slope/control-panel junction. Front lift 8mm."
   },
   "jacks": [
     {
@@ -167,7 +165,7 @@
   "thumbscrew": {
     "x": 0,
     "z": 2.5394,
-    "y": 0.6,
+    "y": 0.394,
     "note": "Battery compartment thumb screw, front center. Sweetwater detail5."
   }
 }

@@ -222,54 +222,79 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
     btn.position.y = 0.14;
     g.add(washer, btn);
   } else if (style === 'boss-pedal') {
-    // Boss compact footswitch: black rubber pad in an orange chassis frame,
-    // hinged at back. MEASURED: pad 65.6mm wide, frame border ~2.5mm.
-    // Side views show a wedge gap under the treadle: hinged at rear, front
-    // raised ~8mm. Origin at deck (y=0).
-    const fw = 0.098; // frame border width in inches (~2.5mm)
-    const fh = 0.12;  // frame height
+    // Boss compact footswitch: SOLID orange plate (not a frame), hinged at back,
+    // with black rubber pad inset on top (front-biased).
+    // MEASURED from Sweetwater closeups:
+    //   Plate: 89mm deep (3.504"), 66mm wide (2.6"), 2mm thick. Spans z=-0.965" (hinge)
+    //          to z=+2.539" (front). Center z=+0.787".
+    //   Pad: 60mm deep (2.362"), 62mm wide, 3mm thick. Front-biased: center z=+1.36",
+    //        spans z=+0.18" to +2.54". Orange border visible on all sides.
+    //   Hinge: pivot at z=-0.965", y=plate top. Front lifted ~8mm (0.315").
+    // Origin at deck (y=0).
+    const plateD = 3.504;  // 89mm
+    const plateW = 2.6;    // 66mm
+    const plateT = 0.08;   // 2mm
+    const plateCz = 0.787; // center: (-0.965 + 2.539)/2
+    const padD = 2.362;    // 60mm
+    const padW = 2.44;     // 62mm
+    const padT = 0.12;     // 3mm
+    const padCz = 1.36;    // front-biased
+    const hingeZ = -0.965;  // pivot at slope/control-panel junction
+    const lift = 0.22;     // 5.6mm front lift (was 3.5mm, reference shows higher)
+
     const fmat = frameColor ? powderCoat(frameColor) : FIN.green;
-    // Build treadle in a subgroup, then hinge it at the back edge
+
+    // Hinge group at the part origin (which is the hinge point in pedal coords,
+    // set by the spec's footswitch.z = -0.965).
+    // Treadle extends FORWARD (+z) from the hinge.
+    const hinge = new THREE.Group();
+    // hinge at origin; treadle children positioned forward
+
+    // Treadle subgroup (plate + pad)
     const treadle = new THREE.Group();
-    const mkBar = (bw, bd, x, z) => {
-      const m = shadowed(new THREE.Mesh(new THREE.BoxGeometry(bw, fh, bd), fmat));
-      m.position.set(x, fh/2, z);
-      return m;
-    };
-    treadle.add(
-      mkBar(w + 2*fw, fw, 0, -d/2 - fw/2),  // back bar
-      mkBar(w + 2*fw, fw, 0,  d/2 + fw/2),  // front bar
-      mkBar(fw, d, -w/2 - fw/2, 0),          // left bar
-      mkBar(fw, d,  w/2 + fw/2, 0),          // right bar
-    );
-    // Black rubber pad, top slightly proud of frame
-    const pedal = shadowed(new THREE.Mesh(new RoundedBoxGeometry(w, 0.22, d, 4, 0.08), FIN.blackPlastic));
-    pedal.position.y = 0.11 + 0.02;
-    treadle.add(pedal);
-    // BOSS logo embossed on the pedal (simple text)
+    // Plate: solid orange box, extends from hinge (z=0) forward to z=plateD
+    const plate = shadowed(new THREE.Mesh(
+      new RoundedBoxGeometry(plateW, plateT, plateD, 2, 0.02), fmat
+    ));
+    plate.position.set(0, 0, plateD / 2);
+    treadle.add(plate);
+
+    // Pad: black rubber, on top of plate, front-biased.
+    // Pad center in pedal coords: z=+1.36". Hinge at z=-0.965".
+    // Pad center relative to hinge: 1.36 - (-0.965) = 2.325".
+    const padRelZ = 2.325;
+    const pad = shadowed(new THREE.Mesh(
+      new RoundedBoxGeometry(padW, padT, padD, 4, 0.06), FIN.blackPlastic
+    ));
+    pad.position.set(0, plateT/2 + padT/2, padRelZ);
+    treadle.add(pad);
+
+    // BOSS logo embossed on the pad (raised, subtle black-on-black)
     const logoCanvas = document.createElement('canvas');
     logoCanvas.width = 512; logoCanvas.height = 128;
     const lctx = logoCanvas.getContext('2d');
     lctx.clearRect(0, 0, 512, 128);
-    lctx.fillStyle = '#2a2a2e';
+    lctx.fillStyle = '#1a1a1c';  // slightly darker than pad
     lctx.font = '700 72px Arial, sans-serif';
     lctx.textAlign = 'center'; lctx.textBaseline = 'middle';
     lctx.fillText('BOSS', 256, 64);
     const logoTex = new THREE.CanvasTexture(logoCanvas);
     logoTex.colorSpace = THREE.SRGBColorSpace;
     const logo = new THREE.Mesh(
-      new THREE.PlaneGeometry(w * 0.6, w * 0.15),
-      new THREE.MeshStandardMaterial({ map: logoTex, transparent: true, roughness: 0.6 })
+      new THREE.PlaneGeometry(padW * 0.6, padW * 0.15),
+      new THREE.MeshStandardMaterial({ map: logoTex, transparent: true, roughness: 0.8 })
     );
     logo.rotation.x = -Math.PI / 2;
-    logo.position.y = 0.255;
+    logo.position.set(0, plateT/2 + padT + 0.001, padRelZ);
     treadle.add(logo);
-    // Hinge: pivot at back edge (z=-d/2), front raised ~8mm (0.315")
-    // over the 2.36" treadle length
-    const hinge = new THREE.Group();
-    hinge.position.set(0, 0, -d/2);
-    treadle.position.set(0, 0, d/2);
-    hinge.rotation.x = -Math.atan2(0.315, d);
+
+    // Hinge rotation: follow the slope down toward the front, plus the 8mm lift.
+    // Slope drops 0.473" over 3.504" = 7.69° front-down.
+    // Lift raises front 0.315" over 3.504" = 5.14° front-up.
+    // Net: 2.55° front-down from horizontal.
+    const slopePitch = Math.atan2(0.473, plateD);  // front-down positive
+    const liftAngle = Math.atan2(lift, plateD);    // front-up
+    hinge.rotation.x = slopePitch - liftAngle;
     hinge.add(treadle);
     g.add(hinge);
   } else {
@@ -485,14 +510,21 @@ export function jack() {
   return g;
 }
 
-/** 9V barrel power jack on the back wall (faces -z). Origin at the wall plane. */
+/** 9V barrel power jack on the back wall (faces -z). Origin at the wall plane.
+ * Boss compact: black SQUARE bezel (~15mm) with round barrel in center. */
 export function powerJack() {
   const g = new THREE.Group();
+  // Square bezel
+  const bezel = shadowed(new THREE.Mesh(new THREE.BoxGeometry(0.59, 0.59, 0.06), FIN.blackPlastic));
+  bezel.position.z = -0.03;
+  // Round barrel housing
   const housing = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.088, 0.088, 0.09, 24), FIN.blackPlastic));
   housing.rotation.x = Math.PI / 2;
+  housing.position.z = -0.06;
   const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.10, 12), FIN.darkMetal);
   pin.rotation.x = Math.PI / 2;
-  g.add(housing, pin);
+  pin.position.z = -0.06;
+  g.add(bezel, housing, pin);
   return g;
 }
 
@@ -780,15 +812,17 @@ export function assemblePedal(spec) {
   }
   if (spec.thumbscrew) {
     // Battery-compartment thumb screw on the front (toe) face. Black knurled knob.
+    // MEASURED: ~15mm diameter, center ~10mm up from base, protrudes ~8mm.
     const ts = spec.thumbscrew;
     const screw = new THREE.Group();
-    const knob = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.18, 20), FIN.blackPlastic));
+    const r = 0.295, h = 0.16;  // 15mm dia, 4mm thick
+    const knob = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 24), FIN.blackPlastic));
     knob.rotation.x = Math.PI / 2;
-    // Knurling: small boxes around the rim
-    for (let i = 0; i < 12; i++) {
-      const k = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.19), FIN.blackPlastic);
-      const a = (i / 12) * Math.PI * 2;
-      k.position.set(Math.cos(a) * 0.28, Math.sin(a) * 0.28, 0);
+    // Knurling: small boxes around the rim, subtle
+    for (let i = 0; i < 16; i++) {
+      const k = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.025, h + 0.01), FIN.blackPlastic);
+      const a = (i / 16) * Math.PI * 2;
+      k.position.set(Math.cos(a) * r, Math.sin(a) * r, 0);
       screw.add(k);
     }
     screw.add(knob);
