@@ -20,22 +20,22 @@
       ],
       [
         -2.5394,
-        1.6929
+        1.4173
       ],
       [
-        -0.9843,
-        1.6929
+        -1.0343,
+        1.4173
       ],
       [
         2.5394,
-        1.3386
+        1.0236
       ],
       [
         2.5394,
         0.0
       ]
     ],
-    "notes": "ITERATION: body 35/26mm from V3 Sweetwater side view. Slope 4deg.",
+    "notes": "CORRECTED 2026-09-29: body 36/26mm from V3 (43mm was treadle, not body). IoU target 0.99.",
     "measured": true,
     "polygon_source": "references/ds1_side_polygon.json"
   },
@@ -95,15 +95,15 @@
     },
     {
       "text": "LEVEL",
-      "x": 0.0,
-      "z": -1.75,
+      "x": 0.65,
+      "z": -1.45,
       "w": 0.4,
       "h": 0.12
     },
     {
       "text": "DIST",
-      "x": 0.65,
-      "z": -1.45,
+      "x": 0.0,
+      "z": -1.05,
       "w": 0.3,
       "h": 0.12
     },
@@ -173,15 +173,15 @@
   "jacks": [
     {
       "side": "left",
-      "z": 0.374,
-      "y": 1.024,
+      "z": 0.0,
+      "y": 1.094,
       "id": "output",
       "note": "OUTPUT jack"
     },
     {
       "side": "right",
-      "z": 0.374,
-      "y": 1.024,
+      "z": 0.0,
+      "y": 1.094,
       "id": "input",
       "note": "INPUT jack"
     }
