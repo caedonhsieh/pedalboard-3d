@@ -598,7 +598,8 @@ export function assemblePedal(spec) {
     return part;
   }
 
-  for (const k of spec.knobs || []) {
+  for (let ki = 0; ki < (spec.knobs || []).length; ki++) {
+    const k = spec.knobs[ki];
     const part = seat(knob(k.style || 'ts9', k.rot || 0, k.scale || 1), k.x, k.z, k.id || 'knob', 'knob');
     // Recessed knobs (e.g. TS9): sink the skirt into the deck so the knob
     // emerges from the surface instead of perching on top of it.
@@ -609,13 +610,16 @@ export function assemblePedal(spec) {
       const trScale = k.tickRingScale || 1;
       const ring = tickRing({ innerR: 0.377 * trScale, outerR: 0.485 * trScale, wedges: 11 });
       const { y, pitch, deck } = surfaceAt(decks, k.z);
-      ring.position.y = 0.012;  // just above deck surface
+      // Stagger Y by knob index (0.001" steps) so overlapping tick rings
+      // don't z-fight — later knobs render on top. Invisible to the eye.
+      const ringY = 0.012 + ki * 0.001;
+      ring.position.y = ringY;
       if (deck.group) {
         deck.group.add(ring);
-        ring.position.set(k.x, 0.012, (k.z - deck.zc) / Math.cos(pitch));
+        ring.position.set(k.x, ringY, (k.z - deck.zc) / Math.cos(pitch));
       } else {
         group.add(ring);
-        ring.position.set(k.x, y + 0.012, k.z);
+        ring.position.set(k.x, y + ringY, k.z);
       }
       parts.push(ring);
     }
