@@ -264,7 +264,7 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
     // set by the spec's footswitch.z).
     // Treadle extends FORWARD (+z) from the hinge.
     const hinge = new THREE.Group();
-    hinge.position.y = 0.110; // plate center 3.75mm above deck: 1mm gap + 2.75mm half-thickness
+    hinge.position.y = 0.1259; // plate center 3.75mm above deck: 1mm gap + 2.75mm half-thickness
     // hinge at origin; treadle children positioned forward
 
     // Treadle subgroup (plate + pad)
@@ -307,7 +307,7 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
     // wide at the front. The treadle is like a diving board, raised at the front.
     // Deck pitch is +4deg (down toward front). Treadle world angle ~ -6deg (up).
     // Hinge relative rotation = -10deg.
-    hinge.rotation.x = -0.172;
+    hinge.rotation.x = -0.1884;
     hinge.add(treadle);
     g.add(hinge);
   } else {
