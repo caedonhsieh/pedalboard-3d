@@ -35,6 +35,10 @@ RENDER_PAGE = REPO / "validate-render.html"
 SIDE_PHOTO = Path.home() / "workspace/user/media_library/image/57/57ccfa5b5018878a1eb8243c8c5c2d311db55cc3dae415c8e0faceba40824819.png"
 TOP_PHOTO = Path("/tmp/ts9_top.jpg")
 
+# Validated side housing mask (Caedon 2026-09-28: "the right housing shape")
+# Used as ground truth for side green (housing silhouette) instead of unreliable cropped photo
+SIDE_MASK = Path.home() / "workspace/imagine_media/ts9-hexagon-mask.png"
+
 # Tolerance: 2px for antialiasing at 1200px render. Anything beyond this is a real bug.
 PIXEL_TOLERANCE = 2
 
