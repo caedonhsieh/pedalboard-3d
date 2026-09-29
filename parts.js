@@ -267,7 +267,7 @@ export function ibanezPlate({ w = 2.145, d = 0.733, border = 0.06 } = {}) {
 /** Tick ring: black wedge segments around a knob. Flat on deck.
  *  Measured from reference: 11 positions around circle, 10 trapezoidal wedges
  *  rendered (gap at bottom). Inner r=0.377", outer r=0.485". Clean vector — no photo paste. */
-export function tickRing({ innerR = 0.377, outerR = 0.485, wedges = 11 } = {}) {
+export function tickRing({ innerR = 0.27, outerR = 0.375, wedges = 11 } = {}) {
   const size = 512;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = size;
@@ -602,7 +602,7 @@ export function assemblePedal(spec) {
     if (recess) part.position.y -= recess;
     // Tick ring flat on the deck around the knob
     if (k.tickRing !== false) {
-      const ring = tickRing({ innerR: 0.377, outerR: 0.485, wedges: 11 });
+      const ring = tickRing({ innerR: 0.27, outerR: 0.375, wedges: 11 });
       const { y, pitch, deck } = surfaceAt(decks, k.z);
       ring.position.y = 0.012;  // just above deck surface
       if (deck.group) {
@@ -627,10 +627,11 @@ export function assemblePedal(spec) {
     const part = jack();
     const x = (j.side === 'left' ? -1 : 1) * (w / 2 - 0.06);
     if (j.side === 'left') part.rotation.y = Math.PI;
-    // Derive y from surfaceAt. Measured from side photo: jack center is
-    // 0.641" below the top surface at its z (jack y=1.340" at z=-0.20).
+    // Derive y from surfaceAt. Measured from side photo at jack x: jack
+    // center at y-pixel 113, housing y[21,305]=2.09" -> y=1.413".
+    // Offset from surface: 0.568" below top at its z.
     const { y: surfY } = surfaceAt(decks, j.z);
-    const y = j.y !== undefined ? j.y : surfY - 0.641;
+    const y = j.y !== undefined ? j.y : surfY - 0.568;
     part.position.set(x, y, j.z);
     group.add(part); parts.push(part);
     anchors.push({ id: j.id || `jack-${j.side}`, kind: 'jack', x, z: j.z, obj: part });
