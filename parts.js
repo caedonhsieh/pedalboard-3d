@@ -270,8 +270,9 @@ export function ibanezPlate({ w = 2.145, d = 0.733, border = 0.06 } = {}) {
 }
 
 /** Tick ring: black wedge segments around a knob. Flat on deck.
- *  Measured from reference: 11 positions around circle, 10 trapezoidal wedges
- *  rendered (gap at bottom). Inner r=0.377", outer r=0.485". Clean vector — no photo paste. */
+ *  Real TS9: 11 positions around circle, 9 trapezoidal wedges rendered
+ *  (2-trapezoid gap centered at bottom). Inner r=0.377", outer r=0.485".
+ *  Clean vector — no photo paste. */
 export function tickRing({ innerR = 0.377, outerR = 0.485, wedges = 11 } = {}) {
   const size = 512;
   const canvas = document.createElement('canvas');
@@ -281,18 +282,17 @@ export function tickRing({ innerR = 0.377, outerR = 0.485, wedges = 11 } = {}) {
   ctx.fillStyle = '#111';
   const c = size / 2;
   const px = (r) => r / outerR * (size / 2);
-  // 11 positions, 10 wedges rendered (gap at bottom, 270° in canvas coords where 0°=right, 90°=down)
-  // Skip the wedge that would be at the bottom
+  // 11 positions, 9 wedges rendered (2-trapezoid gap centered at bottom)
+  // Canvas angle: -π/2=top, π/2=bottom. Skip the 2 wedges straddling the bottom.
   const step = (Math.PI * 2) / wedges;
   const wedgeAngular = step * 0.62;  // wedge covers 62% of step, gap 38%
   for (let i = 0; i < wedges; i++) {
     const centerA = (i / wedges) * Math.PI * 2 - Math.PI / 2;  // start at top
-    // Skip if this wedge is at the bottom (angle ≈ π/2 in canvas coords)
-    // Canvas angle: -π/2=top, π/2=bottom
+    // Skip the 2 wedges centered around the bottom (angle ≈ π/2)
     let normA = centerA;
     while (normA > Math.PI) normA -= Math.PI * 2;
     while (normA < -Math.PI) normA += Math.PI * 2;
-    if (Math.abs(normA - Math.PI / 2) < step / 2) continue;  // gap at bottom
+    if (Math.abs(normA - Math.PI / 2) < step) continue;  // 2-wedge gap at bottom
     const a0 = centerA - wedgeAngular / 2;
     const a1 = centerA + wedgeAngular / 2;
     // Trapezoid: inner arc to outer arc
