@@ -224,17 +224,19 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
   } else if (style === 'boss-pedal') {
     // Boss compact footswitch: black rubber pad in an orange chassis frame,
     // hinged at back. MEASURED: pad 65.6mm wide, frame border ~2.5mm.
-    // Origin at deck (y=0).
+    // Side views show a wedge gap under the treadle: hinged at rear, front
+    // raised ~8mm. Origin at deck (y=0).
     const fw = 0.098; // frame border width in inches (~2.5mm)
     const fh = 0.12;  // frame height
     const fmat = frameColor ? powderCoat(frameColor) : FIN.green;
-    // Orange frame: 4 border boxes around the pad opening
+    // Build treadle in a subgroup, then hinge it at the back edge
+    const treadle = new THREE.Group();
     const mkBar = (bw, bd, x, z) => {
       const m = shadowed(new THREE.Mesh(new THREE.BoxGeometry(bw, fh, bd), fmat));
       m.position.set(x, fh/2, z);
       return m;
     };
-    g.add(
+    treadle.add(
       mkBar(w + 2*fw, fw, 0, -d/2 - fw/2),  // back bar
       mkBar(w + 2*fw, fw, 0,  d/2 + fw/2),  // front bar
       mkBar(fw, d, -w/2 - fw/2, 0),          // left bar
@@ -243,7 +245,7 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
     // Black rubber pad, top slightly proud of frame
     const pedal = shadowed(new THREE.Mesh(new RoundedBoxGeometry(w, 0.22, d, 4, 0.08), FIN.blackPlastic));
     pedal.position.y = 0.11 + 0.02;
-    g.add(pedal);
+    treadle.add(pedal);
     // BOSS logo embossed on the pedal (simple text)
     const logoCanvas = document.createElement('canvas');
     logoCanvas.width = 512; logoCanvas.height = 128;
@@ -261,7 +263,15 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
     );
     logo.rotation.x = -Math.PI / 2;
     logo.position.y = 0.255;
-    g.add(pedal, logo);
+    treadle.add(logo);
+    // Hinge: pivot at back edge (z=-d/2), front raised ~8mm (0.315")
+    // over the 2.36" treadle length
+    const hinge = new THREE.Group();
+    hinge.position.set(0, 0, -d/2);
+    treadle.position.set(0, 0, d/2);
+    hinge.rotation.x = -Math.atan2(0.315, d);
+    hinge.add(treadle);
+    g.add(hinge);
   } else {
     // TS9-style: black bezel RECESSED into the deck (sunk so only a thin lip
     // shows; the deck occludes the rest), chrome treadle sitting down inside it.
