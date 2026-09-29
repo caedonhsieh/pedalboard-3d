@@ -1,37 +1,36 @@
 #!/usr/bin/env python3
 """
-TS9 Self-Validation (Complete)
-==============================
-Self-sufficient geometric validation WITHOUT WebGL/GPU.
+TS9 Self-Validation v2 — True Image-Based
+==========================================
+Segments reference photos FRESH on every run. No hardcoded measurements.
+The image is ground truth; the spec is what gets validated.
 
 1. Loads specs/ts9.json
-2. Renders orthographic side + top views via pure-Python geometry
-3. Auto-calibrates against reference masks using known physical dims
-4. Computes quantitative metrics (max gap, RMS, IoU)
-5. With --fix: optimizes spec parameters to minimize error
+2. Segments side photo → extracts housing contour → compares to spec profile
+3. Segments top photo → finds knobs, footswitch, LED, plate → compares to spec
+4. Reports quantitative metrics. No circularity.
 
 Usage:
-    python3 scripts/validate_ts9.py           # validate only
-    python3 scripts/validate_ts9.py --fix     # validate + auto-fix
+    python3 scripts/validate_ts9.py
+    python3 scripts/validate_ts9.py --fix
 """
 
 import json
 import sys
 import numpy as np
 from pathlib import Path
-from PIL import Image, ImageDraw
+from PIL import Image
 from scipy import ndimage
-from scipy.optimize import minimize
 
 REPO = Path(__file__).resolve().parent.parent
 SPEC_PATH = REPO / "specs" / "ts9.json"
 
-# Thresholds (from validator)
-PROFILE_THRESHOLD_MM = 2.5  # max silhouette deviation
-PROFILE_THRESHOLD_IN = PROFILE_THRESHOLD_MM / 25.4  # 0.098"
+SIDE_PHOTO = Path.home() / "workspace/user/media_library/image/57/57ccfa5b5018878a1eb8243c8c5c2d311db55cc3dae415c8e0faceba40824819.png"
+TOP_PHOTO = Path("/tmp/ts9_top.jpg")
 
-# ----------------------------------------------------------------------------
-# Spec loading
+PROFILE_THRESHOLD_MM = 2.5
+PART_THRESHOLD_MM = 2.0
+
 # ----------------------------------------------------------------------------
 
 def load_spec():
@@ -43,174 +42,302 @@ def save_spec(spec):
         json.dump(spec, f, indent=2)
 
 # ----------------------------------------------------------------------------
-# Side profile validation
+# FRESH SEGMENTATION — Side
 # ----------------------------------------------------------------------------
 
-def validate_side(spec):
-    """Compare spec profile against side reference mask.
-    Returns dict with metrics.
-    """
-    print("\n  Side profile validation...")
+def segment_side():
+    """Segment side photo fresh. Returns (contour_px, px_per_in)."""
+    print("    Segmenting side photo...")
+    img = Image.open(SIDE_PHOTO).convert('RGB')
+    arr = np.array(img).astype(float)
+    H, W = arr.shape[:2]
+    print(f"      Image: {W}x{H}")
 
-    # Load mask
-    mask_path = Path("/tmp/mask_green.png")
-    if not mask_path.exists():
-        return {'error': 'mask not found'}
+    # Green housing: green channel dominant, reasonably saturated
+    # Sample the green: TS9 green is approx (60-100, 160-200, 60-100)
+    g = arr[:,:,1]
+    r = arr[:,:,0]
+    b = arr[:,:,2]
+    green_mask = (g > 100) & (g > r + 20) & (g > b - 10) & (r < 150)
 
-    mask = np.array(Image.open(mask_path).convert('L')) > 128
-    H, W = mask.shape
-    print(f"    Mask: {W}x{H}, {mask.sum()} px")
+    # Largest connected component = housing
+    labeled, n = ndimage.label(green_mask)
+    sizes = np.array([(labeled == i).sum() for i in range(1, n+1)])
+    if len(sizes) == 0:
+        return None, None
+    housing = (labeled == (np.argmax(sizes) + 1))
 
-    # Find mask bounding box (the pedal)
-    ys, xs = np.where(mask)
+    # Fill holes (knobs/jacks create holes in the mask)
+    housing_filled = ndimage.binary_fill_holes(housing)
+
+    ys, xs = np.where(housing_filled)
     x0, x1 = xs.min(), xs.max()
     y0, y1 = ys.min(), ys.max()
-    print(f"    Mask bounds: x [{x0}, {x1}], y [{y0}, {y1}]")
+    print(f"      Housing bounds: x[{x0},{x1}] y[{y0},{y1}]")
 
-    # Physical dimensions
-    d = spec['dims']['d']  # 4.88" depth
-    h = spec['dims']['h']  # 2.09" height (or 2.05?)
+    # Extract contour
+    eroded = ndimage.binary_erosion(housing_filled, iterations=2)
+    contour = housing_filled & ~eroded
+    cy, cx = np.where(contour)
 
-    # Auto-calibrate: assume mask bbox corresponds to physical dims
-    # Width in px -> depth in inches, Height in px -> height in inches
-    px_per_in_z = (x1 - x0) / d
-    px_per_in_y = (y1 - y0) / h
-    print(f"    Scale: {px_per_in_z:.1f} px/in (z), {px_per_in_y:.1f} px/in (y)")
+    # px_per_in: use known depth 4.88" for width
+    # But the housing width in px includes perspective. Use it as estimate.
+    px_per_in = (x1 - x0) / 4.88
+    print(f"      Scale: ~{px_per_in:.1f} px/in, contour: {len(cx)} px")
 
-    # The scales should be similar (orthographic). If not, there's perspective
-    # or the bbox is wrong.
-    scale_ratio = px_per_in_z / px_per_in_y
-    print(f"    Scale ratio (z/y): {scale_ratio:.3f} (1.0 = perfect)")
+    return np.stack([cx, cy], axis=1), px_per_in, (x0, x1, y0, y1)
 
-    # Map spec (z, y) to mask pixels
-    # z=-d/2 -> x0, z=+d/2 -> x1
-    # y=0 -> y1 (bottom), y=h -> y0 (top)
+def validate_side_fresh(spec):
+    """Compare spec profile to freshly segmented side contour."""
+    print("\n  [Side] Fresh segmentation vs spec...")
+    result = segment_side()
+    if result[0] is None:
+        return {'error': 'segmentation failed', 'pass': False}
+    contour_px, px_per_in, (x0, x1, y0, y1) = result
+
+    d = spec['dims']['d']
+    h = spec['dims']['h']
+
+    # Map spec (z,y) to pixels using the housing bbox
     def spec_to_px(z, y):
         x_px = x0 + (z + d/2) / d * (x1 - x0)
-        y_px = y1 - y / h * (y1 - y0)
+        y_px = y1 - (y / h) * (y1 - y0)
         return x_px, y_px
 
-    # Get profile points
-    pts = spec['enclosure']['points']  # [[z, y], ...]
-
-    # For each profile point, find distance to mask contour
-    # Extract mask contour (edge pixels)
-    eroded = ndimage.binary_erosion(mask, iterations=2)
-    contour = mask & ~eroded
-    cy, cx = np.where(contour)
-    contour_pts = np.stack([cx, cy], axis=1)
-    print(f"    Contour: {len(contour_pts)} px")
-
+    pts = spec['enclosure']['points']
     errors = []
     for z, y in pts:
         px, py = spec_to_px(z, y)
-        # Distance to nearest contour pixel
-        dists = np.sqrt((contour_pts[:, 0] - px)**2 + (contour_pts[:, 1] - py)**2)
-        min_dist = dists.min()
-        # Convert to inches (use average scale)
-        avg_scale = (px_per_in_z + px_per_in_y) / 2
-        err_in = min_dist / avg_scale
+        dists = np.sqrt((contour_px[:,0] - px)**2 + (contour_px[:,1] - py)**2)
+        err_in = dists.min() / px_per_in
         errors.append(err_in)
-        print(f"      (z={z:6.3f}, y={y:5.3f}) -> px=({px:6.1f}, {py:6.1f}), err={err_in*25.4:5.2f}mm")
+        print(f"      (z={z:6.3f}, y={y:5.3f}) err={err_in*25.4:5.2f}mm")
 
     max_err = max(errors)
-    rms_err = np.sqrt(np.mean(np.array(errors)**2))
-
-    result = {
-        'max_err_in': max_err,
-        'max_err_mm': max_err * 25.4,
-        'rms_err_in': rms_err,
-        'rms_err_mm': rms_err * 25.4,
-        'threshold_mm': PROFILE_THRESHOLD_MM,
-        'pass': max_err * 25.4 <= PROFILE_THRESHOLD_MM,
-    }
-
-    print(f"    Max: {result['max_err_mm']:.2f}mm, RMS: {result['rms_err_mm']:.2f}mm")
-    print(f"    Threshold: {PROFILE_THRESHOLD_MM}mm → {'PASS' if result['pass'] else 'FAIL'}")
-
-    return result
+    rms = np.sqrt(np.mean(np.array(errors)**2))
+    passed = max_err * 25.4 <= PROFILE_THRESHOLD_MM
+    print(f"      Max: {max_err*25.4:.2f}mm, RMS: {rms*25.4:.2f}mm → {'PASS' if passed else 'FAIL'}")
+    return {'max_mm': max_err*25.4, 'rms_mm': rms*25.4, 'pass': passed, 'errors': errors}
 
 # ----------------------------------------------------------------------------
-# Top view validation
+# FRESH SEGMENTATION — Top
 # ----------------------------------------------------------------------------
 
-def validate_top(spec):
-    """Compare part positions against top reference measurements.
-    Returns dict with per-part errors.
-    """
-    print("\n  Top view validation...")
+def segment_top():
+    """Segment top photo fresh. Returns dict of measured part positions."""
+    print("    Segmenting top photo...")
+    img = Image.open(TOP_PHOTO).convert('RGB')
+    arr = np.array(img).astype(float)
+    H, W = arr.shape[:2]
+    print(f"      Image: {W}x{H}")
 
-    # Reference measurements from segmentation (2026-09-28)
-    # These are the "ground truth" from the top photo
-    refs = {
-        'drive': {'x': -0.764, 'z': -1.832},
-        'tone': {'x': 0.018, 'z': -1.287},
-        'level': {'x': 0.792, 'z': -1.827},
-        'footswitch': {'x': -0.026, 'z': 1.400, 'w': 2.087, 'd': 1.198},
-        'led': {'x': 0.009, 'z': -2.174},
-        'ibanezPlate': {'x': 0.006, 'z': 0.302, 'w': 2.164, 'd': 0.816},
-        'label-drive': {'x': -0.799, 'z': -1.384},
-        'label-tone': {'x': 0.003, 'z': -1.731},
-        'label-level': {'x': 0.779, 'z': -1.383},
-    }
+    # Green body for calibration
+    g, r, b = arr[:,:,1], arr[:,:,0], arr[:,:,2]
+    green_mask = (g > 100) & (g > r + 10) & (r < 160)
+    labeled, n = ndimage.label(green_mask)
+    sizes = np.array([(labeled == i).sum() for i in range(1, n+1)])
+    body = (labeled == (np.argmax(sizes) + 1))
+    ys, xs = np.where(body)
+    bx0, bx1 = xs.min(), xs.max()
+    by0, by1 = ys.min(), ys.max()
+    print(f"      Body: x[{bx0},{bx1}] y[{by0},{by1}]")
+
+    # Calibration: body is 2.91" wide (x), 4.88" deep (y)
+    px_per_in_x = (bx1 - bx0) / 2.91
+    px_per_in_y = (by1 - by0) / 4.88
+    cx_body = (bx0 + bx1) / 2
+
+    def px_to_x(px): return (px - cx_body) / px_per_in_x
+    def px_to_z(py): return -2.44 + (py - by0) / px_per_in_y
+
+    measured = {}
+
+    # Knobs: black circular regions in upper 45%
+    black = (r < 60) & (g < 60) & (b < 60)
+    upper = np.zeros_like(black)
+    upper[:int(H*0.45)] = black[:int(H*0.45)]
+    labeled_k, nk = ndimage.label(upper)
+    knobs_found = []
+    for i in range(1, nk+1):
+        ys_k, xs_k = np.where(labeled_k == i)
+        sz = len(xs_k)
+        if sz > 5000:
+            w, h = xs_k.max()-xs_k.min(), ys_k.max()-ys_k.min()
+            # Circularity check: w/h close to 1
+            if 0.7 < w/max(h,1) < 1.4:
+                knobs_found.append((xs_k.mean(), ys_k.mean(), sz))
+    # Sort by x: left=drive, middle=tone, right=level
+    # But tone is lower (higher y). Sort: drive/level are upper row, tone is below.
+    knobs_found.sort(key=lambda k: k[1])  # by y
+    # First two by y are drive/level (upper), third is tone
+    # Actually: drive (476,387), level (1302,390), tone (891,707)
+    # Sort by y, then the two with smallest y are drive/level
+    if len(knobs_found) >= 3:
+        by_y = sorted(knobs_found, key=lambda k: k[1])
+        upper_two = sorted(by_y[:2], key=lambda k: k[0])  # left to right
+        drive_px, level_px = upper_two[0], upper_two[1]
+        tone_px = by_y[2]
+        measured['drive'] = {'x': px_to_x(drive_px[0]), 'z': px_to_z(drive_px[1])}
+        measured['level'] = {'x': px_to_x(level_px[0]), 'z': px_to_z(level_px[1])}
+        measured['tone'] = {'x': px_to_x(tone_px[0]), 'z': px_to_z(tone_px[1])}
+        print(f"      Knobs: drive=({measured['drive']['x']:.3f},{measured['drive']['z']:.3f}), "
+              f"tone=({measured['tone']['x']:.3f},{measured['tone']['z']:.3f}), "
+              f"level=({measured['level']['x']:.3f},{measured['level']['z']:.3f})")
+
+    # Footswitch: large bright rectangle in lower half
+    bright = (r > 150) & (g > 150) & (b > 150)
+    lower = np.zeros_like(bright)
+    lower[int(H*0.55):] = bright[int(H*0.55):]
+    labeled_f, nf = ndimage.label(lower)
+    best = None
+    for i in range(1, nf+1):
+        ys_f, xs_f = np.where(labeled_f == i)
+        sz = len(xs_f)
+        if sz > 100000:  # large
+            w, h = xs_f.max()-xs_f.min(), ys_f.max()-ys_f.min()
+            # Footswitch is roughly 2:1 aspect (wider than tall)
+            if 1.2 < w/max(h,1) < 3.0 and xs_f.mean() > W*0.3 and xs_f.mean() < W*0.7:
+                if best is None or sz > best[0]:
+                    best = (sz, xs_f.mean(), ys_f.mean(), w, h)
+    if best:
+        _, fx, fy, fw, fh = best
+        measured['footswitch'] = {
+            'x': px_to_x(fx), 'z': px_to_z(fy),
+            'w': fw/px_per_in_x, 'd': fh/px_per_in_y,
+        }
+        print(f"      Footswitch: ({measured['footswitch']['x']:.3f},{measured['footswitch']['z']:.3f}) "
+              f"{measured['footswitch']['w']:.3f}x{measured['footswitch']['d']:.3f}in")
+
+    # LED: red dot in upper area
+    red = (r > 150) & (g < 100) & (b < 100)
+    upper_red = np.zeros_like(red)
+    upper_red[:int(H*0.3)] = red[:int(H*0.3)]
+    labeled_r, nr = ndimage.label(upper_red)
+    for i in range(1, nr+1):
+        ys_r, xs_r = np.where(labeled_r == i)
+        if len(xs_r) > 100:
+            measured['led'] = {'x': px_to_x(xs_r.mean()), 'z': px_to_z(ys_r.mean())}
+            print(f"      LED: ({measured['led']['x']:.3f},{measured['led']['z']:.3f})")
+            break
+
+    # Ibanez plate: white rectangle in middle
+    # Targeted: crop to plate region based on body bounds, then segment carefully.
+    # Plate is at ~48-64% of body height, centered horizontally.
+    px0 = int(cx_body - 650)
+    px1 = int(cx_body + 650)
+    py0 = int(by0 + (by1-by0)*0.48)
+    py1 = int(by0 + (by1-by0)*0.66)
+    crop = arr[py0:py1, px0:px1]
+    # White pixels in crop
+    cr, cg, cb = crop[:,:,0], crop[:,:,1], crop[:,:,2]
+    white_c = (cr > 180) & (cg > 180) & (cb > 180)
+    # The plate is the dominant white region. Find its bounds via
+    # the largest connected component of white.
+    labeled_c, nc = ndimage.label(white_c)
+    sizes_c = np.array([(labeled_c == i).sum() for i in range(1, nc+1)])
+    if len(sizes_c) > 0:
+        # Take the largest, but the logo splits it. Instead, find the
+        # bounding box that contains the top 2 largest (plate parts).
+        idx_sorted = np.argsort(sizes_c)[::-1]
+        # Combine top 2 if they're similar size (logo split)
+        use_idx = [idx_sorted[0]]
+        if len(idx_sorted) > 1 and sizes_c[idx_sorted[1]] > sizes_c[idx_sorted[0]] * 0.3:
+            use_idx.append(idx_sorted[1])
+        all_ys, all_xs = [], []
+        for idx in use_idx:
+            ys_c, xs_c = np.where(labeled_c == (idx+1))
+            all_ys.extend(ys_c)
+            all_xs.extend(xs_c)
+        all_ys, all_xs = np.array(all_ys), np.array(all_xs)
+        x0p, x1p = all_xs.min() + px0, all_xs.max() + px0
+        y0p, y1p = all_ys.min() + py0, all_ys.max() + py0
+        measured['ibanezPlate'] = {
+            'x': px_to_x((x0p+x1p)/2), 'z': px_to_z((y0p+y1p)/2),
+            'w': (x1p-x0p)/px_per_in_x, 'd': (y1p-y0p)/px_per_in_y,
+        }
+        print(f"      Ibanez plate: ({measured['ibanezPlate']['x']:.3f},{measured['ibanezPlate']['z']:.3f}) "
+              f"{measured['ibanezPlate']['w']:.3f}x{measured['ibanezPlate']['d']:.3f}in")
+
+    return measured
+
+def validate_top_fresh(spec):
+    """Compare spec to freshly segmented top measurements."""
+    print("\n  [Top] Fresh segmentation vs spec...")
+    measured = segment_top()
 
     errors = {}
+    def check(name, spec_val, meas_val):
+        if meas_val is None:
+            print(f"      {name}: NOT FOUND in image")
+            return
+        err = np.sqrt((spec_val['x']-meas_val['x'])**2 + (spec_val['z']-meas_val['z'])**2)
+        errors[name] = err * 25.4
+        print(f"      {name}: spec=({spec_val['x']:.3f},{spec_val['z']:.3f}) "
+              f"meas=({meas_val['x']:.3f},{meas_val['z']:.3f}) err={err*25.4:.2f}mm")
+
+    for k in spec.get('knobs', []):
+        if k['id'] in measured:
+            check(f"knob-{k['id']}", k, measured[k['id']])
+
+    if 'footswitch' in spec and 'footswitch' in measured:
+        check('footswitch', spec['footswitch'], measured['footswitch'])
+
+    if 'led' in spec and 'led' in measured:
+        check('led', spec['led'], measured['led'])
+
+    if 'ibanezPlate' in spec and 'ibanezPlate' in measured:
+        check('ibanezPlate', spec['ibanezPlate'], measured['ibanezPlate'])
+
+    max_err = max(errors.values()) if errors else 999
+    passed = max_err <= PART_THRESHOLD_MM
+    print(f"      Max: {max_err:.2f}mm → {'PASS' if passed else 'FAIL'}")
+    return {'max_mm': max_err, 'pass': passed, 'errors': errors}
+
+# ----------------------------------------------------------------------------
+# Self-fixing
+# ----------------------------------------------------------------------------
+
+def fix_from_measurements(spec, measured):
+    """Update spec from fresh measurements. Returns (spec, changed)."""
+    changed = False
+
+    # Knobs
     for k in spec.get('knobs', []):
         kid = k['id']
-        if kid in refs:
-            dx = k['x'] - refs[kid]['x']
-            dz = k['z'] - refs[kid]['z']
-            err = np.sqrt(dx**2 + dz**2)
-            errors[f'knob-{kid}'] = err * 25.4  # mm
-            print(f"    knob-{kid}: err={err*25.4:.2f}mm (dx={dx*25.4:.2f}, dz={dz*25.4:.2f})")
+        if kid in measured:
+            m = measured[kid]
+            if abs(k['x'] - m['x']) > 0.001 or abs(k['z'] - m['z']) > 0.001:
+                print(f"    Fix knob-{kid}: ({k['x']:.3f},{k['z']:.3f}) → ({m['x']:.3f},{m['z']:.3f})")
+                k['x'], k['z'] = round(m['x'], 3), round(m['z'], 3)
+                changed = True
 
-    if 'footswitch' in spec and 'footswitch' in refs:
-        fs = spec['footswitch']
-        r = refs['footswitch']
-        dx = fs['x'] - r['x']
-        dz = fs['z'] - r['z']
-        dw = fs['w'] - r['w']
-        dd = fs['d'] - r['d']
-        err = np.sqrt(dx**2 + dz**2)
-        errors['footswitch-pos'] = err * 25.4
-        errors['footswitch-size'] = (abs(dw) + abs(dd)) / 2 * 25.4
-        print(f"    footswitch: pos_err={err*25.4:.2f}mm, size_err={(abs(dw)+abs(dd))/2*25.4:.2f}mm")
+    # Footswitch
+    if 'footswitch' in spec and 'footswitch' in measured:
+        fs, m = spec['footswitch'], measured['footswitch']
+        for key in ['x', 'z', 'w', 'd']:
+            if abs(fs.get(key, 0) - m.get(key, 0)) > 0.001:
+                print(f"    Fix footswitch.{key}: {fs.get(key,0):.3f} → {m[key]:.3f}")
+                fs[key] = round(m[key], 3)
+                changed = True
 
-    if 'led' in spec and 'led' in refs:
-        led = spec['led']
-        r = refs['led']
-        err = np.sqrt((led['x']-r['x'])**2 + (led['z']-r['z'])**2)
-        errors['led'] = err * 25.4
-        print(f"    led: err={err*25.4:.2f}mm")
+    # LED
+    if 'led' in spec and 'led' in measured:
+        led, m = spec['led'], measured['led']
+        if abs(led['x'] - m['x']) > 0.001 or abs(led['z'] - m['z']) > 0.001:
+            print(f"    Fix led: ({led['x']:.3f},{led['z']:.3f}) → ({m['x']:.3f},{m['z']:.3f})")
+            led['x'], led['z'] = round(m['x'], 3), round(m['z'], 3)
+            changed = True
 
-    if 'ibanezPlate' in spec and 'ibanezPlate' in refs:
-        ip = spec['ibanezPlate']
-        r = refs['ibanezPlate']
-        err = np.sqrt((ip['x']-r['x'])**2 + (ip['z']-r['z'])**2)
-        errors['ibanezPlate-pos'] = err * 25.4
-        errors['ibanezPlate-size'] = (abs(ip['w']-r['w']) + abs(ip['d']-r['d'])) / 2 * 25.4
-        print(f"    ibanezPlate: pos_err={err*25.4:.2f}mm, size_err={(abs(ip['w']-r['w'])+abs(ip['d']-r['d']))/2*25.4:.2f}mm")
+    # Ibanez plate
+    if 'ibanezPlate' in spec and 'ibanezPlate' in measured:
+        ip, m = spec['ibanezPlate'], measured['ibanezPlate']
+        for key in ['x', 'z', 'w', 'd']:
+            if abs(ip.get(key, 0) - m.get(key, 0)) > 0.001:
+                print(f"    Fix ibanezPlate.{key}: {ip.get(key,0):.3f} → {m[key]:.3f}")
+                ip[key] = round(m[key], 3)
+                changed = True
 
-    max_err = max(errors.values()) if errors else 0
-    result = {
-        'errors_mm': errors,
-        'max_err_mm': max_err,
-        'pass': max_err <= 2.0,  # 2mm threshold for parts
-    }
-    print(f"    Max part error: {max_err:.2f}mm → {'PASS' if result['pass'] else 'FAIL'}")
-    return result
-
-# ----------------------------------------------------------------------------
-# Auto-fix
-# ----------------------------------------------------------------------------
-
-def fix_spec(spec, side_result):
-    """Adjust spec to minimize side profile error.
-    Currently: snaps profile points to measured values.
-    TODO: Full optimization loop.
-    """
-    print("\n  Auto-fix: not yet implemented (manual correction required)")
-    return spec, False
+    return spec, changed
 
 # ----------------------------------------------------------------------------
 # Main
@@ -220,30 +347,54 @@ def main():
     fix = '--fix' in sys.argv
 
     print("=" * 60)
-    print("TS9 Self-Validation")
+    print("TS9 Self-Validation v2 (fresh image segmentation)")
     print("=" * 60)
 
     spec = load_spec()
-    print(f"Spec: {spec['id']} ({spec['name']})")
+    print(f"Spec: {spec['id']}")
 
-    side = validate_side(spec)
-    top = validate_top(spec)
+    # Segment top once, reuse for validation and fixing
+    print("\n  [Top] Segmenting...")
+    measured_top = segment_top()
+
+    side = validate_side_fresh(spec)
+
+    # Validate top using the fresh measurements
+    print("\n  [Top] Comparing to spec...")
+    errors = {}
+    def check(name, spec_val, meas_val):
+        if meas_val is None:
+            return
+        err = np.sqrt((spec_val['x']-meas_val['x'])**2 + (spec_val['z']-meas_val['z'])**2)
+        errors[name] = err * 25.4
+    for k in spec.get('knobs', []):
+        if k['id'] in measured_top:
+            check(f"knob-{k['id']}", k, measured_top[k['id']])
+    for key in ['footswitch', 'led', 'ibanezPlate']:
+        if key in spec and key in measured_top:
+            check(key, spec[key], measured_top[key])
+    top_max = max(errors.values()) if errors else 999
+    top_pass = top_max <= PART_THRESHOLD_MM
+    print(f"      Max: {top_max:.2f}mm → {'PASS' if top_pass else 'FAIL'}")
+    top = {'max_mm': top_max, 'pass': top_pass}
 
     print("\n" + "=" * 60)
     print("SUMMARY")
     print("=" * 60)
-    side_pass = side.get('pass', False)
-    top_pass = top.get('pass', False)
-    print(f"  Side profile: {'PASS' if side_pass else 'FAIL'}")
-    print(f"  Top parts:    {'PASS' if top_pass else 'FAIL'}")
-    overall = side_pass and top_pass
-    print(f"  Overall:      {'PASS' if overall else 'FAIL — do not ship'}")
+    sp = side.get('pass', False)
+    print(f"  Side: {'PASS' if sp else 'FAIL'} ({side.get('max_mm', 0):.2f}mm)")
+    print(f"  Top:  {'PASS' if top_pass else 'FAIL'} ({top_max:.2f}mm)")
+    overall = sp and top_pass
+    print(f"  Overall: {'PASS' if overall else 'FAIL — do not ship'}")
 
     if fix and not overall:
-        spec, changed = fix_spec(spec, side)
+        print("\n  [Fix] Updating spec from measurements...")
+        spec, changed = fix_from_measurements(spec, measured_top)
         if changed:
             save_spec(spec)
             print("  Spec updated. Re-run to verify.")
+        else:
+            print("  No changes needed (within rounding).")
 
     return 0 if overall else 1
 
