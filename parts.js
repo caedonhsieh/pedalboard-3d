@@ -264,32 +264,41 @@ export function ibanezPlate({ w = 2.145, d = 0.733, border = 0.06 } = {}) {
   return g;
 }
 
-/** Tick ring: black dashed circle around a knob. Flat on deck.
- *  Clean vector dashes via canvas — no photo paste. */
-export function tickRing({ outerR = 0.49, innerR = 0.35, ticks = 11 } = {}) {
-  const size = 256;
+/** Tick ring: black wedge segments around a knob. Flat on deck.
+ *  Measured from reference: 11 trapezoidal wedges, gap at bottom.
+ *  Inner r=0.377", outer r=0.485". Clean vector — no photo paste. */
+export function tickRing({ innerR = 0.377, outerR = 0.485, wedges = 11 } = {}) {
+  const size = 512;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = size;
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, size, size);
-  ctx.strokeStyle = '#111';
-  ctx.lineWidth = 10;
-  ctx.lineCap = 'butt';
+  ctx.fillStyle = '#111';
   const c = size / 2;
-  // Map inches to pixels: outerR -> size/2
   const px = (r) => r / outerR * (size / 2);
-  for (let i = 0; i < ticks; i++) {
-    const a = (i / ticks) * Math.PI * 2 - Math.PI / 2;  // start at top
-    // Gap at bottom (where the knob pointer area is) — TS9 has a gap
-    // Actually TS9 ticks go all around; keep full circle.
-    const x1 = c + Math.cos(a) * px(innerR);
-    const y1 = c + Math.sin(a) * px(innerR);
-    const x2 = c + Math.cos(a) * px(outerR);
-    const y2 = c + Math.sin(a) * px(outerR);
+  // 11 wedges, gap at bottom (270° in canvas coords where 0°=right, 90°=down)
+  // Skip the wedge that would be at the bottom
+  const step = (Math.PI * 2) / wedges;
+  const wedgeAngular = step * 0.62;  // wedge covers 62% of step, gap 38%
+  for (let i = 0; i < wedges; i++) {
+    const centerA = (i / wedges) * Math.PI * 2 - Math.PI / 2;  // start at top
+    // Skip if this wedge is at the bottom (angle ≈ π/2 in canvas coords)
+    // Canvas angle: -π/2=top, π/2=bottom
+    let normA = centerA;
+    while (normA > Math.PI) normA -= Math.PI * 2;
+    while (normA < -Math.PI) normA += Math.PI * 2;
+    if (Math.abs(normA - Math.PI / 2) < step / 2) continue;  // gap at bottom
+    const a0 = centerA - wedgeAngular / 2;
+    const a1 = centerA + wedgeAngular / 2;
+    // Trapezoid: inner arc to outer arc
     ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.stroke();
+    ctx.moveTo(c + Math.cos(a0) * px(innerR), c + Math.sin(a0) * px(innerR));
+    ctx.lineTo(c + Math.cos(a0) * px(outerR), c + Math.sin(a0) * px(outerR));
+    ctx.arc(c, c, px(outerR), a0, a1);
+    ctx.lineTo(c + Math.cos(a1) * px(innerR), c + Math.sin(a1) * px(innerR));
+    ctx.arc(c, c, px(innerR), a1, a0, true);
+    ctx.closePath();
+    ctx.fill();
   }
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
@@ -592,7 +601,7 @@ export function assemblePedal(spec) {
     if (recess) part.position.y -= recess;
     // Tick ring flat on the deck around the knob
     if (k.tickRing !== false) {
-      const ring = tickRing({ outerR: 0.49, innerR: 0.35, ticks: 11 });
+      const ring = tickRing({ innerR: 0.377, outerR: 0.485, wedges: 11 });
       const { y, pitch, deck } = surfaceAt(decks, k.z);
       ring.position.y = 0.005;  // just above deck surface
       if (deck.group) {
