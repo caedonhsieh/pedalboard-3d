@@ -91,7 +91,8 @@ def extract_masks_id_mode(img):
     """
     Extract color masks from ID-mode render.
     Green = #00FF00 (enclosure), Red = #FF0000 (black parts),
-    Blue = #0000FF (silver/metal), White = background.
+    Blue = #0000FF (silver/metal), Cyan = #00FFFF (white plate),
+    White = background.
     """
     arr = np.array(img)
     r, g, b = arr[:,:,0], arr[:,:,1], arr[:,:,2]
@@ -99,13 +100,15 @@ def extract_masks_id_mode(img):
     green = (g > 200) & (r < 100) & (b < 100)    # #00FF00
     black_parts = (r > 200) & (g < 100) & (b < 100)  # #FF0000 (black plastic as red)
     silver = (b > 200) & (r < 100) & (g < 100)    # #0000FF
+    white_plate = (g > 200) & (b > 200) & (r < 100)  # #00FFFF (cyan)
 
-    return {'green': green, 'black': black_parts, 'silver': silver}
+    return {'green': green, 'black': black_parts, 'silver': silver, 'white': white_plate}
 
 def extract_masks_photo(img):
     """
     Extract color masks from rectified photo.
-    Green = TS9 green housing, Black = dark parts, Silver = chrome/metal.
+    Green = TS9 green housing, Black = dark parts, Silver = chrome/metal,
+    White = Ibanez plate (distinct from silver).
     """
     arr = np.array(img).astype(float)
     r, g, b = arr[:,:,0], arr[:,:,1], arr[:,:,2]
@@ -117,11 +120,15 @@ def extract_masks_photo(img):
     brightness = (r + g + b) / 3
     black = (brightness < 70)
 
-    # Silver/chrome: bright, low saturation
+    # White: very bright, very low saturation (Ibanez plate)
     sat = np.std([r, g, b], axis=0)
-    silver = (brightness > 130) & (sat < 35)
+    white = (brightness > 210) & (sat < 25)
 
-    return {'green': green, 'black': black, 'silver': silver}
+    # Silver/chrome: bright but not white, low saturation
+    # (knob tops, footswitch, jack hardware)
+    silver = (brightness > 130) & (brightness <= 210) & (sat < 35) & ~white
+
+    return {'green': green, 'black': black, 'silver': silver, 'white': white}
 
 # ----------------------------------------------------------------------------
 # Mask comparison
@@ -133,7 +140,7 @@ def compare_masks(render_masks, photo_masks, view_name):
     Returns dict of {color: {iou, max_gap_px, mismatch_px, pass}}.
     """
     results = {}
-    for color in ['green', 'black', 'silver']:
+    for color in ['green', 'black', 'silver', 'white']:
         rm = render_masks[color]
         pm = photo_masks[color]
 

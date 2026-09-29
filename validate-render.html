@@ -66,9 +66,10 @@ if (mode === 'id') {
     green: new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
     black: new THREE.MeshBasicMaterial({ color: 0xff0000 }),
     silver: new THREE.MeshBasicMaterial({ color: 0x0000ff }),
+    white: new THREE.MeshBasicMaterial({ color: 0x00ffff }), // cyan for white plate
     other: new THREE.MeshBasicMaterial({ color: 0xff00ff }),
   };
-  // Background: white (distinct from all ID colors)
+  // Background: white (distinct from all ID colors except white plate which is cyan)
   renderer.setClearColor(0xffffff, 1);
 
   A.group.traverse((obj) => {
@@ -77,12 +78,20 @@ if (mode === 'id') {
       const color = mat.color ? mat.color.getHex() : 0;
       // Classify by material color/properties
       let idMat;
+      // White plate: the ibanezPlate uses plateRib (silver-ish) but it's actually white plastic
+      // We detect it by checking if it's part of the ibanez plate group
+      // For now: plateRib with stripe texture = footswitch (silver), plain white = plate
       if (color === 0x7fb75c || (mat.isMeshPhysicalMaterial && mat.clearcoat > 0)) {
         idMat = idMats.green; // enclosure (powder coat)
       } else if (mat.metalness > 0.5) {
+        // Distinguish: footswitch (has bump texture) vs plate (plain)
+        // Actually, the Ibanez plate is white plastic, not metal. Check the mesh name/context.
+        // For now, treat all metal as silver; the plate is a separate mesh we'll tag.
         idMat = idMats.silver; // chrome/metal
       } else if (color < 0x303030 || mat.map) {
         idMat = idMats.black; // black plastic OR textured artwork (tick rings, labels)
+      } else if (color > 0xf0f0f0) {
+        idMat = idMats.white; // white plate
       } else {
         idMat = idMats.other;
       }
@@ -95,6 +104,25 @@ if (mode === 'id') {
         });
       } else {
         obj.material = idMat;
+      }
+    }
+  });
+
+  // Tag the Ibanez plate specifically: find it by its position/size
+  // The plate is at spec.ibanezPlate position. We'll color it cyan.
+  // (This is a hack; better to tag during assembly, but works for validation.)
+  A.group.traverse((obj) => {
+    if (obj.isMesh && obj.material === idMats.silver) {
+      // Check if this is the plate by its geometry size
+      // Plate is ~2.14 x 0.73, footswitch is ~2.09 x 1.38
+      const size = new THREE.Vector3();
+      new THREE.Box3().setFromObject(obj).getSize(size);
+      // Plate is wider than tall, footswitch is also wider than tall...
+      // Better: check y position. Plate is on the deck (y ~1.5), footswitch is lower (y ~1.0)
+      const pos = new THREE.Vector3();
+      obj.getWorldPosition(pos);
+      if (pos.y > 1.3 && size.x > 1.5 && size.z < 1.0) {
+        obj.material = idMats.white; // cyan
       }
     }
   });
