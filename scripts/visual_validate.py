@@ -24,6 +24,9 @@ import numpy as np
 from pathlib import Path
 from PIL import Image
 from scipy import ndimage
+import sys
+sys.path.insert(0, str(Path(__file__).parent))
+from rectify import rectify_top_homography, rectify_side_homography
 
 REPO = Path(__file__).resolve().parent.parent
 SPEC_PATH = REPO / "specs" / "ts9.json"
@@ -67,69 +70,18 @@ def render_view(view='top', mode='id'):
     return img, view_info
 
 # ----------------------------------------------------------------------------
-# Photo rectification
+# Photo rectification (homography-based, in rectify.py)
 # ----------------------------------------------------------------------------
+# rectify_top() and rectify_side() are now imported from rectify.py
+# They use homography to map the photo to true orthographic.
 
 def rectify_top():
-    """
-    Rectify top photo to orthographic.
-    Returns (rectified PIL Image, px_per_in).
-    Uses the known 2.91" x 4.88" body dimensions.
-    """
-    img = Image.open(TOP_PHOTO).convert('RGB')
-    arr = np.array(img).astype(float)
-    H, W = arr.shape[:2]
-
-    # Find body bounds via green segmentation
-    g, r, b = arr[:,:,1], arr[:,:,0], arr[:,:,2]
-    green_mask = (g > 100) & (g > r + 10) & (r < 160)
-    labeled, n = ndimage.label(green_mask)
-    sizes = np.array([(labeled == i).sum() for i in range(1, n+1)])
-    body = (labeled == (np.argmax(sizes) + 1))
-    ys, xs = np.where(body)
-    bx0, bx1 = xs.min(), xs.max()
-    by0, by1 = ys.min(), ys.max()
-
-    # For now: simple crop + resize to orthographic.
-    # Full perspective rectification via homography would use the 4 corners.
-    # The body is roughly rectangular in the photo; we map it to exact aspect.
-    # Target: 2.91" wide, 4.88" deep at 200 px/in = 582 x 976
-    px_per_in = 200
-    target_w = int(2.91 * px_per_in)
-    target_h = int(4.88 * px_per_in)
-
-    cropped = img.crop((bx0, by0, bx1, by1))
-    rectified = cropped.resize((target_w, target_h), Image.LANCZOS)
-    return rectified, px_per_in
+    """Rectify top photo via homography. Returns (PIL Image, px_per_in)."""
+    return rectify_top_homography(TOP_PHOTO)
 
 def rectify_side():
-    """
-    Rectify side photo to orthographic.
-    Returns (rectified PIL Image, px_per_in).
-    Uses the known 4.88" depth and 2.09" height.
-    """
-    img = Image.open(SIDE_PHOTO).convert('RGB')
-    arr = np.array(img).astype(float)
-    H, W = arr.shape[:2]
-
-    # Find housing via green segmentation
-    g, r, b = arr[:,:,1], arr[:,:,0], arr[:,:,2]
-    green_mask = (g > 100) & (g > r + 20) & (g > b - 10) & (r < 150)
-    labeled, n = ndimage.label(green_mask)
-    sizes = np.array([(labeled == i).sum() for i in range(1, n+1)])
-    housing = (labeled == (np.argmax(sizes) + 1))
-    housing_filled = ndimage.binary_fill_holes(housing)
-    ys, xs = np.where(housing_filled)
-    x0, x1 = xs.min(), xs.max()
-    y0, y1 = ys.min(), ys.max()
-
-    px_per_in = 200
-    target_w = int(4.88 * px_per_in)  # depth
-    target_h = int(2.09 * px_per_in)  # height
-
-    cropped = img.crop((x0, y0, x1, y1))
-    rectified = cropped.resize((target_w, target_h), Image.LANCZOS)
-    return rectified, px_per_in
+    """Rectify side photo via homography. Returns (PIL Image, px_per_in)."""
+    return rectify_side_homography(SIDE_PHOTO)
 
 # ----------------------------------------------------------------------------
 # Color mask extraction
