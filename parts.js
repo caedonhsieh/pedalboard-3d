@@ -250,8 +250,8 @@ export function ibanezPlate({ w = 2.145, d = 0.733, border = 0.06 } = {}) {
   ctx.font = 'italic 900 150px "Arial Rounded MT Bold", Arial, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  // Slight letter spacing to match the flowing logo style
-  ctx.fillText('Ibanez', 512, 140);
+  // Reference shows text shifted left of plate center (starts ~15% from left edge)
+  ctx.fillText('Ibanez', 430, 140);
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
