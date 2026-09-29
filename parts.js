@@ -213,7 +213,7 @@ export function knob(style = 'ts9', pointerRot = 0, scale = 1) {
  *  - 'round': MXR-style round chrome button + washer
  * {w, d} = plate size in inches (ignored for 'round'). Origin at deck (y=0).
  */
-export function footswitch({ w = 2.046, d = 1.382, style = 'plate' } = {}) {
+export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor = null } = {}) {
   const g = new THREE.Group();
   if (style === 'round') {
     const washer = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.30, 0.30, 0.04, 32), FIN.chrome));
@@ -222,10 +222,28 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate' } = {}) {
     btn.position.y = 0.14;
     g.add(washer, btn);
   } else if (style === 'boss-pedal') {
-    // Boss compact footswitch: large black pedal, hinged at back, BOSS logo.
-    // Sits on top of the enclosure, covers lower 60% of the deck.
-    const pedal = shadowed(new THREE.Mesh(new RoundedBoxGeometry(w, 0.25, d, 4, 0.08), FIN.blackPlastic));
-    pedal.position.y = 0.125;
+    // Boss compact footswitch: black rubber pad in an orange chassis frame,
+    // hinged at back. MEASURED: pad 65.6mm wide, frame border ~2.5mm.
+    // Origin at deck (y=0).
+    const fw = 0.098; // frame border width in inches (~2.5mm)
+    const fh = 0.12;  // frame height
+    const fmat = frameColor ? powderCoat(frameColor) : FIN.green;
+    // Orange frame: 4 border boxes around the pad opening
+    const mkBar = (bw, bd, x, z) => {
+      const m = shadowed(new THREE.Mesh(new THREE.BoxGeometry(bw, fh, bd), fmat));
+      m.position.set(x, fh/2, z);
+      return m;
+    };
+    g.add(
+      mkBar(w + 2*fw, fw, 0, -d/2 - fw/2),  // back bar
+      mkBar(w + 2*fw, fw, 0,  d/2 + fw/2),  // front bar
+      mkBar(fw, d, -w/2 - fw/2, 0),          // left bar
+      mkBar(fw, d,  w/2 + fw/2, 0),          // right bar
+    );
+    // Black rubber pad, top slightly proud of frame
+    const pedal = shadowed(new THREE.Mesh(new RoundedBoxGeometry(w, 0.22, d, 4, 0.08), FIN.blackPlastic));
+    pedal.position.y = 0.11 + 0.02;
+    g.add(pedal);
     // BOSS logo embossed on the pedal (simple text)
     const logoCanvas = document.createElement('canvas');
     logoCanvas.width = 512; logoCanvas.height = 128;
@@ -703,7 +721,8 @@ export function assemblePedal(spec) {
   if (spec.footswitch) {
     const fs = spec.footswitch;
     seat(
-      footswitch({ w: fs.w ?? 2.046, d: fs.d ?? 1.382, style: fs.style || 'plate' }),
+      footswitch({ w: fs.w ?? 2.046, d: fs.d ?? 1.382, style: fs.style || 'plate',
+                   frameColor: fs.frameColor || enc.color || null }),
       fs.x, fs.z, 'footswitch', 'footswitch'
     );
   }
@@ -713,11 +732,15 @@ export function assemblePedal(spec) {
     // Wall at x=±w/2. Washer center at +0.018 relative, so origin at w/2 - 0.018.
     const x = (j.side === 'left' ? -1 : 1) * (w / 2 - 0.018);
     if (j.side === 'left') part.rotation.y = Math.PI;
-    // Derive y from surfaceAt. Measured from front product photo: jack
-    // center at ~60% height from bottom = y=1.25". With hexagon profile,
-    // surface at z=-0.2 is y=1.956", so offset = 0.706" below surface.
-    const { y: surfY } = surfaceAt(decks, j.z);
-    const y = surfY - 0.706;
+    // y: use explicit spec value when measured; otherwise fall back to the
+    // legacy surface-offset (TS9-derived, 0.706" below deck surface).
+    let y;
+    if (j.y != null) {
+      y = j.y;
+    } else {
+      const { y: surfY } = surfaceAt(decks, j.z);
+      y = surfY - 0.706;
+    }
     part.position.set(x, y, j.z);
     group.add(part); parts.push(part);
     anchors.push({ id: j.id || `jack-${j.side}`, kind: 'jack', x, z: j.z, obj: part });

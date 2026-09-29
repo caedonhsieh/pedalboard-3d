@@ -1,135 +1,161 @@
 {
-    "id": "ds1",
-    "brand": "Boss",
-    "name": "DS-1 Distortion",
-    "dims": {
-        "w": 2.875,
-        "d": 5.079,
-        "h": 2.323,
-        "source": "manufacturer spec 73 x 129 x 59 mm"
-    },
-    "faceImage": "https://raw.githubusercontent.com/PedalPlayground/pedalplayground/master/public/images/pedals/boss-ds1.png",
-    "enclosure": {
-        "type": "box",
-        "color": "#e8641b",
-        "edgeRadius": 0.08,
-        "note": "Boss compact: rectangular box, rounded edges, orange powder-coat."
-    },
-    "knobs": [
-        {
-            "id": "tone",
-            "x": -0.7418,
-            "z": -1.8268,
-            "style": "boss",
-            "size": "large",
-            "rot": 0.3,
-            "note": "TONE knob, left. Black with silver cap."
-        },
-        {
-            "id": "level",
-            "x": 0.725,
-            "z": -1.8268,
-            "style": "boss",
-            "size": "large",
-            "rot": -0.2,
-            "note": "LEVEL knob, right. Black with silver cap."
-        },
-        {
-            "id": "dist",
-            "x": -0.0042,
-            "z": -1.2124,
-            "style": "boss",
-            "size": "small",
-            "rot": 0.1,
-            "note": "DIST knob, center lower. Smaller."
-        }
+  "id": "ds1",
+  "brand": "Boss",
+  "name": "DS-1 Distortion",
+  "dims": {
+    "w": 2.875,
+    "d": 5.079,
+    "h": 2.323,
+    "source": "manufacturer spec 73 x 129 x 59 mm"
+  },
+  "faceImage": "https://raw.githubusercontent.com/PedalPlayground/pedalplayground/master/public/images/pedals/boss-ds1.png",
+  "enclosure": {
+    "type": "profile",
+    "color": "#f96712",
+    "bevel": 0.05,
+    "smooth": true,
+    "points": [
+      [
+        -2.5394,
+        0.0
+      ],
+      [
+        -2.5394,
+        2.3228
+      ],
+      [
+        -0.9646,
+        2.3228
+      ],
+      [
+        2.5394,
+        1.8504
+      ],
+      [
+        2.5394,
+        0.0
+      ]
     ],
-    "led": {
-        "x": -0.0042,
-        "z": -2.1135,
-        "label": "CHECK",
-        "note": "Red CHECK indicator, top center"
+    "notes": "MEASURED Boss compact wedge: 59mm back, 47mm front, slope over 89mm, 40mm flat panel. From ds1_side_yahoo.jpg + Sweetwater ds1_sw_front.jpg. Color #f96712 sampled from Sweetwater studio shot."
+  },
+  "knobs": [
+    {
+      "id": "tone",
+      "x": -0.7418,
+      "z": -1.8268,
+      "style": "boss",
+      "size": "large",
+      "rot": 0.3,
+      "note": "TONE knob, left. Black with silver cap."
     },
-    "labels": [
-        {
-            "text": "CHECK",
-            "x": -0.0042,
-            "z": -2.3757,
-            "w": 0.4,
-            "h": 0.1
-        },
-        {
-            "text": "TONE",
-            "x": -0.7418,
-            "z": -0.9011,
-            "w": 0.35,
-            "h": 0.12
-        },
-        {
-            "text": "LEVEL",
-            "x": -0.0042,
-            "z": -1.72,
-            "w": 0.4,
-            "h": 0.12
-        },
-        {
-            "text": "DIST",
-            "x": 0.725,
-            "z": -0.9011,
-            "w": 0.3,
-            "h": 0.12
-        },
-        {
-            "text": "OUTPUT",
-            "x": -0.35,
-            "z": -0.639,
-            "w": 0.55,
-            "h": 0.12
-        },
-        {
-            "text": "INPUT",
-            "x": 0.6245,
-            "z": -0.639,
-            "w": 0.45,
-            "h": 0.12
-        },
-        {
-            "text": "Distortion",
-            "x": 0.0,
-            "z": -0.0819,
-            "w": 1.4,
-            "h": 0.25,
-            "spaced": false
-        },
-        {
-            "text": "DS-1",
-            "x": 0.25,
-            "z": 0.2458,
-            "w": 0.5,
-            "h": 0.18
-        }
-    ],
-    "footswitch": {
-        "style": "boss-pedal",
-        "note": "Large black footswitch pedal, lower 60% of top. BOSS logo embossed.",
-        "x": -0.1,
-        "z": 1.39,
-        "w": 2.35,
-        "d": 1.64
+    {
+      "id": "level",
+      "x": 0.725,
+      "z": -1.8268,
+      "style": "boss",
+      "size": "large",
+      "rot": -0.2,
+      "note": "LEVEL knob, right. Black with silver cap."
     },
-    "jacks": [
-        {
-            "side": "left",
-            "z": -0.5,
-            "id": "output",
-            "note": "OUTPUT jack, left side"
-        },
-        {
-            "side": "right",
-            "z": -0.5,
-            "id": "input",
-            "note": "INPUT jack, right side"
-        }
-    ],
-    "notes": "Boss DS-1 hero model #02. Knob positions measured from PedalPlayground top reference."
+    {
+      "id": "dist",
+      "x": -0.0042,
+      "z": -1.2124,
+      "style": "boss",
+      "size": "small",
+      "rot": 0.1,
+      "note": "DIST knob, center lower. Smaller."
+    }
+  ],
+  "led": {
+    "x": -0.0042,
+    "z": -2.1135,
+    "label": "CHECK",
+    "note": "Red CHECK indicator, top center"
+  },
+  "labels": [
+    {
+      "text": "CHECK",
+      "x": -0.0042,
+      "z": -2.3757,
+      "w": 0.4,
+      "h": 0.1
+    },
+    {
+      "text": "TONE",
+      "x": -0.7418,
+      "z": -0.9011,
+      "w": 0.35,
+      "h": 0.12
+    },
+    {
+      "text": "LEVEL",
+      "x": -0.0042,
+      "z": -1.72,
+      "w": 0.4,
+      "h": 0.12
+    },
+    {
+      "text": "DIST",
+      "x": 0.725,
+      "z": -0.9011,
+      "w": 0.3,
+      "h": 0.12
+    },
+    {
+      "text": "\u2190 OUTPUT",
+      "x": -0.55,
+      "z": -0.72,
+      "w": 0.55,
+      "h": 0.12
+    },
+    {
+      "text": "INPUT \u2192",
+      "x": 0.55,
+      "z": -0.72,
+      "w": 0.45,
+      "h": 0.12
+    },
+    {
+      "text": "Distortion",
+      "x": -0.1,
+      "z": -0.62,
+      "w": 1.4,
+      "h": 0.25,
+      "spaced": false
+    },
+    {
+      "text": "DS-1",
+      "x": 0.35,
+      "z": -0.42,
+      "w": 0.5,
+      "h": 0.18
+    }
+  ],
+  "footswitch": {
+    "style": "boss-pedal",
+    "x": 0,
+    "z": 0.95,
+    "w": 2.583,
+    "d": 2.362,
+    "frameColor": "#f96712",
+    "note": "Black rubber pad 65.6mm wide in orange chassis frame. Sweetwater measured."
+  },
+  "jacks": [
+    {
+      "side": "left",
+      "z": 0.374,
+      "y": 1.024,
+      "id": "output",
+      "note": "OUTPUT jack: 55mm from front, 26mm up. Measured."
+    },
+    {
+      "side": "right",
+      "z": 0.374,
+      "y": 1.024,
+      "id": "input",
+      "note": "INPUT jack: 55mm from front, 26mm up. Measured."
+    }
+  ],
+  "notes": "Boss DS-1 hero model #02. Knob positions measured from PedalPlayground top reference."
 }

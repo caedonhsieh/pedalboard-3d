@@ -1,0 +1,6 @@
+DS-1 front studio reference
+Source: Sweetwater product page (https://www.sweetwater.com/store/detail/DS1--boss-ds-1-distortion-pedal)
+CDN: media.sweetwater.com/m/products/image/ae4a3374b5SOsdAuqXqlzUSNgtB3yp2mIcrVWam2.jpg
+Retrieved: 2026-09-29 (curl, width=2000)
+View: dead-on front/top studio shot, near-orthographic, white background
+Use: primary proportion reference for treadle, labels, knob layout

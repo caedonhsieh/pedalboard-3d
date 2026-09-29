@@ -9,9 +9,12 @@ Absolute scale anchored to published dims: **73 W × 129 D × 59 H mm**
 | File | View | Source |
 |---|---|---|
 | `ds1_top.png` | Top-down | PedalPlayground catalog |
+| `ds1_sw_front.jpg` | Dead-on front studio, near-orthographic | Sweetwater CDN (2000px) |
+| `ds1_sw_bundle_cables.jpg` | Slight top-down 3/4 | Sweetwater CDN (DS1Pk bundle) |
+| `ds1_sw_bundle_psu.jpg` | Slight top-down 3/4 | Sweetwater CDN (DS1Pk2 bundle) |
 | `ds1_side_yahoo.jpg` | True side profile | Yahoo Auctions listing |
-| `ds1_side_candidate1.jpg` | Close 3/4, footswitch detail | yayastation.com |
-| `ds1_34_candidate1.jpg` | Full 3/4 | richtonemusic.co.uk |
+| `ds1_side_detail.jpg` | Close 3/4, footswitch detail | yayastation.com |
+| `ds1_34.jpg` | Full 3/4 | Rich Tone Music |
 | `boss_side_ch1.jpg` | Front (CH-1, same enclosure) | session.de |
 
 ## Enclosure side profile (from ds1_side_yahoo.jpg)
@@ -37,20 +40,25 @@ Note: side photo has perspective caveats (camera slightly above). The wedge
 character (tall back, sloping top, shorter front) is unambiguous; exact front
 height ~47mm is provisional pending Sweetwater orthographic side view.
 
-## Footswitch plate (from side + front views)
+## Footswitch / treadle (CORRECTED from Sweetwater ds1_sw_front.jpg)
+
+**Critical correction:** The treadle is a BLACK rubber pad set in an orange
+frame — NOT an orange plate. The earlier "hinged orange plate" description was
+wrong.
 
 | Landmark | Value | Source |
 |---|---|---|
-| Plate length (front-back) | ~60 mm | Side view: 255px / 4.23 px/mm |
-| Plate width | ~68 mm (93% of 73mm) | Front view: 500/540 px ratio |
-| Plate thickness | ~5 mm | Side view + 3/4 detail |
-| Hinge position | ~60 mm from front (plate back end) | Side view x≈310px |
-| Plate tilt | ~4.5° (higher at back/hinge) | Side view |
-| Gap under plate | ~9 mm at front, tapering to hinge | Side view |
-| BOSS logo | Embossed, centered on plate | 3/4 detail view |
+| Rubber pad width | 65.6 mm | SW front: 1660px / 25.3 px/mm |
+| Orange frame border | ~2.5 mm each side | SW front row scans |
+| Total treadle opening | ~70.6 mm | 65.6 + 2×2.5 |
+| Body width | 73 mm | Published |
+| Pad inset from body sides | ~1.2 mm each side | (73 − 70.6) / 2 |
+| Pad length (front-back) | ~60 mm | Side view (unchanged) |
+| BOSS logo | Embossed black-on-black, centered | SW front clearly shows |
 
-The plate is a separate hinged component, NOT flush with the body. There is a
-visible shadow gap between plate underside and the sloped body top.
+The treadle is the classic Boss pivoting design: black rubber on a metal plate,
+hinged at the back (control-panel side). The orange frame is part of the main
+chassis. Visible gap under the treadle front edge (side view).
 
 ## Control panel (from top + 3/4 views)
 
