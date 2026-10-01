@@ -771,7 +771,7 @@ export function assemblePedal(spec) {
     : enc.closed
     ? extrudeProfile({ // closed measured polygon (DS-1 IJKLMN): extrude directly
         points: enc.points, width: w,
-        material, bevel: enc.bevel ?? 0.05, kind: 'enclosure',
+        material, bevel: 0, kind: 'enclosure', // sharp corners; bevel hangs on concave M vertex
       })
     : profileEnclosure({
         w, d, points: enc.points,
