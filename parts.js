@@ -1105,10 +1105,10 @@ export function assemblePedal(spec) {
       const { y, pitch, deck } = surfaceAt(decks, lb.z);
       if (deck.group) {
         deck.group.add(part);
-        part.position.set(lb.x, 0.012, (lb.z - deck.zc) / Math.cos(pitch));
+        part.position.set(lb.x, 0.025, (lb.z - deck.zc) / Math.cos(pitch));
       } else {
         group.add(part);
-        part.position.set(lb.x, y + 0.012, lb.z);
+        part.position.set(lb.x, y + 0.025, lb.z);
       }
     }
     parts.push(part);
