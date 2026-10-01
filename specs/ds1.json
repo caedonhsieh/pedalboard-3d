@@ -144,21 +144,6 @@
       "w": 0.8,
       "h": 0.3,
       "bold": true
-    },
-    {
-      "id": "psa",
-      "text": "USE BOSS PSA\nADAPTOR ONLY\n(9V DC)",
-      "face": "back",
-      "x": -0.7,
-      "y": 0.7,
-      "w": 1.0,
-      "h": 0.65,
-      "size": 0.09,
-      "color": "#cc0000",
-      "bg": "#ffffff",
-      "align": "center",
-      "note": "Added 2026-09-29 from ds1_sw_detail2.jpg. White label with red text, right of DC jack.",
-      "spaced": false
     }
   ],
   "jacks": [
@@ -179,15 +164,15 @@
   ],
   "powerJack": {
     "x": 0,
-    "y": 0.62,
+    "y": 0.56,
     "note": "DC 9V in, centered on back face, below label per ds1_gc_back.jpg"
   },
   "thumbscrew": {
     "x": 0,
-    "z": 2.58,
-    "y": 0.72,
+    "z": 2.56,
+    "y": 1.75,
     "r": 0.2,
-    "note": "Battery thumbscrew, front center just below treadle toe"
+    "note": "Battery thumbscrew on treadle toe, front center"
   },
   "notes": "REBUILT 2026-10-01 from Caedon-approved v4 profile annotation. Body/treadle/recess/pad/base are measured side profiles. Top-view parts (knobs/LED/labels) retain 2026-09-29 positions, UNVALIDATED.",
   "treadleProfile": {
