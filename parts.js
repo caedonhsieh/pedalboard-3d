@@ -153,6 +153,33 @@ export function profileEnclosure({ w, d, points, bevel = 0.05, frontLean = 0, ma
   return g;
 }
 
+/**
+ * Extrude a measured side profile ([x_depth, y_height], x=front-positive,
+ * y=up, inches) into a solid of the given width (X axis, centered).
+ * Used for DS-1 measured parts (treadle, recess, pad, base) from the
+ * Caedon-approved v4 profile annotation. Does NOT touch the TS9 path.
+ */
+export function extrudeProfile({ points, width, material = FIN.green, bevel = 0.02, kind = 'part' } = {}) {
+  const s = new THREE.Shape();
+  s.moveTo(points[0][0], points[0][1]);
+  for (let i = 1; i < points.length; i++) s.lineTo(points[i][0], points[i][1]);
+  s.closePath();
+  const b = bevel;
+  const geo = new THREE.ExtrudeGeometry(s, {
+    depth: Math.max(0.01, width - 2 * b), bevelEnabled: true,
+    bevelThickness: b, bevelSize: b, bevelSegments: 2, steps: 1,
+  });
+  // Shape is in (Z_depth, Y_height); extrusion along shape-Z becomes world X.
+  // rotation.y = -PI/2 maps shape-X -> world +Z (front), shape-Z -> world -X.
+  geo.translate(0, 0, -(width - 2 * b) / 2);
+  const g = new THREE.Group();
+  const mesh = shadowed(new THREE.Mesh(geo, material));
+  mesh.rotation.y = -Math.PI / 2;
+  g.add(mesh);
+  g.userData.kind = kind;
+  return g;
+}
+
 /** Black base plate, slightly inset. */
 export function basePlate({ w, d, h = 0.09 } = {}) {
   const m = shadowed(new THREE.Mesh(new THREE.BoxGeometry(w - 0.12, h, d - 0.12), FIN.blackPlastic));
@@ -224,8 +251,8 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
   padW: specPadW = null, padD: specPadD = null, padCz: specPadCz = null,
   deckPitch = 0 } = {}) {
   const g = new THREE.Group();
-  if (style === 'round') {
   g.userData.kind = 'treadle';
+  if (style === 'round') {
     const washer = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.30, 0.30, 0.04, 32), FIN.chrome));
     washer.position.y = 0.02;
     const btn = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.24, 0.22, 32), FIN.chrome));
@@ -749,6 +776,45 @@ export function assemblePedal(spec) {
   group.add(enclosureMesh);
   group.add(basePlate({ w, d }));
 
+  // Measured-profile parts (DS-1 v4, 2026-10-01). Absolute coords, no seating.
+  // Only present when the spec carries them; TS9 and others are unaffected.
+  const profMat = (c) => c ? powderCoat(c) : material;
+  if (spec.treadleProfile) {
+    const tp = spec.treadleProfile;
+    const treadle = extrudeProfile({
+      points: tp.points, width: tp.width ?? 2.36,
+      material: profMat(tp.color), bevel: 0.03, kind: 'treadle',
+    });
+    group.add(treadle); parts.push(treadle);
+    anchors.push({ id: 'treadle', kind: 'treadle', x: 0, z: 0, obj: treadle });
+  }
+  if (spec.recessProfile) {
+    const rp = spec.recessProfile;
+    const recess = extrudeProfile({
+      points: rp.points, width: rp.width ?? 2.36,
+      material: profMat(rp.color), bevel: 0.02, kind: 'recess',
+    });
+    group.add(recess); parts.push(recess);
+  }
+  if (spec.padProfile) {
+    const pp = spec.padProfile;
+    const pad = extrudeProfile({
+      points: pp.points, width: pp.width ?? 2.165,
+      material: new THREE.MeshStandardMaterial({ color: new THREE.Color(pp.color || '#1a1a1c'), roughness: 0.9 }),
+      bevel: 0.015, kind: 'pad',
+    });
+    group.add(pad); parts.push(pad);
+  }
+  if (spec.baseProfile) {
+    const bp = spec.baseProfile;
+    const base = extrudeProfile({
+      points: bp.points, width: bp.width ?? w,
+      material: new THREE.MeshStandardMaterial({ color: new THREE.Color(bp.color || '#8a8d92'), roughness: 0.5, metalness: 0.6 }),
+      bevel: 0.01, kind: 'base',
+    });
+    group.add(base); parts.push(base);
+  }
+
   const decks = buildDecks(group, spec);
 
   function seat(part, x, z, id, kind) {
@@ -854,6 +920,7 @@ export function assemblePedal(spec) {
     // Battery-compartment thumb screw on the front (toe) face. Black knurled knob.
     const ts = spec.thumbscrew;
     const screw = new THREE.Group();
+    screw.userData.kind = 'thumbscrew';
     const r = ts.r ?? 0.20, h = 0.16;
     const knob = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 24), FIN.blackPlastic));
     knob.rotation.x = Math.PI / 2;
