@@ -1038,7 +1038,7 @@ export function applyTreadleDecal(assembly, texture, { anisotropy = 8 } = {}) {
   // Texture V=1 (image top) is at plane +Y -> world -Z = treadle back (hinge). Good.
   // extrudeProfile maps profile-x -> world +Z, profile-y -> world Y.
   const pitch = Math.atan2(dy, dx); // negative: surface slopes down toward front
-  m.rotation.x = -Math.PI / 2 + pitch; // lay flat, tilt to match slope (pitch<0 slopes down toward front)
+  m.rotation.x = -Math.PI / 2 - pitch; // lay flat, then tilt front edge down
   const cx = (ax + bx) / 2, cy = (ay + by) / 2;
   // Treadle extruded with bevel 0.03: top surface sits ~0.03 above profile.
   // Place decal just above the beveled surface.
