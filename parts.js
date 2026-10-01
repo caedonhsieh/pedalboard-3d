@@ -159,6 +159,46 @@ export function profileEnclosure({ w, d, points, bevel = 0.05, frontLean = 0, ma
  * Used for DS-1 measured parts (treadle, recess, pad, base) from the
  * Caedon-approved v4 profile annotation. Does NOT touch the TS9 path.
  */
+/**
+ * Chamfer sharp concave vertices in a 2D polygon.
+ * Three.js ExtrudeGeometry bevel hangs on severe concave corners.
+ * Replaces each concave vertex with two points offset along incident edges.
+ */
+export function chamferConcave(points, dist = 0.08) {
+  if (points.length < 4) return points;
+  // Compute signed area to determine winding
+  let area = 0;
+  for (let i = 0; i < points.length; i++) {
+    const [x1, y1] = points[i];
+    const [x2, y2] = points[(i + 1) % points.length];
+    area += (x2 - x1) * (y2 + y1);
+  }
+  const ccw = area < 0; // negative area = counterclockwise in standard math coords
+  const result = [];
+  for (let i = 0; i < points.length; i++) {
+    const prev = points[(i - 1 + points.length) % points.length];
+    const curr = points[i];
+    const next = points[(i + 1) % points.length];
+    // Vectors
+    const v1x = curr[0] - prev[0], v1y = curr[1] - prev[1];
+    const v2x = next[0] - curr[0], v2y = next[1] - curr[1];
+    const cross = v1x * v2y - v1y * v2x;
+    const isConcave = ccw ? (cross < 0) : (cross > 0);
+    if (isConcave) {
+      // Chamfer: two points along each edge, dist from vertex
+      const len1 = Math.hypot(v1x, v1y);
+      const len2 = Math.hypot(v2x, v2y);
+      const d = Math.min(dist, len1 * 0.4, len2 * 0.4);
+      const c1 = [curr[0] - (v1x / len1) * d, curr[1] - (v1y / len1) * d];
+      const c2 = [curr[0] + (v2x / len2) * d, curr[1] + (v2y / len2) * d];
+      result.push(c1, c2);
+    } else {
+      result.push(curr);
+    }
+  }
+  return result;
+}
+
 export function extrudeProfile({ points, width, material = FIN.green, bevel = 0.02, kind = 'part' } = {}) {
   const s = new THREE.Shape();
   s.moveTo(points[0][0], points[0][1]);
@@ -856,8 +896,8 @@ export function assemblePedal(spec) {
     ? boxEnclosure({ w, d, h, edgeRadius: enc.edgeRadius ?? 0.06, material })
     : enc.closed
     ? extrudeProfile({ // closed measured polygon (DS-1 IJKLMN): extrude directly
-        points: enc.points, width: w,
-        material, bevel: 0, kind: 'enclosure', // sharp corners; bevel hangs on concave M vertex (confirmed 2026-10-01)
+        points: chamferConcave(enc.points, 0.08), width: w,
+        material, bevel: 0.02, kind: 'enclosure', // chamfer concave M, then small bevel
       })
     : profileEnclosure({
         w, d, points: enc.points,
