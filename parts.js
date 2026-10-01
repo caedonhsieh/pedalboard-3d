@@ -904,7 +904,7 @@ export function assemblePedal(spec) {
     : enc.closed
     ? extrudeProfile({ // closed measured polygon (DS-1 IJKLMN): extrude directly
         points: roundPolygon(enc.points, 0.08, 6), width: w,
-        material, bevel: 0, kind: 'enclosure', // 2D chamfered corners for rounded edges
+        material, bevel: 0.02, kind: 'enclosure', // 2D rounded corners + 3D bevel for horizontal rounding
       })
     : profileEnclosure({
         w, d, points: enc.points,
