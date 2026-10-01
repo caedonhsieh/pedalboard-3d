@@ -160,11 +160,12 @@ export function profileEnclosure({ w, d, points, bevel = 0.05, frontLean = 0, ma
  * Caedon-approved v4 profile annotation. Does NOT touch the TS9 path.
  */
 /**
- * Chamfer all vertices of a 2D polygon.
- * Replaces each sharp corner with a short straight edge.
- * Simple, robust, no hang risk. Gives a "rounded" appearance.
+ * Round all vertices of a 2D polygon using quadratic Bezier curves.
+ * Replaces each sharp corner with a smooth curved segment.
+ * For convex vertices: outer round. For concave: inner fillet.
+ * Returns polyline points approximating the curves. Safe for ExtrudeGeometry.
  */
-export function chamferAll(points, dist = 0.05) {
+export function roundPolygon(points, radius = 0.06, segPerCorner = 6) {
   if (points.length < 3) return points;
   const result = [];
   for (let i = 0; i < points.length; i++) {
@@ -175,10 +176,24 @@ export function chamferAll(points, dist = 0.05) {
     const v2x = next[0] - curr[0], v2y = next[1] - curr[1];
     const len1 = Math.hypot(v1x, v1y), len2 = Math.hypot(v2x, v2y);
     if (len1 < 1e-9 || len2 < 1e-9) { result.push(curr); continue; }
-    const d = Math.min(dist, len1 * 0.3, len2 * 0.3);
-    const c1 = [curr[0] - (v1x / len1) * d, curr[1] - (v1y / len1) * d];
-    const c2 = [curr[0] + (v2x / len2) * d, curr[1] + (v2y / len2) * d];
-    result.push(c1, c2);
+    const r = Math.min(radius, len1 * 0.4, len2 * 0.4);
+    if (r < 1e-6) { result.push(curr); continue; }
+    // Tangent points
+    const t1x = curr[0] - (v1x / len1) * r;
+    const t1y = curr[1] - (v1y / len1) * r;
+    const t2x = curr[0] + (v2x / len2) * r;
+    const t2y = curr[1] + (v2y / len2) * r;
+    // Quadratic Bezier: P0=t1, P1=curr (control), P2=t2
+    // B(t) = (1-t)^2*P0 + 2(1-t)t*P1 + t^2*P2
+    for (let s = 0; s <= segPerCorner; s++) {
+      const t = s / segPerCorner;
+      const mt = 1 - t;
+      const x = mt*mt*t1x + 2*mt*t*curr[0] + t*t*t2x;
+      const y = mt*mt*t1y + 2*mt*t*curr[1] + t*t*t2y;
+      // Skip first point (duplicate of previous segment's last)
+      if (s === 0 && result.length > 0) continue;
+      result.push([x, y]);
+    }
   }
   return result;
 }
@@ -840,7 +855,7 @@ export function assemblePedal(spec) {
     ? boxEnclosure({ w, d, h, edgeRadius: enc.edgeRadius ?? 0.06, material })
     : enc.closed
     ? extrudeProfile({ // closed measured polygon (DS-1 IJKLMN): extrude directly
-        points: chamferAll(enc.points, 0.06), width: w,
+        points: roundPolygon(enc.points, 0.08, 6), width: w,
         material, bevel: 0, kind: 'enclosure', // 2D chamfered corners for rounded edges
       })
     : profileEnclosure({
