@@ -224,9 +224,13 @@ Shared `parts.js` changes affect all pedals. After any edit, verify:
 ## 9. Key Principles
 
 1. **Stop guessing and measure.** Every value traces to a measured source.
-2. **Caedon's annotations are the spec.** Apply verbatim, never advance a stage
-   without his explicit approval.
-3. **Never copy specs** — derive from reference photos.
-4. **Fix only the named part** — don't let fixes propagate to siblings unasked.
-5. **Counts from photos, never estimated** (he caught a guessed flute count).
-6. **Disclose deviations honestly** up front.
+2. **Self-validate first, human review last.** Always make a strong autonomous
+   attempt to validate and improve without a human in the loop. Iterate until
+   no more progress can be made (≥20 no-improvement iterations before ending
+   a branch). Only then bring in human review.
+3. **Manual annotation is last resort.** See §0 — exhaust specs and automated
+   measurement before asking for hand annotation.
+4. **Never copy specs** — derive from reference photos.
+5. **Fix only the named part** — don't let fixes propagate to siblings unasked.
+6. **Counts from photos, never estimated** (he caught a guessed flute count).
+7. **Disclose deviations honestly** up front.
