@@ -507,9 +507,10 @@ export function knobBaseRing({ innerR = 0.27, width = 0.1, dotR = 0.035, dotRadi
   tex.anisotropy = 8;
   const m = new THREE.Mesh(
     new THREE.CircleGeometry(texR, 48),
-    new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 })
+    new THREE.MeshStandardMaterial({ map: tex, transparent: true, alphaTest: 0.1, depthWrite: false, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 })
   );
   m.rotation.x = -Math.PI / 2;
+  m.renderOrder = 1;
   const g = new THREE.Group();
   g.add(m);
   g.userData.kind = 'basering';
