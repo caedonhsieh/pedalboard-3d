@@ -16,17 +16,16 @@ TEXT_DISTORTION = "Distortion"
 TEXT_MODEL = "DS-1"
 
 # --- LAYOUT (positions in 2048x2048 canvas) ---
-# These match the original traced decal layout
+# Distortion spans full width; DS-1 bottom-right, right-aligned to Distortion's edge
 POS_OUTPUT = (85, 100)      # top-left
 POS_INPUT = (1450, 100)     # top-right
-POS_DISTORTION = (100, 250) # middle, large (spans full width)
-# DS-1: right-aligned (right edge at x=1950), vertically centered with Distortion
-POS_MODEL = (1577, 320)     # right side, level with Distortion
+POS_DISTORTION = (100, 250) # middle, spans full width (1846px, right edge at 1946)
+POS_MODEL = (1627, 577)     # bottom-right, right edge aligned at 1946
 
 # --- FONT SIZES ---
 SIZE_LABEL = 120    # OUTPUT/INPUT
-SIZE_DISTORTION = 240  # Distortion (bold sans-serif, left side)
-SIZE_MODEL = 140    # DS-1 (right side, level with Distortion)
+SIZE_DISTORTION = 391  # Distortion (LiberationSans-Bold, spans full width)
+SIZE_MODEL = 140    # DS-1 (LiberationSans-Bold, right-aligned)
 
 # --- COLORS ---
 COLOR_BLACK = (0, 0, 0, 255)
