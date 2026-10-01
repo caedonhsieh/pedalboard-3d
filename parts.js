@@ -544,10 +544,11 @@ export function knobBaseRing({ innerR = 0.27, width = 0.1, dotR = 0.035, dotRadi
   tex.anisotropy = 8;
   const m = new THREE.Mesh(
     new THREE.CircleGeometry(texR, 48),
-    new THREE.MeshStandardMaterial({ map: tex, transparent: true, alphaTest: 0.1, depthWrite: false, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 })
+    new THREE.MeshStandardMaterial({ map: tex, transparent: true, alphaTest: 0.1, depthWrite: false, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4, side: THREE.DoubleSide })
   );
   m.rotation.x = -Math.PI / 2;
   m.renderOrder = 1;
+  m.frustumCulled = false;
   const g = new THREE.Group();
   g.add(m);
   g.userData.kind = 'basering';
@@ -649,9 +650,10 @@ export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', bg = nul
   tex.anisotropy = 8;
   const m = new THREE.Mesh(
     new THREE.PlaneGeometry(w, h),
-    new THREE.MeshStandardMaterial({ map: tex, transparent: true, alphaTest: 0.1, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 })
+    new THREE.MeshStandardMaterial({ map: tex, transparent: true, alphaTest: 0.1, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4, side: THREE.DoubleSide })
   );
   m.rotation.x = -Math.PI / 2;
+  m.frustumCulled = false;
   const g = new THREE.Group();
   g.add(m);
   g.userData.kind = 'label';
