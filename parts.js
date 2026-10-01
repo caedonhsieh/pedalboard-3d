@@ -475,8 +475,9 @@ export function dotRing({ r = 0.42, dots = 11, dotR = 0.035 } = {}) {
 
 /** Base ring + 3 indicator dots for Boss knobs. Flat on deck.
  *  Ring: 0.1" wide black annulus at knob base. Dots at 12, 5, 7 o'clock. */
-export function knobBaseRing({ innerR = 0.27, width = 0.1, dotR = 0.035, dotRadius = 0.45 } = {}) {
+export function knobBaseRing({ innerR = 0.27, width = 0.1, dotR = 0.035, dotRadius = 0.5 } = {}) {
   const outerR = innerR + width;
+  const texR = dotRadius + dotR + 0.05; // texture covers dots outside ring
   const size = 512;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = size;
@@ -484,15 +485,15 @@ export function knobBaseRing({ innerR = 0.27, width = 0.1, dotR = 0.035, dotRadi
   ctx.clearRect(0, 0, size, size);
   ctx.fillStyle = '#111';
   const c = size / 2;
-  const px = (rr) => rr / outerR * (size / 2) * 0.95;
-  // Ring: filled annulus
+  const px = (rr) => rr / texR * (size / 2) * 0.95;
+  // Ring: filled annulus (black 0.1" ring at knob base)
   ctx.beginPath();
   ctx.arc(c, c, px(outerR), 0, Math.PI * 2);
   ctx.arc(c, c, px(innerR), 0, Math.PI * 2, true);
   ctx.fill();
-  // 3 dots at 12, 5, 7 o'clock (canvas angles: 12=90deg, 5=-60deg, 7=-120deg)
+  // 3 black dots OUTSIDE the ring at 12, 5, 7 o'clock
   // Canvas +y (down) maps to world -z (back) after -PI/2 rotation
-  ctx.fillStyle = '#e8e8e8'; // white dots, visible on black ring
+  ctx.fillStyle = '#111'; // black dots on pedal surface
   const dotAngles = [Math.PI/2, -Math.PI/3, -2*Math.PI/3]; // 90deg, -60deg, -120deg
   for (const a of dotAngles) {
     const x = c + Math.cos(a) * px(dotRadius);
@@ -505,7 +506,7 @@ export function knobBaseRing({ innerR = 0.27, width = 0.1, dotR = 0.035, dotRadi
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
   const m = new THREE.Mesh(
-    new THREE.CircleGeometry(outerR, 48),
+    new THREE.CircleGeometry(texR, 48),
     new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 })
   );
   m.rotation.x = -Math.PI / 2;
