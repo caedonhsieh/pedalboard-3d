@@ -840,8 +840,8 @@ export function assemblePedal(spec) {
     ? boxEnclosure({ w, d, h, edgeRadius: enc.edgeRadius ?? 0.06, material })
     : enc.closed
     ? extrudeProfile({ // closed measured polygon (DS-1 IJKLMN): extrude directly
-        points: enc.points, width: w,
-        material, bevel: 0, kind: 'enclosure', // sharp corners; chamferAll disabled - causes hang (debug pending)
+        points: chamferAll(enc.points, 0.06), width: w,
+        material, bevel: 0, kind: 'enclosure', // 2D chamfered corners for rounded edges
       })
     : profileEnclosure({
         w, d, points: enc.points,
