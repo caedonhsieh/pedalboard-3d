@@ -609,18 +609,25 @@ export function tickRing({ innerR = 0.32, outerR = 0.485, wedges = 12 } = {}) {
 
 /** Flat text label on the deck. Clean vector text via canvas. */
 export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', bg = null, font = null, spaced = true, arrow = null, script = false, bold = false } = {}) {
+  // Canvas sized proportionally to plane to avoid stretch distortion.
+  // Fixed pixels-per-inch so font size is consistent across labels.
+  const PPI = 1200; // pixels per inch
+  const canvasW = Math.max(64, Math.round(w * PPI));
+  const canvasH = Math.max(64, Math.round(h * PPI));
   const canvas = document.createElement('canvas');
-  canvas.width = 512; canvas.height = 256;
+  canvas.width = canvasW; canvas.height = canvasH;
   const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, 512, 256);
+  ctx.clearRect(0, 0, canvasW, canvasH);
   // Optional solid background (e.g. white PSA label)
-  if (bg) { ctx.fillStyle = bg; ctx.fillRect(0, 0, 512, 256); }
+  if (bg) { ctx.fillStyle = bg; ctx.fillRect(0, 0, canvasW, canvasH); }
   ctx.fillStyle = color;
+  // Font size: 70% of canvas height for cap height consistency
+  const fontPx = Math.round(canvasH * 0.7);
   // Font selection: script (italic serif), bold, or standard
   if (!font) {
-    if (script) font = 'italic 700 130px Georgia, serif';
-    else if (bold) font = '800 140px Arial, sans-serif';
-    else font = '600 115px Arial, sans-serif';
+    if (script) font = `italic 700 ${Math.round(canvasH * 0.75)}px Georgia, serif`;
+    else if (bold) font = `800 ${Math.round(canvasH * 0.8)}px Arial, sans-serif`;
+    else font = `600 ${fontPx}px Arial, sans-serif`;
   }
   ctx.font = font;
   ctx.textAlign = 'center';
@@ -632,9 +639,9 @@ export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', bg = nul
   else if (arrow === 'right') render = render + ' \u2192';
   // Multi-line support: split on \n and stack vertically
   const lines = render.split('\n');
-  const lineH = 256 / (lines.length + 0.5);
+  const lineH = canvasH / (lines.length + 0.5);
   lines.forEach((ln, i) => {
-    ctx.fillText(ln, 256, lineH * (i + 0.75));
+    ctx.fillText(ln, canvasW / 2, lineH * (i + 0.75));
   });
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
