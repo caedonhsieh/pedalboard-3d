@@ -1001,7 +1001,7 @@ export function assemblePedal(spec) {
     if (k.baseRing) {
       const bring = knobBaseRing({});
       const { y: by, pitch: bpitch, deck: bdeck } = surfaceAt(decks, k.z);
-      const bringY = 0.013 + ki * 0.001;
+      const bringY = 0.03 + ki * 0.001; // above labels (0.025) so dots aren't covered
       bring.position.y = bringY;
       if (bdeck.group) {
         bdeck.group.add(bring);
