@@ -77,8 +77,8 @@
       "rot": 0.1,
       "note": "MEASURED from ds1_top.png: centered, 29.9mm from back, 14.3mm dia (smaller).",
       "measured": true,
-      "scale": 0.72,
-      "tickRing": false
+      "tickRing": false,
+      "diaScale": 0.85
     }
   ],
   "led": {

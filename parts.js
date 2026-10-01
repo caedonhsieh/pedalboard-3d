@@ -198,7 +198,7 @@ export function basePlate({ w, d, h = 0.09 } = {}) {
  * pointerRot: rotation of the pointer, radians.
  * Origin at the knob base (sits on the deck at y=0).
  */
-export function knob(style = 'ts9', pointerRot = 0, scale = 1) {
+export function knob(style = 'ts9', pointerRot = 0, scale = 1, diaScale = null) {
   // tagged below
   const k = new THREE.Group();
   k.userData.kind = 'knob';
@@ -236,7 +236,11 @@ export function knob(style = 'ts9', pointerRot = 0, scale = 1) {
     k.add(skirt, cap, pg);
   }
   k.userData.knobStyle = style;
-  if (scale !== 1) k.scale.setScalar(scale);
+  if (diaScale !== null && diaScale !== 1) {
+    k.scale.set(diaScale, scale, diaScale); // skinnier diameter, same height
+  } else if (scale !== 1) {
+    k.scale.setScalar(scale);
+  }
   return k;
 }
 
@@ -839,7 +843,7 @@ export function assemblePedal(spec) {
 
   for (let ki = 0; ki < (spec.knobs || []).length; ki++) {
     const k = spec.knobs[ki];
-    const part = seat(knob(k.style || 'ts9', k.rot || 0, k.scale || 1), k.x, k.z, k.id || 'knob', 'knob');
+    const part = seat(knob(k.style || 'ts9', k.rot || 0, k.scale || 1, k.diaScale || null), k.x, k.z, k.id || 'knob', 'knob');
     // Recessed knobs (e.g. TS9): sink the skirt into the deck so the knob
     // emerges from the surface instead of perching on top of it.
     const recess = k.recess ?? 0;
