@@ -544,7 +544,7 @@ export function knobBaseRing({ innerR = 0.27, width = 0.1, dotR = 0.035, dotRadi
   tex.anisotropy = 8;
   const m = new THREE.Mesh(
     new THREE.CircleGeometry(texR, 48),
-    new THREE.MeshStandardMaterial({ map: tex, transparent: true, alphaTest: 0.1, depthWrite: false, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -6, polygonOffsetUnits: -6 })
+    new THREE.MeshStandardMaterial({ map: tex, transparent: true, alphaTest: 0.1, depthWrite: false, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 })
   );
   m.rotation.x = -Math.PI / 2;
   m.renderOrder = 1;
@@ -1001,7 +1001,7 @@ export function assemblePedal(spec) {
     if (k.baseRing) {
       const bring = knobBaseRing({});
       const { y: by, pitch: bpitch, deck: bdeck } = surfaceAt(decks, k.z);
-      const bringY = 0.015 + ki * 0.0005; // flush with labels; polygonOffset (-6 vs -4) handles draw order
+      const bringY = 0.016 + ki * 0.0005; // 0.001" above labels (0.015") - enough for depth, invisible to eye
       bring.position.y = bringY;
       if (bdeck.group) {
         bdeck.group.add(bring);
