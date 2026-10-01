@@ -957,30 +957,6 @@ export function assemblePedal(spec) {
 
   const decks = buildDecks(group, spec);
 
-  // Correct deck Y positions via raycast against the actual enclosure mesh.
-  // The bevel/roundPolygon cause the real surface to deviate from nominal spec,
-  // which buried labels/rings. Raycast finds the true top surface.
-  (function correctDecks() {
-    if (!enc.closed || !enc.points) return; // only for measured-profile enclosures
-    enclosureMesh.updateWorldMatrix(true, false);
-    const ray = new THREE.Raycaster();
-    const down = new THREE.Vector3(0, -1, 0);
-    for (const dk of decks) {
-      if (!dk.group) continue;
-      // Raycast from above at deck center (x=0, z=zc)
-      const origin = new THREE.Vector3(0, 10, dk.zc);
-      ray.set(origin, down);
-      const hits = ray.intersectObject(enclosureMesh, false);
-      if (hits.length > 0) {
-        const trueY = hits[0].point.y;
-        // Update both the group position and the cached yc for surfaceAt()
-        const dy = trueY - dk.yc;
-        dk.group.position.y += dy;
-        dk.yc = trueY;
-      }
-    }
-  })();
-
   function seat(part, x, z, id, kind) {
     const { y, pitch, deck } = surfaceAt(decks, z);
     if (deck.group) {
@@ -999,6 +975,16 @@ export function assemblePedal(spec) {
   for (let ki = 0; ki < (spec.knobs || []).length; ki++) {
     const k = spec.knobs[ki];
     const part = seat(knob(k.style || 'ts9', k.rot || 0, k.scale || 1, k.diaScale || null), k.x, k.z, k.id || 'knob', 'knob');
+    // If baked surfaceY exists (offline raycast), correct the Y to the true beveled surface
+    if (k.surfaceY !== undefined) {
+      const { y: nominalY } = surfaceAt(decks, k.z);
+      // seat() placed it at nominalY (via deck.group); adjust by the difference
+      // The part is in deck.group (local Y=0); we need to move the GROUP or the part?
+      // Simplest: move the part's world Y by (surfaceY - nominalY)
+      // Since part is in deck.group at local Y=0, and deck.group is at nominalY,
+      // we set part local Y to (surfaceY - nominalY)
+      part.position.y = k.surfaceY - nominalY;
+    }
     // Recessed knobs (e.g. TS9): sink the skirt into the deck so the knob
     // emerges from the surface instead of perching on top of it.
     const recess = k.recess ?? 0;
@@ -1009,32 +995,48 @@ export function assemblePedal(spec) {
       const ring = k.style === 'boss'
         ? dotRing({ r: 0.42 * trScale, dots: 11, dotR: 0.035 * trScale })
         : tickRing({ innerR: 0.32 * trScale, outerR: 0.485 * trScale, wedges: 12 });
-      const { y, pitch, deck } = surfaceAt(decks, k.z);
       // Stagger Y by knob index (0.001" steps) so overlapping tick rings
       // don't z-fight — later knobs render on top. Invisible to the eye.
       const ringY = 0.012 + ki * 0.001;
-      ring.position.y = ringY;
-      if (deck.group) {
-        deck.group.add(ring);
-        ring.position.set(k.x, ringY, (k.z - deck.zc) / Math.cos(pitch));
-      } else {
+      if (k.surfaceY !== undefined) {
+        // Baked offline surface Y: position directly in world space
+        const { pitch } = surfaceAt(decks, k.z);
         group.add(ring);
-        ring.position.set(k.x, y + ringY, k.z);
+        ring.position.set(k.x, k.surfaceY + ringY, k.z);
+        ring.rotation.x = pitch;
+      } else {
+        const { y, pitch, deck } = surfaceAt(decks, k.z);
+        ring.position.y = ringY;
+        if (deck.group) {
+          deck.group.add(ring);
+          ring.position.set(k.x, ringY, (k.z - deck.zc) / Math.cos(pitch));
+        } else {
+          group.add(ring);
+          ring.position.set(k.x, y + ringY, k.z);
+        }
       }
       parts.push(ring);
     }
     // Base ring + 3 indicator dots (Boss TONE/DIST): black 0.1" ring at knob base
     if (k.baseRing) {
       const bring = knobBaseRing({});
-      const { y: by, pitch: bpitch, deck: bdeck } = surfaceAt(decks, k.z);
       const bringY = 0.016 + ki * 0.0005; // 0.001" above labels (0.015") - enough for depth, invisible to eye
-      bring.position.y = bringY;
-      if (bdeck.group) {
-        bdeck.group.add(bring);
-        bring.position.set(k.x, bringY, (k.z - bdeck.zc) / Math.cos(bpitch));
-      } else {
+      if (k.surfaceY !== undefined) {
+        // Baked offline surface Y: position directly in world space
+        const { pitch: bpitch } = surfaceAt(decks, k.z);
         group.add(bring);
-        bring.position.set(k.x, by + bringY, k.z);
+        bring.position.set(k.x, k.surfaceY + bringY, k.z);
+        bring.rotation.x = bpitch;
+      } else {
+        const { y: by, pitch: bpitch, deck: bdeck } = surfaceAt(decks, k.z);
+        bring.position.y = bringY;
+        if (bdeck.group) {
+          bdeck.group.add(bring);
+          bring.position.set(k.x, bringY, (k.z - bdeck.zc) / Math.cos(bpitch));
+        } else {
+          group.add(bring);
+          bring.position.set(k.x, by + bringY, k.z);
+        }
       }
       parts.push(bring);
     }
@@ -1127,6 +1129,13 @@ export function assemblePedal(spec) {
       group.add(part);
       const backZ = -(spec.dims?.d ?? 5.079) / 2 - 0.005;
       part.position.set(lb.x ?? 0, lb.y ?? 0.75, backZ);
+    } else if (lb.surfaceY !== undefined) {
+      // Baked offline surface Y (from raycasting the beveled mesh).
+      // Position directly in world space, bypassing nominal deck math.
+      const { pitch } = surfaceAt(decks, lb.z);
+      group.add(part);
+      part.position.set(lb.x ?? 0, lb.surfaceY + 0.015, lb.z ?? 0);
+      part.rotation.x = pitch;
     } else {
       const { y, pitch, deck } = surfaceAt(decks, lb.z);
       if (deck.group) {

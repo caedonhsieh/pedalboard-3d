@@ -56,7 +56,8 @@
       "note": "MEASURED from ds1_top.png: 16.3mm left of center, 16.9mm from back, 19.6mm dia. Scale 1.45 for 18mm height (V3 measured).",
       "measured": true,
       "tickRing": false,
-      "baseRing": true
+      "baseRing": true,
+      "surfaceY": 1.5895
     },
     {
       "id": "dist",
@@ -68,7 +69,8 @@
       "note": "MEASURED from ds1_top.png: 16.5mm right of center, 17.1mm from back, 19.8mm dia. Scale 1.45 for 18mm height (V3 measured).",
       "measured": true,
       "tickRing": false,
-      "baseRing": true
+      "baseRing": true,
+      "surfaceY": 1.5895
     },
     {
       "id": "level",
@@ -80,7 +82,8 @@
       "note": "MEASURED from ds1_top.png: centered, 29.9mm from back, 14.3mm dia (smaller).",
       "measured": true,
       "tickRing": false,
-      "diaScale": 0.85
+      "diaScale": 0.85,
+      "surfaceY": 1.5925
     }
   ],
   "led": {
@@ -95,7 +98,8 @@
       "x": 0.0,
       "z": -2.3,
       "w": 0.4,
-      "h": 0.1
+      "h": 0.1,
+      "surfaceY": 1.5873
     },
     {
       "text": "TONE",
@@ -103,7 +107,8 @@
       "z": -1.35,
       "w": 0.9,
       "h": 0.24,
-      "spaced": false
+      "spaced": false,
+      "surfaceY": 1.5925
     },
     {
       "text": "LEVEL",
@@ -111,7 +116,8 @@
       "z": -1.65,
       "w": 0.9,
       "h": 0.24,
-      "spaced": false
+      "spaced": false,
+      "surfaceY": 1.5909
     },
     {
       "text": "DIST",
@@ -119,7 +125,8 @@
       "z": -1.35,
       "w": 0.9,
       "h": 0.24,
-      "spaced": false
+      "spaced": false,
+      "surfaceY": 1.5925
     },
     {
       "text": "OUTPUT",
@@ -128,7 +135,8 @@
       "w": 0.45,
       "h": 0.12,
       "arrow": "left",
-      "spaced": false
+      "spaced": false,
+      "surfaceY": 1.7717
     },
     {
       "text": "INPUT",
@@ -137,7 +145,8 @@
       "w": 0.45,
       "h": 0.12,
       "arrow": "right",
-      "spaced": false
+      "spaced": false,
+      "surfaceY": 1.7717
     },
     {
       "text": "Distortion",
@@ -145,7 +154,8 @@
       "z": -0.22,
       "w": 1.8,
       "h": 0.35,
-      "script": true
+      "script": true,
+      "surfaceY": 1.6743
     },
     {
       "text": "DS-1",
@@ -153,7 +163,8 @@
       "z": 0.15,
       "w": 0.8,
       "h": 0.3,
-      "bold": true
+      "bold": true,
+      "surfaceY": 1.565
     }
   ],
   "jacks": [
