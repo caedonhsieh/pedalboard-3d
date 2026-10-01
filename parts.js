@@ -635,9 +635,8 @@ export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', bg = nul
   // Letter-spacing for the TS9 label style (wide-tracked caps); disable for script words
   let render = spaced && !script ? text.split('').join('\u2009') : text;
   // Add arrow symbol if specified
-  // TEMP DISABLED: Unicode arrows may cause font substitution affecting metrics
-  // if (arrow === 'left') render = '\u2190 ' + render;
-  // else if (arrow === 'right') render = render + ' \u2192';
+  if (arrow === 'left') render = '\u2190 ' + render;
+  else if (arrow === 'right') render = render + ' \u2192';
   // Multi-line support: split on \n and stack vertically
   const lines = render.split('\n');
   const lineH = canvasH / (lines.length + 0.5);
