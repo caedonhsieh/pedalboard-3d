@@ -492,6 +492,7 @@ export function knobBaseRing({ innerR = 0.27, width = 0.1, dotR = 0.035, dotRadi
   ctx.fill();
   // 3 dots at 12, 5, 7 o'clock (canvas angles: 12=90deg, 5=-60deg, 7=-120deg)
   // Canvas +y (down) maps to world -z (back) after -PI/2 rotation
+  ctx.fillStyle = '#e8e8e8'; // white dots, visible on black ring
   const dotAngles = [Math.PI/2, -Math.PI/3, -2*Math.PI/3]; // 90deg, -60deg, -120deg
   for (const a of dotAngles) {
     const x = c + Math.cos(a) * px(dotRadius);
