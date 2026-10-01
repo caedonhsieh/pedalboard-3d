@@ -42,7 +42,8 @@
     "notes": "MEASURED 2026-10-01: 31-pt body profile from validated Sweetwater right-profile annotation (v4, Caedon-approved). X scaled to 129mm depth, Y scaled to 59mm height.",
     "measured": true,
     "polygon_source": "your_files/ds1-reference-tags/outlines/all_outlines.json (v4)",
-    "note": "Caedon nodes IJKLMN, smooth=false for sharp corners 2026-10-01"
+    "note": "Caedon nodes IJKLMN, smooth=false for sharp corners 2026-10-01",
+    "closed": true
   },
   "knobs": [
     {

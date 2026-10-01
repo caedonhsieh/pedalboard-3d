@@ -768,6 +768,11 @@ export function assemblePedal(spec) {
   const material = enc.color ? powderCoat(enc.color) : FIN.green;
   const enclosureMesh = enc.type === 'box' || !enc.points
     ? boxEnclosure({ w, d, h, edgeRadius: enc.edgeRadius ?? 0.06, material })
+    : enc.closed
+    ? extrudeProfile({ // closed measured polygon (DS-1 IJKLMN): extrude directly
+        points: enc.points, width: w,
+        material, bevel: enc.bevel ?? 0.05, kind: 'enclosure',
+      })
     : profileEnclosure({
         w, d, points: enc.points,
         bevel: enc.bevel ?? 0.05, frontLean: enc.frontLean ?? 0, material,
@@ -1035,7 +1040,9 @@ export function applyTreadleDecal(assembly, texture, { anisotropy = 8 } = {}) {
   const pitch = Math.atan2(dy, dx); // negative: surface slopes down toward front
   m.rotation.x = -Math.PI / 2 - pitch; // lay flat, then tilt front edge down
   const cx = (ax + bx) / 2, cy = (ay + by) / 2;
-  m.position.set(0, cy + 0.012, cx); // profile-x -> world +Z
+  // Treadle extruded with bevel 0.03: top surface sits ~0.03 above profile.
+  // Place decal just above the beveled surface.
+  m.position.set(0, cy + 0.045, cx); // profile-x -> world +Z
   m.receiveShadow = true;
   assembly.group.add(m);
 }
