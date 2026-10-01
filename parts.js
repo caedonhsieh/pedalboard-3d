@@ -857,7 +857,7 @@ export function assemblePedal(spec) {
     : enc.closed
     ? extrudeProfile({ // closed measured polygon (DS-1 IJKLMN): extrude directly
         points: enc.points, width: w,
-        material, bevel: 0, kind: 'enclosure', // sharp corners; bevel hangs on concave M vertex
+        material, bevel: 0.02, kind: 'enclosure', // small rounding; larger bevels hang on concave M vertex
       })
     : profileEnclosure({
         w, d, points: enc.points,
@@ -874,7 +874,7 @@ export function assemblePedal(spec) {
     const tp = spec.treadleProfile;
     const treadle = extrudeProfile({
       points: tp.points, width: tp.width ?? 2.36,
-      material: profMat(tp.color), bevel: 0.03, kind: 'treadle',
+      material: profMat(tp.color), bevel: 0.04, kind: 'treadle',
     });
     group.add(treadle); parts.push(treadle);
     anchors.push({ id: 'treadle', kind: 'treadle', x: 0, z: 0, obj: treadle });
@@ -883,7 +883,7 @@ export function assemblePedal(spec) {
     const rp = spec.recessProfile;
     const recess = extrudeProfile({
       points: rp.points, width: rp.width ?? 2.36,
-      material: profMat(rp.color), bevel: 0.02, kind: 'recess',
+      material: profMat(rp.color), bevel: 0.03, kind: 'recess',
     });
     group.add(recess); parts.push(recess);
   }
