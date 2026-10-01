@@ -17,14 +17,45 @@ exception, not the rule.
 
 ## 1. Reference Collection
 
+### Automated Image Fetching (preferred)
+Use `scripts/fetch_views.py` — it pulls multi-view reference galleries via
+product APIs instead of hand-scraping:
+
+```bash
+python3 scripts/fetch_views.py --pedal <id> --query "Brand Model" --backend sweetwater-cdn
+```
+
+**Backends (priority order):**
+
+1. **sweetwater-cdn** — Sweetwater CDN URLs via image-search skill.
+   - Product HTML pages are PerimeterX-blocked; use image search instead.
+   - CDN: `media.sweetwater.com/m/products/image/{32-char-id}.jpg`
+   - Closeups: `media.sweetwater.com/api/i/.../images/closeup/750-{SKU}_detail{N}.jpg`
+   - Tokens can't be guessed — must come from image search or page HTML.
+   - Search query: `"site:sweetwater.com {product name} closeup"`
+   - Yields 6–10 studio views per pedal (top, sides, back, 3/4s) under consistent lighting.
+
+2. **ebay** — eBay Browse API: up to 24 images per listing. Used-gear listings
+   show every angle (wear reveals edges). Needs `EBAY_CLIENT_ID` and
+   `EBAY_CLIENT_SECRET` env vars (one-time signup at developer.ebay.com).
+
+3. **pedalplayground** — PedalPlayground GitHub catalog: 8000+ pedals, single
+   top-down view each. No key needed. Good for layout, not 3D form.
+
+4. **manual** — Direct URLs from image search (one-offs).
+
+Output: `references/<pedal>_<view>.jpg` + `.META.txt` per image.
+
+### Required Views
 Gather at minimum:
 - **Top-down**: knob/label/jack layout, x/z placement
 - **True side profile** (left AND right): enclosure silhouette, heights, slopes
 - **Front and back**: width profile, footswitch plate, power jack
 - **3/4 angles** (2+): cross-check proportions, surface transitions
 
-Sweetwater product pages are the first stop (6–10 studio views per pedal).
-Also: manufacturer pages, Reverb used listings (wear angles reveal edges).
+### Manual Fallback
+If automation fails: manufacturer product pages, Reverb used listings,
+retailer catalog shots (Thomann, session.de).
 
 ## 2. Manual Annotation Workflow (Last Resort)
 
