@@ -551,46 +551,6 @@ export function tickRing({ innerR = 0.32, outerR = 0.485, wedges = 12 } = {}) {
   return g;
 }
 
-/** Base ring + 3 indicator dots for Boss knobs. Flat on deck.
- *  Ring: 0.1" wide black annulus at knob base. Dots at 12, 5, 7 o'clock. */
-export function knobBaseRing({ innerR = 0.27, width = 0.1, dotR = 0.035, dotRadius = 0.45 } = {}) {
-  const outerR = innerR + width;
-  const size = 512;
-  const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = size;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, size, size);
-  ctx.fillStyle = '#111';
-  const c = size / 2;
-  const px = (rr) => rr / outerR * (size / 2) * 0.95;
-  // Ring: filled annulus
-  ctx.beginPath();
-  ctx.arc(c, c, px(outerR), 0, Math.PI * 2);
-  ctx.arc(c, c, px(innerR), 0, Math.PI * 2, true);
-  ctx.fill();
-  // 3 dots at 12, 5, 7 o'clock (canvas angles: 12=90deg, 5=-60deg, 7=-120deg)
-  // Canvas +y (down) maps to world -z (back) after -PI/2 rotation
-  const dotAngles = [Math.PI/2, -Math.PI/3, -2*Math.PI/3]; // 90deg, -60deg, -120deg
-  for (const a of dotAngles) {
-    const x = c + Math.cos(a) * px(dotRadius);
-    const y = c + Math.sin(a) * px(dotRadius);
-    ctx.beginPath();
-    ctx.arc(x, y, px(dotR), 0, Math.PI * 2);
-    ctx.fill();
-  }
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.anisotropy = 8;
-  const m = new THREE.Mesh(
-    new THREE.CircleGeometry(outerR, 48),
-    new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 })
-  );
-  m.rotation.x = -Math.PI / 2;
-  const g = new THREE.Group();
-  g.add(m);
-  g.userData.kind = 'basering';
-  return g;
-}
 
 /** Flat text label on the deck. Clean vector text via canvas. */
 export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', bg = null, font = null, spaced = true, arrow = null, script = false, bold = false } = {}) {
