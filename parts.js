@@ -544,7 +544,7 @@ export function knobBaseRing({ innerR = 0.27, width = 0.1, dotR = 0.035, dotRadi
   tex.anisotropy = 8;
   const m = new THREE.Mesh(
     new THREE.CircleGeometry(texR, 48),
-    new THREE.MeshStandardMaterial({ map: tex, transparent: true, alphaTest: 0.1, depthWrite: false, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 })
+    new THREE.MeshStandardMaterial({ map: tex, transparent: true, alphaTest: 0.1, depthWrite: false, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -6, polygonOffsetUnits: -6 })
   );
   m.rotation.x = -Math.PI / 2;
   m.renderOrder = 1;
@@ -1001,7 +1001,7 @@ export function assemblePedal(spec) {
     if (k.baseRing) {
       const bring = knobBaseRing({});
       const { y: by, pitch: bpitch, deck: bdeck } = surfaceAt(decks, k.z);
-      const bringY = 0.03 + ki * 0.001; // above labels (0.025) so dots aren't covered
+      const bringY = 0.015 + ki * 0.0005; // flush with labels; polygonOffset (-6 vs -4) handles draw order
       bring.position.y = bringY;
       if (bdeck.group) {
         bdeck.group.add(bring);
@@ -1105,10 +1105,10 @@ export function assemblePedal(spec) {
       const { y, pitch, deck } = surfaceAt(decks, lb.z);
       if (deck.group) {
         deck.group.add(part);
-        part.position.set(lb.x, 0.025, (lb.z - deck.zc) / Math.cos(pitch));
+        part.position.set(lb.x, 0.015, (lb.z - deck.zc) / Math.cos(pitch));
       } else {
         group.add(part);
-        part.position.set(lb.x, y + 0.025, lb.z);
+        part.position.set(lb.x, y + 0.015, lb.z);
       }
     }
     parts.push(part);
