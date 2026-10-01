@@ -42,7 +42,7 @@
     "notes": "MEASURED 2026-10-01: 31-pt body profile from validated Sweetwater right-profile annotation (v4, Caedon-approved). X scaled to 129mm depth, Y scaled to 59mm height.",
     "measured": true,
     "polygon_source": "your_files/ds1-reference-tags/outlines/all_outlines.json (v4)",
-    "note": "from Caedon nodes IJKLMN 2026-10-01"
+    "note": "Caedon nodes IJKLMN, NHGI collinear 2026-10-01"
   },
   "knobs": [
     {
@@ -210,30 +210,30 @@
     ],
     "width": 2.362,
     "color": "#e85d10",
-    "note": "from Caedon nodes ABCD 2026-10-01"
+    "note": "Caedon nodes ABCD, DEFC collinear 2026-10-01"
   },
   "recessProfile": {
     "points": [
       [
-        -0.6093,
-        1.944
+        -0.6016,
+        1.9811
       ],
       [
-        2.3069,
-        1.3876
+        2.3111,
+        1.4089
       ],
       [
-        2.3069,
-        0.9205
+        2.3034,
+        0.9081
       ],
       [
-        -0.6164,
-        1.786
+        -0.6206,
+        1.7716
       ]
     ],
     "width": 2.362,
     "color": "#c44d0e",
-    "note": "from Caedon nodes EFGH 2026-10-01"
+    "note": "Caedon nodes EFGH, DEFC/NHGI collinear 2026-10-01"
   },
   "padProfile": {
     "points": [
