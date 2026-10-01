@@ -434,6 +434,47 @@ export function dotRing({ r = 0.42, dots = 11, dotR = 0.035 } = {}) {
   return g;
 }
 
+/** Base ring + 3 indicator dots for Boss knobs. Flat on deck.
+ *  Ring: 0.1" wide black annulus at knob base. Dots at 12, 5, 7 o'clock. */
+export function knobBaseRing({ innerR = 0.27, width = 0.1, dotR = 0.035, dotRadius = 0.45 } = {}) {
+  const outerR = innerR + width;
+  const size = 512;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, size, size);
+  ctx.fillStyle = '#111';
+  const c = size / 2;
+  const px = (rr) => rr / outerR * (size / 2) * 0.95;
+  // Ring: filled annulus
+  ctx.beginPath();
+  ctx.arc(c, c, px(outerR), 0, Math.PI * 2);
+  ctx.arc(c, c, px(innerR), 0, Math.PI * 2, true);
+  ctx.fill();
+  // 3 dots at 12, 5, 7 o'clock (canvas angles: 12=90deg, 5=-60deg, 7=-120deg)
+  // Canvas +y (down) maps to world -z (back) after -PI/2 rotation
+  const dotAngles = [Math.PI/2, -Math.PI/3, -2*Math.PI/3]; // 90deg, -60deg, -120deg
+  for (const a of dotAngles) {
+    const x = c + Math.cos(a) * px(dotRadius);
+    const y = c + Math.sin(a) * px(dotRadius);
+    ctx.beginPath();
+    ctx.arc(x, y, px(dotR), 0, Math.PI * 2);
+    ctx.fill();
+  }
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  const m = new THREE.Mesh(
+    new THREE.CircleGeometry(outerR, 48),
+    new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 })
+  );
+  m.rotation.x = -Math.PI / 2;
+  const g = new THREE.Group();
+  g.add(m);
+  g.userData.kind = 'basering';
+  return g;
+}
+
 /** Tick ring: black wedge segments around a knob. Flat on deck.
  *  Real TS9: 12 positions around circle, 10 trapezoidal wedges rendered
  *  (2-trapezoid gap centered at bottom). Wedges tuck slightly under the knob
@@ -483,6 +524,47 @@ export function tickRing({ innerR = 0.32, outerR = 0.485, wedges = 12 } = {}) {
   const g = new THREE.Group();
   g.add(m);
   g.userData.kind = 'ring';
+  return g;
+}
+
+/** Base ring + 3 indicator dots for Boss knobs. Flat on deck.
+ *  Ring: 0.1" wide black annulus at knob base. Dots at 12, 5, 7 o'clock. */
+export function knobBaseRing({ innerR = 0.27, width = 0.1, dotR = 0.035, dotRadius = 0.45 } = {}) {
+  const outerR = innerR + width;
+  const size = 512;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, size, size);
+  ctx.fillStyle = '#111';
+  const c = size / 2;
+  const px = (rr) => rr / outerR * (size / 2) * 0.95;
+  // Ring: filled annulus
+  ctx.beginPath();
+  ctx.arc(c, c, px(outerR), 0, Math.PI * 2);
+  ctx.arc(c, c, px(innerR), 0, Math.PI * 2, true);
+  ctx.fill();
+  // 3 dots at 12, 5, 7 o'clock (canvas angles: 12=90deg, 5=-60deg, 7=-120deg)
+  // Canvas +y (down) maps to world -z (back) after -PI/2 rotation
+  const dotAngles = [Math.PI/2, -Math.PI/3, -2*Math.PI/3]; // 90deg, -60deg, -120deg
+  for (const a of dotAngles) {
+    const x = c + Math.cos(a) * px(dotRadius);
+    const y = c + Math.sin(a) * px(dotRadius);
+    ctx.beginPath();
+    ctx.arc(x, y, px(dotR), 0, Math.PI * 2);
+    ctx.fill();
+  }
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  const m = new THREE.Mesh(
+    new THREE.CircleGeometry(outerR, 48),
+    new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 })
+  );
+  m.rotation.x = -Math.PI / 2;
+  const g = new THREE.Group();
+  g.add(m);
+  g.userData.kind = 'basering';
   return g;
 }
 
@@ -867,6 +949,21 @@ export function assemblePedal(spec) {
         ring.position.set(k.x, y + ringY, k.z);
       }
       parts.push(ring);
+    }
+    // Base ring + 3 indicator dots (Boss TONE/DIST): black 0.1" ring at knob base
+    if (k.baseRing) {
+      const bring = knobBaseRing({});
+      const { y: by, pitch: bpitch, deck: bdeck } = surfaceAt(decks, k.z);
+      const bringY = 0.013 + ki * 0.001;
+      bring.position.y = bringY;
+      if (bdeck.group) {
+        bdeck.group.add(bring);
+        bring.position.set(k.x, bringY, (k.z - bdeck.zc) / Math.cos(bpitch));
+      } else {
+        group.add(bring);
+        bring.position.set(k.x, by + bringY, k.z);
+      }
+      parts.push(bring);
     }
   }
   if (spec.led) seat(led(), spec.led.x, spec.led.z, 'led', 'led');
