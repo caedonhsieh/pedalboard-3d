@@ -9,8 +9,9 @@ from PIL import Image, ImageDraw, ImageFont
 import os
 
 # --- TEXT CONTENT (edit these to update the decal) ---
-TEXT_OUTPUT = "\u2190 OUTPUT"  # ← OUTPUT (left side)
-TEXT_INPUT = "INPUT \u2190"     # INPUT ← (right side, arrow points left)
+# Using U+2B05 (⬅ LEFTWARDS BLACK ARROW) for thicker arrows
+TEXT_OUTPUT = "\u2b05 OUTPUT"  # ⬅ OUTPUT (left side, thick arrow)
+TEXT_INPUT = "INPUT \u2b05"     # INPUT ⬅ (right side, thick arrow points left)
 TEXT_DISTORTION = "Distortion"
 TEXT_MODEL = "DS-1"
 
