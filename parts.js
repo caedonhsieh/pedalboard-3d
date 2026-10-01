@@ -160,21 +160,12 @@ export function profileEnclosure({ w, d, points, bevel = 0.05, frontLean = 0, ma
  * Caedon-approved v4 profile annotation. Does NOT touch the TS9 path.
  */
 /**
- * Round all vertices of a 2D polygon with arcs.
- * Replaces each sharp corner with a circular arc (approximated by segments).
- * Handles both convex (outer round) and concave (inner fillet) vertices.
- * Returns a new polygon with no sharp corners — safe for ExtrudeGeometry.
+ * Chamfer all vertices of a 2D polygon.
+ * Replaces each sharp corner with a short straight edge.
+ * Simple, robust, no hang risk. Gives a "rounded" appearance.
  */
-export function roundPolygon(points, radius = 0.05, segPerCorner = 4) {
+export function chamferAll(points, dist = 0.05) {
   if (points.length < 3) return points;
-  // Winding
-  let area = 0;
-  for (let i = 0; i < points.length; i++) {
-    const [x1, y1] = points[i];
-    const [x2, y2] = points[(i + 1) % points.length];
-    area += (x2 - x1) * (y2 + y1);
-  }
-  const ccw = area < 0;
   const result = [];
   for (let i = 0; i < points.length; i++) {
     const prev = points[(i - 1 + points.length) % points.length];
@@ -184,58 +175,10 @@ export function roundPolygon(points, radius = 0.05, segPerCorner = 4) {
     const v2x = next[0] - curr[0], v2y = next[1] - curr[1];
     const len1 = Math.hypot(v1x, v1y), len2 = Math.hypot(v2x, v2y);
     if (len1 < 1e-9 || len2 < 1e-9) { result.push(curr); continue; }
-    const u1x = v1x / len1, u1y = v1y / len1; // into vertex
-    const u2x = v2x / len2, u2y = v2y / len2; // out of vertex
-    const cross = v1x * v2y - v1y * v2x;
-    const isConcave = ccw ? (cross < 0) : (cross > 0);
-    const r = Math.min(radius, len1 * 0.4, len2 * 0.4);
-    if (r < 1e-6) { result.push(curr); continue; }
-    // Tangent points
-    const t1 = [curr[0] - u1x * r, curr[1] - u1y * r];
-    const t2 = [curr[0] + u2x * r, curr[1] + u2y * r];
-    // Arc center: intersection of offset lines
-    // For convex: center is inside the angle bisector, offset inward
-    // For concave: center is outside, creating a fillet
-    const dot = u1x * u2x + u1y * u2y;
-    const theta = Math.acos(Math.max(-1, Math.min(1, dot))); // angle between edges
-    const half = theta / 2;
-    const sinHalf = Math.sin(half);
-    if (sinHalf < 1e-6) { result.push(t1, t2); continue; }
-    // Bisector direction (pointing into the interior angle)
-    let bx = u2x - u1x, by = u2y - u1y;
-    const blen = Math.hypot(bx, by);
-    if (blen < 1e-9) { result.push(t1, t2); continue; }
-    bx /= blen; by /= blen;
-    // Distance from vertex to arc center
-    const distToCenter = r / sinHalf;
-    // For convex, center is along +bisector (into polygon if ccw and convex?)
-    // Simpler: center is at t1 + perpendicular offset
-    // Compute perpendicular to u1 (rotated 90deg)
-    // The center lies at distance r from both tangent points, on the interior side
-    const cx = curr[0] + bx * distToCenter * (isConcave ? -1 : 1);
-    const cy = curr[1] + by * distToCenter * (isConcave ? -1 : 1);
-    // Angles of tangent points relative to center
-    const a1 = Math.atan2(t1[1] - cy, t1[0] - cx);
-    const a2 = Math.atan2(t2[1] - cy, t2[0] - cx);
-    // Sweep direction
-    let sweep = a2 - a1;
-    // Normalize to choose the shorter arc on the correct side
-    if (isConcave) {
-      // Fillet: arc bulges into the polygon (interior)
-      // The center is outside, arc goes the "long way" around the outside?
-      // Actually for fillet, we want the arc that connects t1 to t2 staying near the vertex
-      if (sweep > 0) sweep -= Math.PI * 2;
-      if (sweep < -Math.PI) sweep += Math.PI * 2;
-    } else {
-      // Outer round: arc bulges outward
-      if (sweep < 0) sweep += Math.PI * 2;
-      if (sweep > Math.PI) sweep -= Math.PI * 2;
-    }
-    // Generate arc points (excluding t1, including t2 to avoid duplicates)
-    for (let s = 1; s <= segPerCorner; s++) {
-      const a = a1 + (sweep * s) / segPerCorner;
-      result.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
-    }
+    const d = Math.min(dist, len1 * 0.3, len2 * 0.3);
+    const c1 = [curr[0] - (v1x / len1) * d, curr[1] - (v1y / len1) * d];
+    const c2 = [curr[0] + (v2x / len2) * d, curr[1] + (v2y / len2) * d];
+    result.push(c1, c2);
   }
   return result;
 }
@@ -937,8 +880,8 @@ export function assemblePedal(spec) {
     ? boxEnclosure({ w, d, h, edgeRadius: enc.edgeRadius ?? 0.06, material })
     : enc.closed
     ? extrudeProfile({ // closed measured polygon (DS-1 IJKLMN): extrude directly
-        points: enc.points, width: w,
-        material, bevel: 0, kind: 'enclosure', // sharp corners; rounding disabled pending debug
+        points: chamferAll(enc.points, 0.06), width: w,
+        material, bevel: 0, kind: 'enclosure', // 2D chamfered corners, no Three.js bevel (hang risk)
       })
     : profileEnclosure({
         w, d, points: enc.points,
