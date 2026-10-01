@@ -3,6 +3,18 @@
 How the Boss DS-1 hero model was built (2026-09-29 → 2026-10-01). This is the
 playbook for replicating the process on the next pedal.
 
+## 0. Measurement Priority (in order)
+
+1. **Manufacturer specs** — dims, heights, official diagrams (highest confidence)
+2. **Automated photo measurement** — calibrated photos, Kasa circle fit for
+   knob centers, edge detection for profiles (see PROCESS.md §1)
+3. **Manual annotation by Caedon** — LAST RESORT ONLY, when 1+2 fail
+
+Manual annotation is expensive (requires his time). Exhaust automated methods
+first. The DS-1 side profile required manual annotation because the beveled
+enclosure silhouette couldn't be reliably auto-extracted — this should be the
+exception, not the rule.
+
 ## 1. Reference Collection
 
 Gather at minimum:
@@ -14,10 +26,11 @@ Gather at minimum:
 Sweetwater product pages are the first stop (6–10 studio views per pedal).
 Also: manufacturer pages, Reverb used listings (wear angles reveal edges).
 
-## 2. Caedon Annotation Workflow
+## 2. Manual Annotation Workflow (Last Resort)
 
-Caedon is the ground-truth annotator. His hand-painted boundaries and node
-placements are the spec, not suggestions.
+When automated measurement fails, Caedon acts as ground-truth annotator.
+His hand-painted boundaries and node placements are the spec, not suggestions.
+Use sparingly — this is the most expensive step in the pipeline.
 
 ### Side Profile Annotation
 1. He paints a boundary map: green=treadle, yellow=recess, orange=body
