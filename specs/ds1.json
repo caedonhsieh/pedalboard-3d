@@ -184,10 +184,10 @@
   },
   "thumbscrew": {
     "x": 0,
-    "z": 2.5394,
+    "z": 2.58,
     "y": 0.394,
     "r": 0.2,
-    "note": "Battery compartment thumb screw, front center. Reduced from 0.295\" (was oversized)."
+    "note": "Battery thumbscrew, front center under treadle toe"
   },
   "notes": "REBUILT 2026-10-01 from Caedon-approved v4 profile annotation. Body/treadle/recess/pad/base are measured side profiles. Top-view parts (knobs/LED/labels) retain 2026-09-29 positions, UNVALIDATED.",
   "treadleProfile": {
