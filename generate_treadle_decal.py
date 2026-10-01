@@ -31,19 +31,30 @@ SIZE_MODEL = 140    # DS-1 (right side, level with Distortion)
 # --- COLORS ---
 COLOR_BLACK = (0, 0, 0, 255)
 
-def get_font(bold=False, italic=False, size=120):
-    """Get a font with good Unicode coverage. Uses DejaVu/Liberation."""
+def get_font(bold=False, italic=False, size=120, for_arrows=False):
+    """Get a font with good Unicode coverage. Uses DejaVu/Liberation.
+    
+    Args:
+        for_arrows: If True, use DejaVuSans-Bold which has U+2B05 (thick arrow).
+                   LiberationSans-Bold lacks this glyph.
+    """
     # Map to actual available font files
-    if bold and italic:
+    if for_arrows:
+        # Must use DejaVu for thick arrow U+2B05
+        candidates = [
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+        ]
+    elif bold and italic:
         # For Distortion script - use bold italic serif
         candidates = [
             "/usr/share/fonts/truetype/liberation/LiberationSerif-BoldItalic.ttf",
             "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf",  # fallback to bold
         ]
     elif bold:
+        # Use LiberationSans-Bold (Arial-style) per user pick #2
         candidates = [
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
             "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
         ]
     elif italic:
         candidates = [
@@ -67,22 +78,23 @@ def main():
     draw = ImageDraw.Draw(img)
     
     # Load fonts
-    # All labels use bold sans-serif (Distortion is NOT italic, matches DS-1)
-    font_label = get_font(bold=True, size=SIZE_LABEL)
+    # Labels with arrows use DejaVu (has U+2B05 thick arrow glyph)
+    # Distortion and DS-1 use LiberationSans-Bold (user pick #2, Arial-style)
+    font_arrow_label = get_font(bold=True, size=SIZE_LABEL, for_arrows=True)
     font_distortion = get_font(bold=True, size=SIZE_DISTORTION)
     font_model = get_font(bold=True, size=SIZE_MODEL)
     
     # Draw text
-    # OUTPUT (top-left, arrow points left)
-    draw.text(POS_OUTPUT, TEXT_OUTPUT, font=font_label, fill=COLOR_BLACK)
+    # OUTPUT (top-left, arrow points left) - uses DejaVu for arrow glyph
+    draw.text(POS_OUTPUT, TEXT_OUTPUT, font=font_arrow_label, fill=COLOR_BLACK)
     
-    # INPUT (top-right, arrow points left, on right side of text)
-    draw.text(POS_INPUT, TEXT_INPUT, font=font_label, fill=COLOR_BLACK)
+    # INPUT (top-right, arrow points left, on right side of text) - uses DejaVu
+    draw.text(POS_INPUT, TEXT_INPUT, font=font_arrow_label, fill=COLOR_BLACK)
     
-    # Distortion (middle, italic serif)
+    # Distortion (middle, LiberationSans-Bold per user pick)
     draw.text(POS_DISTORTION, TEXT_DISTORTION, font=font_distortion, fill=COLOR_BLACK)
     
-    # DS-1 (bottom-right, bold)
+    # DS-1 (bottom-right, LiberationSans-Bold)
     draw.text(POS_MODEL, TEXT_MODEL, font=font_model, fill=COLOR_BLACK)
     
     # Save
