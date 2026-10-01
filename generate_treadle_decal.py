@@ -18,12 +18,12 @@ TEXT_MODEL = "DS-1"
 # These match the original traced decal layout
 POS_OUTPUT = (85, 100)      # top-left
 POS_INPUT = (1450, 100)     # top-right
-POS_DISTORTION = (250, 300) # middle, large script
-POS_MODEL = (1250, 650)     # bottom-right
+POS_DISTORTION = (100, 250) # middle, large script (spans full width)
+POS_MODEL = (1250, 700)     # bottom-right
 
 # --- FONT SIZES ---
 SIZE_LABEL = 120    # OUTPUT/INPUT
-SIZE_DISTORTION = 280  # Distortion script
+SIZE_DISTORTION = 430  # Distortion script (spans ~1800px wide)
 SIZE_MODEL = 140    # DS-1
 
 # --- COLORS ---
