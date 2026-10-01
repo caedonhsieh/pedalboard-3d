@@ -24,7 +24,7 @@ POS_MODEL = (1250, 700)     # bottom-right
 
 # --- FONT SIZES ---
 SIZE_LABEL = 120    # OUTPUT/INPUT
-SIZE_DISTORTION = 430  # Distortion script (spans ~1800px wide)
+SIZE_DISTORTION = 318  # Distortion (bold sans-serif, spans ~1800px wide)
 SIZE_MODEL = 140    # DS-1
 
 # --- COLORS ---
@@ -66,8 +66,9 @@ def main():
     draw = ImageDraw.Draw(img)
     
     # Load fonts
+    # All labels use bold sans-serif (Distortion is NOT italic, matches DS-1)
     font_label = get_font(bold=True, size=SIZE_LABEL)
-    font_distortion = get_font(bold=True, italic=True, size=SIZE_DISTORTION)
+    font_distortion = get_font(bold=True, size=SIZE_DISTORTION)
     font_model = get_font(bold=True, size=SIZE_MODEL)
     
     # Draw text
