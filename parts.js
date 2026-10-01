@@ -957,6 +957,30 @@ export function assemblePedal(spec) {
 
   const decks = buildDecks(group, spec);
 
+  // Correct deck Y positions via raycast against the actual enclosure mesh.
+  // The bevel/roundPolygon cause the real surface to deviate from nominal spec,
+  // which buried labels/rings. Raycast finds the true top surface.
+  (function correctDecks() {
+    if (!enc.closed || !enc.points) return; // only for measured-profile enclosures
+    enclosureMesh.updateWorldMatrix(true, false);
+    const ray = new THREE.Raycaster();
+    const down = new THREE.Vector3(0, -1, 0);
+    for (const dk of decks) {
+      if (!dk.group) continue;
+      // Raycast from above at deck center (x=0, z=zc)
+      const origin = new THREE.Vector3(0, 10, dk.zc);
+      ray.set(origin, down);
+      const hits = ray.intersectObject(enclosureMesh, false);
+      if (hits.length > 0) {
+        const trueY = hits[0].point.y;
+        // Update both the group position and the cached yc for surfaceAt()
+        const dy = trueY - dk.yc;
+        dk.group.position.y += dy;
+        dk.yc = trueY;
+      }
+    }
+  })();
+
   function seat(part, x, z, id, kind) {
     const { y, pitch, deck } = surfaceAt(decks, z);
     if (deck.group) {
