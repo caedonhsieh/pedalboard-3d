@@ -937,8 +937,8 @@ export function assemblePedal(spec) {
     ? boxEnclosure({ w, d, h, edgeRadius: enc.edgeRadius ?? 0.06, material })
     : enc.closed
     ? extrudeProfile({ // closed measured polygon (DS-1 IJKLMN): extrude directly
-        points: roundPolygon(enc.points, 0.06, 5), width: w,
-        material, bevel: 0, kind: 'enclosure', // 2D arc rounding (avoids ExtrudeGeometry bevel hang on concave M)
+        points: enc.points, width: w,
+        material, bevel: 0, kind: 'enclosure', // sharp corners; rounding disabled pending debug
       })
     : profileEnclosure({
         w, d, points: enc.points,
