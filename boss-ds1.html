@@ -57,7 +57,7 @@
 
 <script type="module">
 import * as THREE from 'three';
-import { studioScene, assemblePedal, applyDecal } from './parts.js';
+import { studioScene, assemblePedal, applyDecal, applyTreadleDecal } from './parts.js';
 
 /* Boss DS-1 HERO — thin consumer of the shared part library.
    All geometry lives in specs/ds1.json + parts.js; this page only
@@ -81,18 +81,21 @@ const A = assemblePedal(spec);
 A.group.position.y = 0.02;
 S.scene.add(A.group);
 
+let pending = 0;
+const done = () => { if (--pending <= 0) document.getElementById('loader').style.opacity = '0'; };
 if (spec.decal) {
+  pending++;
   new THREE.TextureLoader().load(spec.decal,
-    (tex) => {
-      applyDecal(A, tex, { anisotropy: S.renderer.capabilities.getMaxAnisotropy() });
-      document.getElementById('loader').style.opacity = '0';
-    },
-    undefined,
-    () => { document.getElementById('loader').style.opacity = '0'; }
-  );
-} else {
-  document.getElementById('loader').style.opacity = '0';
+    (tex) => { applyDecal(A, tex, { anisotropy: S.renderer.capabilities.getMaxAnisotropy() }); done(); },
+    undefined, done);
 }
+if (spec.treadleDecal) {
+  pending++;
+  new THREE.TextureLoader().load(spec.treadleDecal,
+    (tex) => { applyTreadleDecal(A, tex, { anisotropy: S.renderer.capabilities.getMaxAnisotropy() }); done(); },
+    undefined, done);
+}
+if (pending === 0) document.getElementById('loader').style.opacity = '0';
 
 S.start();
 </script>

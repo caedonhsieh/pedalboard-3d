@@ -1006,6 +1006,40 @@ export function applyDecal(assembly, texture, { anisotropy = 8 } = {}) {
   }
 }
 
+/* Treadle decal: maps a texture onto the sloped top face of the treadle.
+ * The treadle is an extruded side-profile; its top face runs from the back-top
+ * point to the front-top point. The decal plane is sized to that face and
+ * pitched to match, sitting just above the surface to avoid z-fighting.
+ * Texture orientation: image top = treadle back (hinge side). */
+export function applyTreadleDecal(assembly, texture, { anisotropy = 8 } = {}) {
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = anisotropy;
+  const { spec } = assembly;
+  const tp = spec.treadleProfile;
+  if (!tp || !tp.points || tp.points.length < 2) return;
+  // Top face: first two points are back-top and front-top (A, B)
+  const [ax, ay] = tp.points[0], [bx, by] = tp.points[1];
+  const dx = bx - ax, dy = by - ay;
+  const len = Math.hypot(dx, dy);
+  const width = tp.width ?? 2.875;
+  const mat = new THREE.MeshStandardMaterial({
+    map: texture, transparent: true, roughness: 0.42, metalness: 0.05,
+    envMapIntensity: 0.7, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
+  });
+  const g = new THREE.PlaneGeometry(width, len);
+  const m = new THREE.Mesh(g, mat);
+  // PlaneGeometry lies in XY (width=X, height=Y). rotation.x=-PI/2 lays it flat:
+  // plane X -> world X (width across), plane Y -> world -Z, normal -> +Y (up).
+  // Texture V=1 (image top) is at plane +Y -> world -Z = treadle back (hinge). Good.
+  // extrudeProfile maps profile-x -> world +Z, profile-y -> world Y.
+  const pitch = Math.atan2(dy, dx); // negative: surface slopes down toward front
+  m.rotation.x = -Math.PI / 2 - pitch; // lay flat, then tilt front edge down
+  const cx = (ax + bx) / 2, cy = (ay + by) / 2;
+  m.position.set(0, cy + 0.012, cx); // profile-x -> world +Z
+  m.receiveShadow = true;
+  assembly.group.add(m);
+}
+
 /* ---------------- enclosure presets (boxy pedals) ----------------
  * Provenance + uncertainty documented per preset. Dimensions are the bare
  * enclosure (before knobs/switch); individual models vary, so per-model
