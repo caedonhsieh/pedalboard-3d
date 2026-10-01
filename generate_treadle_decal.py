@@ -17,10 +17,11 @@ TEXT_MODEL = "DS-1"
 
 # --- LAYOUT (positions in 2048x2048 canvas) ---
 # Distortion spans full width; DS-1 bottom-right, right-aligned to Distortion's edge
+# Spacing: extra gap between INPUT/OUTPUT and Distortion; extra gap between Distortion and DS-1
 POS_OUTPUT = (85, 100)      # top-left
 POS_INPUT = (1450, 100)     # top-right
-POS_DISTORTION = (100, 250) # middle, spans full width (1846px, right edge at 1946)
-POS_MODEL = (1627, 577)     # bottom-right, right edge aligned at 1946
+POS_DISTORTION = (100, 350) # middle, spans full width (moved down 100px for space from INPUT/OUTPUT)
+POS_MODEL = (1627, 700)     # bottom-right, right edge aligned (moved down 123px for space from Distortion)
 
 # --- FONT SIZES ---
 SIZE_LABEL = 120    # OUTPUT/INPUT
