@@ -10,7 +10,7 @@
   },
   "enclosure": {
     "type": "profile",
-    "color": "#f2b705",
+    "color": "#f0d060",
     "bevel": 0.05,
     "smooth": false,
     "points": [
@@ -48,8 +48,8 @@
   "knobs": [
     {
       "id": "tone",
-      "x": -0.678,
-      "z": -1.901,
+      "x": 0.695,
+      "z": -1.894,
       "style": "boss",
       "size": "large",
       "rot": 0.3,
@@ -61,8 +61,8 @@
     },
     {
       "id": "drive",
-      "x": 0.695,
-      "z": -1.894,
+      "x": 0.0,
+      "z": -1.352,
       "style": "boss",
       "size": "large",
       "rot": -0.2,
@@ -74,8 +74,8 @@
     },
     {
       "id": "level",
-      "x": 0.0,
-      "z": -1.352,
+      "x": -0.678,
+      "z": -1.901,
       "style": "boss-smooth",
       "size": "small",
       "rot": 0.1,
@@ -103,7 +103,7 @@
     },
     {
       "text": "TONE",
-      "x": -0.678,
+      "x": 0.695,
       "z": -1.35,
       "w": 0.9,
       "h": 0.24,
@@ -112,8 +112,8 @@
     },
     {
       "text": "LEVEL",
-      "x": 0.0,
-      "z": -1.65,
+      "x": -0.678,
+      "z": -1.35,
       "w": 0.9,
       "h": 0.24,
       "spaced": false,
@@ -121,8 +121,8 @@
     },
     {
       "text": "DRIVE",
-      "x": 0.695,
-      "z": -1.35,
+      "x": 0.0,
+      "z": -1.65,
       "w": 0.9,
       "h": 0.24,
       "spaced": false,
@@ -216,7 +216,7 @@
       ]
     ],
     "width": 2.875,
-    "color": "#e85d10",
+    "color": "#f0d060",
     "note": "Caedon nodes ABCD, width=2.875 (same as body) 2026-10-01"
   },
   "recessProfile": {
@@ -1160,5 +1160,5 @@
     "color": "#8a8d92",
     "note": "Caedon L1/L2 division 2026-10-01, correct coordinate transform"
   },
-  "treadleDecal": "./textures/sd1_treadle_decal.png?v=20261001a"
+  "treadleDecal": "./textures/sd1_treadle_decal.png?v=20261001b"
 }
