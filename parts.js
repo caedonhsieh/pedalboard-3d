@@ -278,7 +278,7 @@ export function knob(style = 'ts9', pointerRot = 0, scale = 1, diaScale = null) 
   } else if (style === 'boss') {
     // Boss 450-4618: fluted black body (12 scallops), silver aluminum inlay, white line.
     // Body: 0.54" dia x 0.39" tall. Flange: 0.79" dia x 0.07" (spec A/D).
-    const skirt = flutedKnobBody({ rTop: 0.24, rBottom: 0.27, h: 0.39, flutes: 12, fluteAmp: 0.018 });
+    const skirt = flutedKnobBody({ rTop: 0.24, rBottom: 0.27, h: 0.39, flutes: 10, fluteAmp: 0.012 });
     skirt.position.y = 0.07 + 0.195; // on top of flange
     const flange = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.395, 0.395, 0.07, 48), FIN.blackPlastic));
     flange.position.y = 0.035;
@@ -288,6 +288,16 @@ export function knob(style = 'ts9', pointerRot = 0, scale = 1, diaScale = null) 
     pointer.position.set(0, 0.46 + 0.045, -0.045);
     const pg = new THREE.Group(); pg.add(pointer); pg.rotation.y = pointerRot;
     k.add(flange, skirt, cap, pg);
+  } else if (style === 'boss-smooth') {
+    // LEVEL knob: smooth (no fluting, no flange), black body with silver cap.
+    const skirt = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.27, 0.45, 32), FIN.knobRib));
+    skirt.position.y = 0.225;
+    const cap = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.19, 0.04, 32), FIN.silverCap));
+    cap.position.y = 0.47;
+    const pointer = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.012, 0.16), FIN.pointer);
+    pointer.position.set(0, 0.495, -0.045);
+    const pg = new THREE.Group(); pg.add(pointer); pg.rotation.y = pointerRot;
+    k.add(skirt, cap, pg);
   } else { // 'ts9'
     // Davies-style TS9 knobs. Overlay vs Sweetwater photo shows the original
     // 0.66" diameter is correct (the 0.34" "fix" was based on a bad measurement).

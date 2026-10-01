@@ -74,7 +74,7 @@
       "id": "level",
       "x": 0.0,
       "z": -1.352,
-      "style": "boss",
+      "style": "boss-smooth",
       "size": "small",
       "rot": 0.1,
       "note": "MEASURED from ds1_top.png: centered, 29.9mm from back, 14.3mm dia (smaller).",
@@ -102,29 +102,33 @@
       "x": -0.678,
       "z": -1.45,
       "w": 0.45,
-      "h": 0.12
+      "h": 0.12,
+      "spaced": false
     },
     {
       "text": "LEVEL",
       "x": 0.0,
       "z": -1.65,
       "w": 0.45,
-      "h": 0.12
+      "h": 0.12,
+      "spaced": false
     },
     {
       "text": "DIST",
       "x": 0.695,
       "z": -1.45,
       "w": 0.45,
-      "h": 0.12
+      "h": 0.12,
+      "spaced": false
     },
     {
       "text": "OUTPUT",
       "x": -0.9,
       "z": -0.55,
-      "w": 0.55,
+      "w": 0.45,
       "h": 0.12,
-      "arrow": "right"
+      "arrow": "right",
+      "spaced": false
     },
     {
       "text": "INPUT",
@@ -132,7 +136,8 @@
       "z": -0.55,
       "w": 0.45,
       "h": 0.12,
-      "arrow": "left"
+      "arrow": "left",
+      "spaced": false
     },
     {
       "text": "Distortion",
