@@ -494,7 +494,7 @@ export function knobBaseRing({ innerR = 0.27, width = 0.1, dotR = 0.035, dotRadi
   // 3 black dots OUTSIDE the ring at 12, 5, 7 o'clock
   // Canvas +y (down) maps to world -z (back) after -PI/2 rotation
   ctx.fillStyle = '#111'; // black dots on pedal surface
-  const dotAngles = [Math.PI/2, -Math.PI/3, -2*Math.PI/3]; // 90deg, -60deg, -120deg
+  const dotAngles = [-Math.PI/2, Math.PI/3, 2*Math.PI/3]; // 12, 5, 7 o'clock (canvas: -90deg, 60deg, 120deg)
   for (const a of dotAngles) {
     const x = c + Math.cos(a) * px(dotRadius);
     const y = c + Math.sin(a) * px(dotRadius);
