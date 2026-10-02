@@ -128,44 +128,6 @@
       "h": 0.24,
       "spaced": false,
       "surfaceY": 1.5925
-    },
-    {
-      "text": "OUTPUT",
-      "x": -0.9,
-      "z": -0.55,
-      "w": 0.45,
-      "h": 0.12,
-      "arrow": "left",
-      "spaced": false,
-      "surfaceY": 1.7717
-    },
-    {
-      "text": "INPUT",
-      "x": 0.9,
-      "z": -0.55,
-      "w": 0.45,
-      "h": 0.12,
-      "arrow": "right",
-      "spaced": false,
-      "surfaceY": 1.7717
-    },
-    {
-      "text": "Super OverDrive",
-      "x": 0.0,
-      "z": -0.22,
-      "w": 1.8,
-      "h": 0.35,
-      "script": true,
-      "surfaceY": 1.6743
-    },
-    {
-      "text": "SD-1",
-      "x": 0.0,
-      "z": 0.15,
-      "w": 0.8,
-      "h": 0.3,
-      "bold": true,
-      "surfaceY": 1.565
     }
   ],
   "jacks": [
@@ -1161,5 +1123,5 @@
     "color": "#8a8d92",
     "note": "Caedon L1/L2 division 2026-10-01, correct coordinate transform"
   },
-  "treadleDecal": "./textures/sd1_treadle_decal.png?v=20261001d"
+  "treadleDecal": "./textures/sd1_treadle_decal.png?v=20261001e"
 }
