@@ -22,18 +22,18 @@ TEXT_OVERDRIVE = "OverDrive"
 TEXT_MODEL = "SD-1"
 
 # --- LAYOUT (positions in 2048x2048 canvas) ---
-# From reference: SUPER top, OverDrive below, SD-1 to the right
+# From reference: SUPER top, OverDrive below, SD-1 to the right (no overlap)
 POS_OUTPUT = (85, 100)
 POS_INPUT = (1450, 100)
 POS_SUPER = (100, 350)
 POS_OVERDRIVE = (100, 650)
-POS_MODEL = (1400, 700)  # right of OverDrive
+POS_MODEL = (1550, 700)  # right of OverDrive, no overlap
 
 # --- FONT SIZES ---
 SIZE_LABEL = 120
-SIZE_SUPER = 320       # SUPER - large
-SIZE_OVERDRIVE = 320   # OverDrive - same as SUPER
-SIZE_MODEL = 180       # SD-1 - smaller, to the right
+SIZE_SUPER = 280       # SUPER - large (965px wide)
+SIZE_OVERDRIVE = 280   # OverDrive - same as SUPER (1339px, ends at x=1439)
+SIZE_MODEL = 180       # SD-1 - smaller, at x=1550 (no overlap)
 
 # --- COLORS ---
 COLOR_BLACK = (0, 0, 0, 255)

@@ -70,20 +70,21 @@
       "measured": true,
       "tickRing": false,
       "baseRing": true,
-      "surfaceY": 1.5895
+      "surfaceY": 1.5925
     },
     {
       "id": "level",
       "x": -0.678,
       "z": -1.901,
-      "style": "boss-smooth",
+      "style": "boss",
       "size": "small",
       "rot": 0.1,
       "note": "MEASURED from ds1_top.png: centered, 29.9mm from back, 14.3mm dia (smaller).",
       "measured": true,
       "tickRing": false,
       "diaScale": 0.85,
-      "surfaceY": 1.5925
+      "surfaceY": 1.5895,
+      "baseRing": true
     }
   ],
   "led": {
@@ -117,7 +118,7 @@
       "w": 0.9,
       "h": 0.24,
       "spaced": false,
-      "surfaceY": 1.5909
+      "surfaceY": 1.5925
     },
     {
       "text": "DRIVE",
@@ -126,7 +127,7 @@
       "w": 0.9,
       "h": 0.24,
       "spaced": false,
-      "surfaceY": 1.5925
+      "surfaceY": 1.5909
     },
     {
       "text": "OUTPUT",
@@ -1160,5 +1161,5 @@
     "color": "#8a8d92",
     "note": "Caedon L1/L2 division 2026-10-01, correct coordinate transform"
   },
-  "treadleDecal": "./textures/sd1_treadle_decal.png?v=20261001b"
+  "treadleDecal": "./textures/sd1_treadle_decal.png?v=20261001c"
 }
