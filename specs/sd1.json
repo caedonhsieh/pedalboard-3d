@@ -50,13 +50,13 @@
       "id": "tone",
       "x": 0.695,
       "z": -1.894,
-      "style": "boss",
+      "style": "boss-smooth",
       "size": "large",
       "rot": 0.3,
       "note": "MEASURED from ds1_top.png: 16.3mm left of center, 16.9mm from back, 19.6mm dia. Scale 1.45 for 18mm height (V3 measured).",
       "measured": true,
       "tickRing": false,
-      "baseRing": true,
+      "baseRing": false,
       "surfaceY": 1.5895
     },
     {
@@ -1161,5 +1161,5 @@
     "color": "#8a8d92",
     "note": "Caedon L1/L2 division 2026-10-01, correct coordinate transform"
   },
-  "treadleDecal": "./textures/sd1_treadle_decal.png?v=20261001c"
+  "treadleDecal": "./textures/sd1_treadle_decal.png?v=20261001d"
 }

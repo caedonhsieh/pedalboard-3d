@@ -27,7 +27,7 @@ POS_OUTPUT = (85, 100)
 POS_INPUT = (1450, 100)
 POS_SUPER = (100, 350)
 POS_OVERDRIVE = (100, 650)
-POS_MODEL = (1550, 700)  # right of OverDrive, no overlap
+POS_MODEL = (1470, 680)  # tight against OverDrive (ends at x~1439), baseline-aligned
 
 # --- FONT SIZES ---
 SIZE_LABEL = 120
