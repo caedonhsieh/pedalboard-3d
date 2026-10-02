@@ -22,20 +22,22 @@ TEXT_OVERDRIVE = "OverDrive"   # Same size as SUPER, below-right (indented)
 TEXT_MODEL = "SD-1"            # 70% size, upper-right
 
 # --- LAYOUT (positions in 2048x2048 canvas) ---
-# Interleaved logo lockup from reference (no overlaps):
-# SUPER top-left, OverDrive below-right (indented), SD-1 upper-right
-POS_OUTPUT = (85, 100)
+# Single-line logo: "SUPER OverDrive" on one baseline, "SD-1" below-right
+# Matches reference: SUPER (620px) + gap (40px) + OverDrive (861px) = 1521px
+# Centered: start x = (2048-1521)/2 = 263
+POS_OUTPUT = (150, 100)
 POS_INPUT = (1450, 100)
-POS_SUPER = (100, 150)
-POS_OVERDRIVE = (250, 430)
-POS_MODEL = (1450, 280)
+POS_SUPER = (263, 300)         # Start of "SUPER OverDrive" line
+POS_OVERDRIVE = (923, 300)     # 263+620+40 = 923 (same baseline as SUPER)
+POS_MODEL = (1350, 450)        # Under right portion of OverDrive
 
 # --- FONT SIZES ---
-# SUPER and OverDrive same size; SD-1 at 70%
-SIZE_LABEL = 120
-SIZE_SUPER = 300
-SIZE_OVERDRIVE = 300
-SIZE_MODEL = 210
+# Measured from reference: SUPER cap height ~0.18" (vs my 0.30")
+# Scale factor: 0.6x
+SIZE_LABEL = 70        # INPUT/OUTPUT (was 120)
+SIZE_SUPER = 180       # Was 300
+SIZE_OVERDRIVE = 180   # Was 300
+SIZE_MODEL = 126       # 70% of 180 (was 210)
 
 # --- COLORS ---
 COLOR_BLACK = (0, 0, 0, 255)
