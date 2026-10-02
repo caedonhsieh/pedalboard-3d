@@ -17,24 +17,25 @@ import os
 # --- TEXT CONTENT ---
 TEXT_OUTPUT = "\u2b05 OUTPUT"  # <- OUTPUT (left side)
 TEXT_INPUT = "INPUT \u2b05"     # INPUT <- (right side)
-TEXT_SUPER = "SUPER"            # Above OverDrive (SD-1 only)
-TEXT_OVERDRIVE = "OverDrive"   # Same position/size as DS-1's Distortion
-TEXT_MODEL = "SD-1"            # Same position/size as DS-1's DS-1
+TEXT_SUPER = "SUPER"            # Same size as OverDrive, above-left
+TEXT_OVERDRIVE = "OverDrive"   # Same size as SUPER, below-right (indented)
+TEXT_MODEL = "SD-1"            # 70% size, upper-right
 
 # --- LAYOUT (positions in 2048x2048 canvas) ---
-# Matches DS-1: OverDrive at Distortion position, SD-1 at DS-1 position
-# SUPER added above OverDrive
+# Interleaved logo lockup from reference (no overlaps):
+# SUPER top-left, OverDrive below-right (indented), SD-1 upper-right
 POS_OUTPUT = (85, 100)
 POS_INPUT = (1450, 100)
-POS_SUPER = (100, 220)         # Between INPUT/OUTPUT and OverDrive (no overlap)
-POS_OVERDRIVE = (100, 400)     # Same as DS-1 Distortion
-POS_MODEL = (1627, 750)        # Same as DS-1 DS-1
+POS_SUPER = (100, 150)
+POS_OVERDRIVE = (250, 430)
+POS_MODEL = (1450, 280)
 
 # --- FONT SIZES ---
+# SUPER and OverDrive same size; SD-1 at 70%
 SIZE_LABEL = 120
-SIZE_SUPER = 180       # Fits in 190px gap (164px tall)
-SIZE_OVERDRIVE = 391   # Same as DS-1 Distortion
-SIZE_MODEL = 140       # Same as DS-1 DS-1
+SIZE_SUPER = 300
+SIZE_OVERDRIVE = 300
+SIZE_MODEL = 210
 
 # --- COLORS ---
 COLOR_BLACK = (0, 0, 0, 255)
