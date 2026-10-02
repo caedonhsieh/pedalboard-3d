@@ -26,13 +26,13 @@ TEXT_MODEL = "SD-1"            # Same position/size as DS-1's DS-1
 # SUPER added above OverDrive
 POS_OUTPUT = (85, 100)
 POS_INPUT = (1450, 100)
-POS_SUPER = (100, 80)          # Above OverDrive
+POS_SUPER = (100, 220)         # Between INPUT/OUTPUT and OverDrive (no overlap)
 POS_OVERDRIVE = (100, 400)     # Same as DS-1 Distortion
 POS_MODEL = (1627, 750)        # Same as DS-1 DS-1
 
 # --- FONT SIZES ---
 SIZE_LABEL = 120
-SIZE_SUPER = 340       # SUPER - above OverDrive
+SIZE_SUPER = 180       # Fits in 190px gap (164px tall)
 SIZE_OVERDRIVE = 391   # Same as DS-1 Distortion
 SIZE_MODEL = 140       # Same as DS-1 DS-1
 
