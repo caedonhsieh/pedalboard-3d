@@ -1,0 +1,4 @@
+BOSS-DD8 hero34 reference
+Source: https://static.roland.com/assets/images/products/gallery/dd-8_angle_gal.jpg
+Retrieved: 2026-09-29 (fetch_views.py)
+View: hero34

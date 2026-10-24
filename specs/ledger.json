@@ -86,9 +86,9 @@
       "enclosure": "boss_compact",
       "id": "boss-dd8",
       "name": "DD-8",
-      "notes": "",
+      "notes": "Spec specs/boss-dd8.json + boss-dd8.html standalone hero. Validate PASS (A 1.35mm, C 1.32mm; B skipped, no full-top decal) 2026-10-24.",
       "priority": 2,
-      "status": "planned"
+      "status": "hero"
     },
     {
       "brand": "Boss",

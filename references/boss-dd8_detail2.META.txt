@@ -1,0 +1,4 @@
+BOSS-DD8 detail2 reference
+Source: https://static.roland.com/products/dd-8/image/dd-8_gal_02.jpg
+Retrieved: 2026-09-29 (fetch_views.py)
+View: detail2

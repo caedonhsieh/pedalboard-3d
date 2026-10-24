@@ -1,0 +1,4 @@
+BOSS-DD8 hero reference
+Source: https://static.roland.com/products/dd-8/image/dd-8_hero.jpg
+Retrieved: 2026-09-29 (fetch_views.py)
+View: hero
