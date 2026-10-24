@@ -1,0 +1,123 @@
+{
+  "id": "tc-electronic-ditto",
+  "brand": "TC Electronic",
+  "name": "Ditto",
+  "dims": {
+    "w": 1.89,
+    "d": 3.661,
+    "h": 1.26,
+    "source": "TC Electronic Ditto Looper manual Technical Specifications 48 x 48 x 93 mm (W x H-overall x D), corroborated B&H 960801001 1.9 x 1.9 x 3.7 in. Bare enclosure h=1.26 in (32 mm) derived from side views in references/tc-electronic-ditto_measurements.md (published 48 mm is overall incl. knob). Original Ditto Looper only - not X2/X4/Ditto+."
+  },
+  "enclosure": {
+    "type": "box",
+    "color": "#33343a",
+    "edgeRadius": 0.08,
+    "note": "Custom mini box (no preset matches 48x93 mm). Flat top, rounded corners, charcoal sparkle powder coat."
+  },
+  "knobs": [
+    {
+      "id": "loop-level",
+      "style": "mxr",
+      "x": 0,
+      "z": -1.31,
+      "rot": 2.5,
+      "scale": 0.82,
+      "diaScale": 0.82,
+      "tickRing": false,
+      "note": "Single LOOP LEVEL knob, centred. Photo-derived in two views (topdown + detail-knob, references/tc-electronic-ditto_measurements.md). mxr Davies body scaled 0.82 (~0.75 in dia) as nearest shared style for the TC mini knob; white pointer at ~7-8 o'clock in topdown (rot provisional)."
+    }
+  ],
+  "led": {
+    "x": 0,
+    "z": 0.1,
+    "note": "Red LED centred below LOOPER print. Photo-derived in two views (topdown + hero34). Lit in all studio references."
+  },
+  "footswitch": {
+    "style": "round",
+    "x": 0,
+    "z": 1.0,
+    "note": "Round chrome stomp, centred. Photo-derived in two views (topdown + detail-footswitch)."
+  },
+  "jacks": [
+    {
+      "id": "input",
+      "side": "right",
+      "z": -0.1,
+      "y": 0.63,
+      "note": "INPUT on right wall (side-right view, 'input' wall print below jack). Explicit wall y (mid-wall in side views)."
+    },
+    {
+      "id": "output",
+      "side": "left",
+      "z": -0.31,
+      "y": 0.63,
+      "note": "OUTPUT on left wall (side-left view). Explicit wall y."
+    }
+  ],
+  "powerJack": null,
+  "labels": [
+    {
+      "id": "loop-level-label",
+      "text": "loop level",
+      "x": 0,
+      "z": -1.76,
+      "w": 0.72,
+      "h": 0.13,
+      "spaced": false,
+      "bold": false,
+      "color": "#b9bbbe",
+      "note": "Small lowercase print at back edge above knob (topdown)."
+    },
+    {
+      "id": "ditto",
+      "text": "DITTO",
+      "x": 0,
+      "z": -0.55,
+      "w": 1.62,
+      "h": 0.42,
+      "spaced": false,
+      "bold": true,
+      "color": "#b9bbbe",
+      "note": "Large wordmark. Real O carries a waveform glyph; bold vector caps approximate it (see notes)."
+    },
+    {
+      "id": "looper",
+      "text": "LOOPER",
+      "x": -0.28,
+      "z": -0.18,
+      "w": 0.95,
+      "h": 0.2,
+      "spaced": false,
+      "bold": false,
+      "color": "#b9bbbe",
+      "note": "Caps under DITTO, left block (topdown)."
+    },
+    {
+      "id": "true-bypass",
+      "text": "true bypass",
+      "x": 0,
+      "z": 0.62,
+      "w": 0.78,
+      "h": 0.13,
+      "spaced": false,
+      "bold": false,
+      "color": "#b9bbbe",
+      "note": "Lowercase print above footswitch (topdown, detail-footswitch)."
+    },
+    {
+      "id": "tc-electronic",
+      "text": "tc electronic",
+      "x": 0,
+      "z": 1.55,
+      "w": 1.45,
+      "h": 0.22,
+      "spaced": false,
+      "bold": true,
+      "color": "#b9bbbe",
+      "note": "Brand line at front edge (topdown, detail-footswitch)."
+    }
+  ],
+  "faceImage": "https://thumbs.static-thomann.de/thumb/padthumb600x600/pics/bdb/_30/304324/7930689_800.jpg",
+  "decal": null,
+  "notes": "TC Electronic Ditto (ORIGINAL Ditto Looper, mini 48x93 mm, single loop-level knob) hero - not the Ditto X2/X4/Ditto+. Flat box, no profile. All deck parts seat via surfaceAt() (flat deck h=1.26) - no hardcoded y on knob/LED/footswitch. powerJack is null: the real 9V barrel + mini-USB sit in a recess on the RIGHT side wall behind INPUT (side-right view), and parts.js powerJack() only builds back-wall jacks - the hero page stages the side recess locally and a shared side-wall power builder is reported as a shared need. Side-wall 'input'/'output' word print is likewise not deck text. No full-top decal (vector labels), so validate CHECK B is skipped. Positions photo-derived per references/tc-electronic-ditto_measurements.md; bare height and knob rot provisional as flagged there."
+}

@@ -167,9 +167,9 @@
       "enclosure": "custom",
       "id": "tc-electronic-ditto",
       "name": "Ditto",
-      "notes": "",
+      "notes": "Spec specs/tc-electronic-ditto.json + tc-electronic-ditto.html standalone hero (original Ditto Looper). Validate PASS (A 0.38mm, C 1.36mm; B skipped, no full-top decal) 2026-10-24.",
       "priority": 2,
-      "status": "planned"
+      "status": "hero"
     },
     {
       "brand": "Fulltone",
