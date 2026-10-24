@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="icon" href="data:,">
+<title>Dunlop Cry Baby GCB95 Hero — pedalboard-3d</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #060607;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, Helvetica, Arial, sans-serif;
+    -webkit-user-select: none; user-select: none; }
+  #app { position: fixed; inset: 0; }
+  canvas { display: block; }
+  .hud { position: fixed; z-index: 10; color: #e8e9ec; }
+  #title { top: max(18px, env(safe-area-inset-top)); left: 20px; pointer-events: none; }
+  #title h1 { margin: 0; font-size: clamp(22px, 5.5vw, 34px); font-weight: 700; letter-spacing: -0.02em; }
+  #title h1 .accent { color: #e8e9ec; }
+  #title p { margin: 6px 0 0; font-size: clamp(12px, 3.2vw, 14px); color: #9aa0ab; font-weight: 500; }
+  #badge { top: max(18px, env(safe-area-inset-top)); right: 20px; text-align: right; pointer-events: none;
+    font-size: clamp(11px, 3vw, 12px); color: #6b7078; font-weight: 600; letter-spacing: 0.08em; }
+  #hint { top: max(16px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); right: auto; text-align: center; pointer-events: none;
+    font-size: clamp(12px, 3.2vw, 14px); color: #9aa0ab; font-weight: 500; white-space: nowrap;
+    background: rgba(8,8,10,.78); padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.07); }
+  #loader { top: 50%; left: 0; right: 0; text-align: center; color: #6b7078; pointer-events: none;
+    font-size: 14px; font-weight: 500; transition: opacity 0.6s ease; }
+  #controls { left: 0; right: 0; bottom: max(14px, env(safe-area-inset-bottom)); display: flex;
+    justify-content: center; gap: 8px; flex-wrap: wrap; padding: 0 12px; }
+  #controls button { pointer-events: auto; background: rgba(22,22,26,.92); color: #e8e9ec;
+    border: 1px solid #2b2b31; border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 600;
+    cursor: pointer; backdrop-filter: blur(8px); }
+  #controls button:hover { background: rgba(38,38,44,.95); border-color: #3a3a43; }
+  #controls button.active { border-color: #e8e9ec; color: #ffffff; }
+  #specbar { left: 20px; top: max(98px, env(safe-area-inset-top)); max-width: min(320px, calc(100vw - 40px));
+    font-size: 11px; line-height: 1.55; color: #9aa0ab; pointer-events: none;
+    background: rgba(10,10,12,.62); border: 1px solid rgba(255,255,255,.06); border-radius: 10px; padding: 8px 10px; backdrop-filter: blur(8px); }
+  #specbar b { color: #d6d8dd; font-weight: 650; }
+  #err { display: none; left: 12px; right: 12px; top: 12px; z-index: 30;
+    background: rgba(60,10,8,.96); border: 1px solid #ff5147; color: #ffe1de; border-radius: 10px;
+    padding: 12px 14px; font-size: 13px; line-height: 1.5; white-space: pre-wrap; }
+  canvas { touch-action: none; }
+  @media (max-width: 600px) {
+    #title { left: 16px; } #title h1 { font-size: 24px; } #badge { right: 16px; font-size: 10px; }
+    #title p { max-width: 58vw; }
+    #hint { display: none; } #specbar { display: none; }
+  }
+  @media (max-height: 500px) { #title p { display: none; } #hint { display: none; } }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/three.module.js",
+    "three/addons/": "./vendor/three/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app"></div>
+<div class="hud" id="title">
+  <h1><span class="accent">Dunlop</span> Cry Baby</h1>
+  <p>GCB95 wah &middot; parametric part-library hero &middot; standalone for board adaptation</p>
+</div>
+<div class="hud" id="badge">HERO&nbsp;MODEL</div>
+<div class="hud" id="specbar"><b>Dunlop Cry Baby GCB95</b> &middot; 4.02 &times; 10.00 &times; 3.00 in rest &middot; black die-cast shell &middot; rocking treadle, side jacks + DC, toe switch, no LED</div>
+<div class="hud" id="hint">drag to orbit &nbsp;&middot;&nbsp; scroll to zoom &nbsp;&middot;&nbsp; hold the treadle down</div>
+<div class="hud" id="loader">rocking the wah&hellip;</div>
+<div class="hud" id="controls" aria-label="Camera views">
+  <button data-view="hero" class="active">3/4 view</button>
+  <button data-view="top">Top</button>
+  <button data-view="front">Front</button>
+  <button data-view="side">Side</button>
+  <button data-view="back">Back</button>
+</div>
+<div class="hud" id="err" role="alert"></div>
+
+<script type="module">
+/* Dunlop Cry Baby GCB95 — thin consumer of the shared part library (parts.js).
+   Geometry lives in specs/dunlop-crybaby-gcb95.json + parts.js; this page
+   only stages the studio, assembles the spec, renders the three proposed
+   spec fields parts.js cannot place yet (toe badge, side DC jack, side
+   sticker — see the spec notes), and wires view buttons. */
+import * as THREE from 'three';
+import { studioScene, assemblePedal, applyPadDecal, textLabel, powerJack, screw } from './parts.js';
+
+const errBox = document.getElementById('err');
+function showErr(msg) { errBox.style.display = 'block'; errBox.textContent = 'Could not start the 3D view.\n' + msg; document.getElementById('loader').style.opacity = '0'; }
+window.addEventListener('error', (e) => showErr(e.message || 'Unknown error'));
+window.addEventListener('unhandledrejection', (e) => showErr((e.reason && e.reason.message) || String(e.reason)));
+
+try {
+  const spec = await (await fetch('./specs/dunlop-crybaby-gcb95.json')).json();
+
+  // Responsive camera: on narrow/portrait screens the horizontal field is
+  // the limit, so pull back instead of pushing in.
+  const aspect = window.innerWidth / window.innerHeight;
+  let cameraPos = [8.4, 7.0, 11.6];
+  if (aspect < 1) {
+    const s = 1.88 - 0.55 * aspect;
+    cameraPos = cameraPos.map(v => v * s);
+  }
+
+  const S = studioScene(document.getElementById('app'), {
+    cameraPos, target: [0, 1.3, 0], autoRotate: true, exposure: 1.1,
+  });
+  // Solid backdrop + matched fog so the floor edge never shows as a seam.
+  S.scene.background = new THREE.Color(0x070708);
+  S.scene.fog = new THREE.Fog(0x070708, 45, 140); // portrait hero sits ~40 away: keep it out of the fog
+  let keyLight = null;
+  S.scene.traverse((o) => {
+    if (o.isDirectionalLight && o.intensity > 1) {
+      o.intensity = 1.3;
+      o.position.set(6, 3.6, 2.5);
+      o.color.set(0xfff2e0);
+      keyLight = o;
+    }
+  });
+  // Darken the studio floor so its light pool does not read as a
+  // white spotlight column behind the pedal.
+  S.scene.traverse((o) => {
+    if (o.isMesh && o.geometry && o.geometry.type === 'CircleGeometry') {
+      o.material = new THREE.MeshStandardMaterial({ color: 0x060607, roughness: 0.95, metalness: 0 });
+    }
+  });
+  const fill = new THREE.DirectionalLight(0xfff1e2, 0.55);
+  fill.position.set(-3.5, 2.5, 6.5);
+  S.scene.add(fill);
+  const sideFill = new THREE.DirectionalLight(0xfff2e0, 0.45);
+  sideFill.position.set(-6, 1.6, -3);
+  S.scene.add(sideFill);
+  S.scene.traverse((o) => {
+    if (o.isHemisphereLight) {
+      o.color.set(0xfff2e0);
+      o.groundColor.set(0x1a1a1a);
+      o.intensity = 0.3;
+    }
+  });
+
+  // Keep free orbit upright: no upside-down pedal, no under-floor camera.
+  S.controls.minPolarAngle = 0.12;
+  S.controls.maxPolarAngle = 1.62;
+  S.controls.minDistance = 6.5; // closest scroll stop still frames pedal detail, never inside it
+  S.controls.maxDistance = 30; // portrait hero fit pulls past 16; tightened after hero fit below
+  const A = assemblePedal(spec);
+  A.group.position.y = 0.005;
+  S.scene.add(A.group);
+
+  // Proposed spec fields that parts.js cannot place yet (see spec notes).
+  // Rendered here from the spec so the data stays the source of truth.
+  if (spec.toeBadge) {
+    const badge = textLabel({ text: spec.toeBadge.text, w: spec.toeBadge.w, h: spec.toeBadge.h,
+      color: '#f2f2f2', bg: '#0a0a0b', spaced: false, rounded: true,
+      font: '800 600px "Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif' });
+    badge.children[0].rotation.set(0, 0, 0); // face +z (toe), not up
+    badge.position.set(0, spec.toeBadge.y, spec.dims.d / 2 + 0.03);
+    A.group.add(badge);
+  }
+  if (spec.sidePowerJack) {
+    const pj = powerJack({ style: 'round' });
+    pj.rotation.y = -Math.PI / 2; // face +x (right wall)
+    pj.position.set(spec.dims.w / 2 - 0.01, spec.sidePowerJack.y, spec.sidePowerJack.z);
+    A.group.add(pj);
+  }
+  if (spec.sideSticker) {
+    const st = textLabel({ text: spec.sideSticker.text, w: spec.sideSticker.w, h: spec.sideSticker.h,
+      color: '#16181a', bg: '#e9e9e7', spaced: false, bold: true });
+    st.children[0].rotation.set(0, Math.PI / 2, 0); // face +x (right wall)
+    st.position.set(spec.dims.w / 2 + 0.02, spec.sideSticker.y, spec.sideSticker.z);
+    A.group.add(st);
+  }
+
+  // Soft contact shadow directly under the enclosure (works even where
+  // shadow maps are off on a software renderer, so the pedal never floats).
+  {
+    const c = document.createElement('canvas'); c.width = c.height = 256;
+    const g2 = c.getContext('2d');
+    const grd = g2.createRadialGradient(128, 128, 18, 128, 128, 126);
+    grd.addColorStop(0, 'rgba(0,0,0,0.92)'); grd.addColorStop(0.55, 'rgba(0,0,0,0.6)');
+    grd.addColorStop(1, 'rgba(0,0,0,0)');
+    g2.fillStyle = grd; g2.fillRect(0, 0, 256, 256);
+    const tex = new THREE.CanvasTexture(c);
+    const sh = new THREE.Mesh(
+      new THREE.PlaneGeometry(spec.dims.w + 1.0, spec.dims.d + 1.0),
+      new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false })
+    );
+    sh.rotation.x = -Math.PI / 2;
+    sh.position.y = 0.006;
+    sh.renderOrder = 1;
+    S.scene.add(sh);
+  }
+
+  // Aspect-aware elevations: distance fits subject width on portrait too.
+  const fitDist = (subjectW, subjectH, margin = 1.45) => {
+    const vTan = Math.tan(THREE.MathUtils.degToRad(S.camera.fov / 2));
+    const hTan = vTan * S.camera.aspect;
+    return Math.max(subjectW / 2 / hTan, subjectH / 2 / vTan) * margin;
+  };
+  // Centre fit plus the half-extent toward the camera (front face is
+  // D/2 nearer than the centre, so a centre-only fit crops it).
+  const dFront = fitDist(spec.dims.w, 3.4, 1.65) + spec.dims.d / 2;
+  const dSide = fitDist(spec.dims.d, 3.4, 1.65) + spec.dims.w / 2;
+  const dTop = fitDist(spec.dims.w, spec.dims.d, 1.45) + spec.dims.h;
+  // Portrait hero must fit the projected diagonal, not just the width.
+  let heroPos = cameraPos;
+  if (aspect < 1) {
+    // Projected diagonal of the 4.02 x 10.00in body in the 3/4 view is
+    // ~11in once jacks are included; fit that, not the width.
+    const need = fitDist(11.5, 4.2, 1.12);
+    const dir = new THREE.Vector3(...cameraPos).normalize();
+    heroPos = dir.multiplyScalar(Math.max(new THREE.Vector3(...cameraPos).length(), need)).toArray();
+    S.camera.position.set(...heroPos);
+  }
+  // Far scroll stop: 1.5x the hero distance, so the pedal can shrink for
+  // context but never becomes a lost stamp in black space.
+  {
+    const heroDist = new THREE.Vector3(...heroPos).distanceTo(new THREE.Vector3(0, 1.3, 0));
+    S.controls.maxDistance = Math.max(16, heroDist * 1.5);
+  }
+  const views = {
+    hero:  { pos: heroPos, tgt: [0, 1.3, 0] },
+    top:   { pos: [0, Math.max(9.5, dTop), 0.9], tgt: [0, 1.1, 0] },
+    front: { pos: [0, 2.4, dFront], tgt: [0, 1.25, 0] },
+    side:  { pos: [dSide, 2.4, 0], tgt: [0, 1.25, 0] },
+    back:  { pos: [0, 2.4, -dFront], tgt: [0, 1.25, 0] },
+  };
+  const buttons = [...document.querySelectorAll('#controls button')];
+  function setView(name) {
+    const v = views[name]; if (!v) return;
+    S.controls.autoRotate = false;
+    S.camera.position.set(...v.pos);
+    S.controls.target.set(...v.tgt);
+    S.controls.update();
+    // Key on the camera side of each preset (reference is top-lit;
+    // elevations get modelling light, not a shadow-side wall).
+    if (keyLight) {
+      keyLight.color.set(name === 'top' ? 0xffffff : 0xfff2e0);
+      if (name === 'top') { keyLight.position.set(2, 8, 2); keyLight.intensity = 1.2; }
+      else if (name === 'front') { keyLight.position.set(3, 6, 8); keyLight.intensity = 1.25; }
+      else if (name === 'side') { keyLight.position.set(8, 4, 3); keyLight.intensity = 1.25; }
+      else if (name === 'back') { keyLight.position.set(-3, 6, -8); keyLight.intensity = 1.6; }
+      else { keyLight.position.set(6, 3.6, 2.5); keyLight.intensity = 1.3; }
+    }
+    buttons.forEach(b => b.classList.toggle('active', b.dataset.view === name));
+  }
+  buttons.forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+
+  /* Pedal's own interaction: hold the treadle down. The GCB95 has no
+     knobs and no LED, so a press only rocks the treadle — it toggles
+     nothing. Everything on the moving panel travels together about the
+     measured pivot (spec.pivot): the treadle casting, the rubber pad,
+     the pad decal (added when its texture lands, below), and the pivot
+     pins. The base, toe badge, jacks and toe switch stay fixed. */
+  const treadleA = A.anchors.find(a => a.kind === 'treadle');
+  const movingObjs = [];
+  if (treadleA) movingObjs.push(treadleA.obj);
+  A.group.traverse((o) => {
+    if (o.userData && o.userData.kind === 'pad') movingObjs.push(o);
+  });
+  // Pivot pins ride on the treadle sides at the measured pivot.
+  if (spec.pivot) {
+    for (const sideSign of [1, -1]) {
+      const pin = screw();
+      pin.rotation.z = sideSign > 0 ? -Math.PI / 2 : Math.PI / 2; // dome faces outward
+      pin.position.set(sideSign * ((spec.treadleProfile.width / 2) + 0.01), spec.pivot.y + 0.12, spec.pivot.z);
+      A.group.add(pin);
+      movingObjs.push(pin);
+    }
+  }
+  const pivot = new THREE.Vector3(0, spec.pivot ? spec.pivot.y : 1.7, spec.pivot ? spec.pivot.z : -2.1);
+  const DIP = 0.055; // toe-down travel: drops the toe ~0.39 in, just closing the toe gap
+  const dipBase = new Map();
+  function setDip(on) {
+    const c = Math.cos(DIP), s = Math.sin(DIP);
+    for (const o of movingObjs) {
+      if (!dipBase.has(o)) dipBase.set(o, { p: o.position.clone(), rx: o.rotation.x });
+      const b = dipBase.get(o);
+      if (on) {
+        const dy = b.p.y - pivot.y, dz = b.p.z - pivot.z;
+        o.position.set(b.p.x, pivot.y + dy * c - dz * s, pivot.z + dy * s + dz * c);
+        o.rotation.x = b.rx + DIP;
+      } else {
+        o.position.copy(b.p);
+        o.rotation.x = b.rx;
+      }
+    }
+  }
+
+  const ray = new THREE.Raycaster();
+  const ptr = new THREE.Vector2();
+  let downInfo = null;
+  function pick(e) {
+    const r = S.renderer.domElement.getBoundingClientRect();
+    ptr.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+    ptr.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+    ray.setFromCamera(ptr, S.camera);
+    const hits = ray.intersectObjects(movingObjs.filter(Boolean), true);
+    if (!hits.length) return null;
+    let o = hits[0].object;
+    while (o) {
+      if (movingObjs.includes(o)) return { kind: 'treadle' };
+      o = o.parent;
+    }
+    return null;
+  }
+  S.renderer.domElement.addEventListener('pointerdown', (e) => {
+    const hit = pick(e);
+    downInfo = { x: e.clientX, y: e.clientY, hit };
+    // The treadle sinks while held, like the real rocking switch.
+    if (hit && hit.kind === 'treadle') setDip(true);
+  });
+  S.renderer.domElement.addEventListener('pointerup', () => {
+    setDip(false); // springs back on release
+    downInfo = null;
+  });
+  S.renderer.domElement.addEventListener('pointercancel', () => { setDip(false); downInfo = null; });
+  // Fade the spec card while the player is orbiting/zooming close.
+  const specbar = document.getElementById('specbar');
+  specbar.style.transition = 'opacity 0.4s ease';
+  // Resume gentle auto-rotate after idle, unless user chose a fixed view recently.
+  let idleT = null;
+  S.controls.addEventListener('start', () => { clearTimeout(idleT); specbar.style.opacity = '0.25'; });
+  S.controls.addEventListener('change', () => {
+    const close = S.camera.position.distanceTo(S.controls.target) < 5.2;
+    specbar.style.opacity = close ? '0.25' : '1';
+  });
+  S.controls.addEventListener('end', () => {
+    clearTimeout(idleT);
+    specbar.style.opacity = '1';
+    idleT = setTimeout(() => {
+      if (!document.querySelector('#controls button.active[data-view="top"], #controls button.active[data-view="front"], #controls button.active[data-view="side"], #controls button.active[data-view="back"]')) {
+        S.controls.autoRotate = true;
+      }
+    }, 3000);
+  });
+
+  // Pad decal: loader fades once it has settled.
+  let pending = 0;
+  const done = () => { if (--pending <= 0) document.getElementById('loader').style.opacity = '0'; };
+  if (spec.padDecal) {
+    pending++;
+    new THREE.TextureLoader().load(spec.padDecal,
+      (tex) => {
+        // Decals land after the moving set was collected: join it, so the
+        // pad print dips with the panel instead of staying behind.
+        const m = applyPadDecal(A, tex, { anisotropy: S.renderer.capabilities.getMaxAnisotropy() });
+        if (m) movingObjs.push(m);
+        done();
+      },
+      undefined, done);
+  }
+  if (pending === 0) document.getElementById('loader').style.opacity = '0';
+
+  S.start();
+} catch (e) {
+  showErr(e && e.message || String(e));
+  console.error(e);
+}
+</script>
+</body>
+</html>

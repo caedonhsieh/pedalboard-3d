@@ -50,9 +50,9 @@
       "enclosure": "custom (wah shell)",
       "id": "dunlop-crybaby-gcb95",
       "name": "Cry Baby GCB95",
-      "notes": "Wah shell \u2014 needs custom profile work, not a box.",
+      "notes": "Wah shell \u2014 needs custom profile work, not a box. Spec specs/dunlop-crybaby-gcb95.json + dunlop-crybaby-gcb95.html standalone hero. Validate PASS (A 0.00mm, C 0.35mm; B skipped, no full-top decal) 2026-10-24.",
       "priority": 1,
-      "status": "planned"
+      "status": "hero"
     },
     {
       "brand": "Boss",

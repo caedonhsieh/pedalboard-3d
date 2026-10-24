@@ -1,0 +1,104 @@
+{
+  "id": "dunlop-crybaby-gcb95",
+  "brand": "Dunlop",
+  "name": "Cry Baby GCB95",
+  "dims": {
+    "w": 4.02,
+    "d": 10.0,
+    "h": 3.0,
+    "source": "Thomann GCB95 listing (W x D x H) 102 x 254 x 64 mm, corroborated by Dunlop retailer listings 10 x 4 x 2-1/2 in: footprint 4.02 x 10.00 in is published; the published 64 mm (2.52 in) height is the treadle-level nominal and matches the measured treadle-top height over the heel/pivot (2.50 in), so h here is the measured toe-raised rest height of the bare shell+treadle (3.00 in, rubber pad and feet excluded) from references/dunlop-crybaby-gcb95_measurements.md"
+  },
+  "enclosure": {
+    "type": "profile",
+    "color": "#26262a",
+    "bevel": 0.06,
+    "smooth": false,
+    "points": [
+      [-5.0, 1.02],
+      [-3.0, 1.2],
+      [0.0, 1.42],
+      [3.0, 1.7],
+      [5.0, 1.92]
+    ],
+    "notes": "Base casting only (the wah shell lower half), traced from both Dunlop side views calibrated at 104.5 px/in against the published 10.00 in depth, y=0 at the base plate (feet excluded). The moving treadle and rubber pad are treadleProfile / padProfile below, DS-1 pattern. See references/dunlop-crybaby-gcb95_measurements.md. Constant-width extrusion: the real shell tapers 3.96 in (toe) to 3.18 in (heel) in plan; that taper needs the proposed tapered wah builder in the build report."
+  },
+  "treadleProfile": {
+    "points": [
+      [-4.9, 2.5],
+      [4.9, 3.0],
+      [4.9, 2.35],
+      [0.0, 1.95],
+      [-4.9, 1.5]
+    ],
+    "width": 3.3,
+    "color": "#26262a",
+    "note": "Moving treadle casting at rest (toe raised), traced from both side views (see measurements). Polygon: heel-top, toe-top, toe face bottom (0.65 in face), underside skirt line through mid, heel-bottom. The underside is hollow in the real casting, but the side skirt bottom is this line — a recessed underside profile made the treadle read as a thin floating slab in Side view (checked against the references, corrected 2026-10-24). Width is a mid-taper compromise (real casting tapers with the shell). Pivot for the hero press: z -2.10, y 1.70 (pivot field below)."
+  },
+  "padProfile": {
+    "points": [
+      [-4.55, 2.65],
+      [4.55, 3.11],
+      [4.55, 2.98],
+      [-4.55, 2.52]
+    ],
+    "width": 2.95,
+    "color": "#131315",
+    "note": "Ribbed rubber pad on the treadle top (treadle top line + ~0.13 in). Ribs and the embossed AMPLIFIER / INSTRUMENT groove words are the padDecal texture, not geometry."
+  },
+  "pivot": {
+    "z": -2.1,
+    "y": 1.7,
+    "note": "Treadle pivot axis from the silver side pins in both side views (left z -1.99, right z -2.35 after mirroring; average). Used by the hero page to rotate the whole moving set (treadle + pad + pad decal + pivot pins) toe-down on a press. Not read by parts.js yet: proposed spec field, see build report."
+  },
+  "knobs": [],
+  "led": null,
+  "footswitch": {
+    "style": "round",
+    "x": 0.0,
+    "z": 3.6,
+    "note": "Toe switch under the treadle toe (chrome plunger in the Dunlop MAIN and Sweetwater detail toe views), seated on the base profile at its z (deck part: no y in spec). It stays fixed on a treadle press; the treadle dips toward it."
+  },
+  "jacks": [
+    {
+      "id": "amplifier",
+      "side": "left",
+      "z": 0.58,
+      "y": 0.85,
+      "note": "AMPLIFIER (output) on the left wall, from the left side view + top view hole."
+    },
+    {
+      "id": "instrument",
+      "side": "right",
+      "z": 0.58,
+      "y": 0.85,
+      "note": "INSTRUMENT (input) on the right wall, from the right side view + top view; spec z is the two sides' average (left 0.55, right 0.60)."
+    }
+  ],
+  "powerJack": null,
+  "sidePowerJack": {
+    "side": "right",
+    "z": 0.22,
+    "y": 0.85,
+    "note": "Proposed spec field (parts.js powerJack() only mounts on the back wall; the GCB95 DC 9V barrel is on the right wall just heel-ward of the INSTRUMENT jack, right side view + 3/4, provisional). The hero page renders it from this field; board integration needs the proposed parts.js side-power support in the build report."
+  },
+  "toeBadge": {
+    "text": "cry baby",
+    "y": 0.92,
+    "w": 2.55,
+    "h": 1.25,
+    "note": "Proposed spec field (parts.js textLabels have no front-face orientation; the black badge plate with white cry baby print is on the toe face +z). The hero page renders it from this field; board integration needs the proposed front-face label support in the build report."
+  },
+  "sideSticker": {
+    "text": "CE 9V",
+    "side": "right",
+    "z": -0.9,
+    "y": 0.85,
+    "w": 0.85,
+    "h": 0.28,
+    "note": "Proposed spec field: small white CE / polarity sticker on the right wall, heel-ward of the DC jack (right side view + 3/4, provisional size). Rendered by the hero page."
+  },
+  "faceImage": "https://cdn11.bigcommerce.com/s-n26aknlnlm/images/stencil/1280x1280/products/583/6160/11095000001.TOPP__06867.1663874792.jpg?c=2",
+  "decal": null,
+  "padDecal": "./textures/dunlop-crybaby-gcb95-decal.png",
+  "notes": "Dunlop Cry Baby GCB95 wah hero. No knobs and NO LED on the real pedal (verified in all seven references), so led is null and a treadle press toggles nothing. All measured values trace to references/dunlop-crybaby-gcb95_measurements.md; provisional single-view values (DC jack, CE sticker, treadle recess, shell taper) are flagged there and in the field notes above. Deck parts (toe switch) carry no y: they seat by sampling the base profile. The moving set is treadleProfile + padProfile + padDecal, rotating about the pivot field on a press."
+}
