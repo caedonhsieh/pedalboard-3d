@@ -1,0 +1,265 @@
+{
+  "id": "ehx-deluxe-memory-man",
+  "brand": "EHX",
+  "name": "Deluxe Memory Man",
+  "dims": {
+    "w": 5.75,
+    "d": 4.75,
+    "h": 1.68,
+    "source": "EHX official spec 5.75 x 4.75 x 2.5 in (ehx.com/products/deluxe-memory-man, UPC 683274010724, verified in data/spec_sheets_staging.json); W=5.75 (left-right) / D=4.75 (front-back) resolved from the orthographic face photo aspect 866x714 px = 1.213 = 5.75/4.75 (staging W/D transposed, see references/ehx-deluxe-memory-man_measurements.md); bare enclosure h=1.68 in measured from calibrated side/back photos (254 px at 150-151 px/in) - published 2.5 in is overall incl. knobs (0.65 in above deck) and feet"
+  },
+  "enclosure": {
+    "type": "box",
+    "color": "#cbcbc9",
+    "edgeRadius": 0.08,
+    "notes": "Flat silver die-cast box, constant deck height in both side views - not sloped (contrast Big Muff Pi). Black field is print, supplied by textures/ehx-deluxe-memory-man-decal.png; sides stay silver."
+  },
+  "knobs": [
+    {
+      "id": "blend",
+      "style": "ehx",
+      "x": -2.26,
+      "z": -1.41,
+      "rot": 0.0,
+      "scale": 1.05,
+      "diaScale": 0.68,
+      "tickRing": false,
+      "note": "Photo-derived: BLEND left knob, black puck 0.66 in dia, 0.65 in above deck (ehx body diaScale 0.68 / height 1.05). Row spacing-fit from measured right three, corroborated in back view; provisional to 0.05 in."
+    },
+    {
+      "id": "level",
+      "style": "ehx",
+      "x": -1.36,
+      "z": -1.41,
+      "rot": 0.0,
+      "scale": 1.05,
+      "diaScale": 0.68,
+      "tickRing": false,
+      "note": "Photo-derived: LEVEL knob, same row. OVERLOAD LED sits directly in front of this knob."
+    },
+    {
+      "id": "feedback",
+      "style": "ehx",
+      "x": -0.45,
+      "z": -1.41,
+      "rot": 0.0,
+      "scale": 1.05,
+      "diaScale": 0.68,
+      "tickRing": false,
+      "note": "Photo-derived: FEEDBACK centre-left knob, same row."
+    },
+    {
+      "id": "chrs-vibr",
+      "style": "ehx",
+      "x": 0.46,
+      "z": -1.41,
+      "rot": 2.35,
+      "scale": 1.05,
+      "diaScale": 0.68,
+      "tickRing": false,
+      "note": "Photo-derived centroid (570.7, 289.2 px) in the face view: CHRS/VIBR knob. Pointer points front-left in the reference (rot 2.35, at the hero drag clamp; single-view, +/-0.15 rad)."
+    },
+    {
+      "id": "depth",
+      "style": "ehx",
+      "x": 1.37,
+      "z": -1.41,
+      "rot": 0.0,
+      "scale": 1.05,
+      "diaScale": 0.68,
+      "tickRing": false,
+      "note": "Photo-derived centroid (708.1, 291.3 px): DEPTH knob, same row."
+    },
+    {
+      "id": "delay",
+      "style": "ehx",
+      "x": 2.26,
+      "z": -1.41,
+      "rot": 0.0,
+      "scale": 1.05,
+      "diaScale": 0.68,
+      "tickRing": false,
+      "note": "Photo-derived centroid (842.9, 291.2 px): DELAY right knob, same row."
+    }
+  ],
+  "led": {
+    "x": -0.01,
+    "z": 0.79,
+    "note": "Bypass/status red LED in the MAN wordmark, face red-blob centroid (500.8, 620.0 px). This is the LED the footswitch toggles. The second (OVERLOAD) LED at (-1.35, -0.54) has no spec field - the shared assembler supports one led; the hero page stages it as an extra led() part (see notes)."
+  },
+  "footswitch": {
+    "style": "round",
+    "x": 0,
+    "z": 1.62,
+    "note": "Round chrome stomp centred, face bright-chrome centroid (501.1, 743.4 px) -> (0.00, 1.62); corroborated at the front end of both side views."
+  },
+  "jacks": [
+    {
+      "id": "direct-out",
+      "side": "left",
+      "z": 0.0,
+      "y": 0.89,
+      "note": "DIRECT OUT on the left wall. Two views agree to 0.05 in: side-left hole centre -> z +0.03, face left-edge tab -> z -0.02 (references/ehx-deluxe-memory-man_measurements.md)."
+    },
+    {
+      "id": "effect-out",
+      "side": "left",
+      "z": 0.79,
+      "y": 0.89,
+      "note": "EFFECT OUT on the left wall, front of DIRECT OUT: side-left -> z +0.81, face tab -> z +0.78."
+    },
+    {
+      "id": "input",
+      "side": "right",
+      "z": 0.8,
+      "y": 0.89,
+      "note": "INPUT on the right wall: side-right (mirrored view) -> z +0.83, face right-edge tab -> z +0.78."
+    }
+  ],
+  "powerJack": {
+    "x": 0.01,
+    "y": 0.89,
+    "style": "boss-square",
+    "note": "24V square socket centred on the back wall, back-view centroid (500.5, 495.1 px) -> x +0.01, y 0.89. Square bezel matches the photographed plate (barrel is 24V on this model; voltage is print only)."
+  },
+  "labels": [
+    {
+      "id": "blend-label",
+      "text": "BLEND",
+      "x": -2.26,
+      "z": -0.86,
+      "w": 0.7,
+      "h": 0.16,
+      "spaced": false,
+      "bold": true,
+      "color": "#f5f5f2",
+      "note": "White caps on the black wedge, in front of the BLEND knob (face view)."
+    },
+    {
+      "id": "level-label",
+      "text": "LEVEL",
+      "x": -1.36,
+      "z": -0.86,
+      "w": 0.62,
+      "h": 0.16,
+      "spaced": false,
+      "bold": true,
+      "color": "#f5f5f2",
+      "note": "White caps on black, in front of the LEVEL knob."
+    },
+    {
+      "id": "feedback-label",
+      "text": "FEEDBACK",
+      "x": -0.45,
+      "z": -0.86,
+      "w": 0.95,
+      "h": 0.16,
+      "spaced": false,
+      "bold": true,
+      "color": "#f5f5f2",
+      "note": "White caps on black, in front of the FEEDBACK knob."
+    },
+    {
+      "id": "chrs-vibr-label",
+      "text": "CHRS/VIBR",
+      "x": 0.46,
+      "z": -0.86,
+      "w": 1.0,
+      "h": 0.16,
+      "spaced": false,
+      "bold": true,
+      "color": "#151515",
+      "note": "Black caps on silver, in front of the CHRS/VIBR knob."
+    },
+    {
+      "id": "depth-label",
+      "text": "DEPTH",
+      "x": 1.37,
+      "z": -0.86,
+      "w": 0.68,
+      "h": 0.16,
+      "spaced": false,
+      "bold": true,
+      "color": "#151515",
+      "note": "Black caps on silver, in front of the DEPTH knob."
+    },
+    {
+      "id": "delay-label",
+      "text": "DELAY",
+      "x": 2.26,
+      "z": -0.86,
+      "w": 0.68,
+      "h": 0.16,
+      "spaced": false,
+      "bold": true,
+      "color": "#151515",
+      "note": "Black caps on silver, in front of the DELAY knob."
+    },
+    {
+      "id": "overload-label",
+      "text": "OVERLOAD",
+      "x": -0.72,
+      "z": -0.54,
+      "w": 0.95,
+      "h": 0.15,
+      "spaced": false,
+      "bold": true,
+      "color": "#f5f5f2",
+      "note": "White caps right of the OVERLOAD LED (LED itself staged by the hero page, see notes)."
+    },
+    {
+      "id": "power-label",
+      "text": "24V",
+      "x": 0,
+      "z": -2.18,
+      "w": 0.55,
+      "h": 0.15,
+      "spaced": false,
+      "bold": true,
+      "color": "#151515",
+      "note": "Black 24V print at the back edge above the power socket (polarity symbol omitted - no vector glyph in the label builder)."
+    },
+    {
+      "id": "direct-out-label",
+      "text": "DIRECT OUT",
+      "x": -2.68,
+      "z": 0.0,
+      "w": 1.05,
+      "h": 0.15,
+      "spaced": false,
+      "bold": true,
+      "color": "#f5f5f2",
+      "rot": 1.5708,
+      "note": "Vertical white caps on the left deck edge beside DIRECT OUT (face view)."
+    },
+    {
+      "id": "effect-out-label",
+      "text": "EFFECT OUT",
+      "x": -2.68,
+      "z": 0.79,
+      "w": 1.05,
+      "h": 0.15,
+      "spaced": false,
+      "bold": true,
+      "color": "#f5f5f2",
+      "rot": 1.5708,
+      "note": "Vertical white caps on the left deck edge beside EFFECT OUT."
+    },
+    {
+      "id": "input-label",
+      "text": "INPUT",
+      "x": 2.68,
+      "z": 0.8,
+      "w": 0.65,
+      "h": 0.15,
+      "spaced": false,
+      "bold": true,
+      "color": "#151515",
+      "rot": 1.5708,
+      "note": "Vertical black caps on the right deck edge beside INPUT."
+    }
+  ],
+  "faceImage": "https://www.ehx.com/wp-content/uploads/2020/10/DMM_Front.jpg",
+  "decal": "./textures/ehx-deluxe-memory-man-decal.png",
+  "notes": "EHX Deluxe Memory Man XO (current reissue, UPC 683274010724) hero. Flat silver box 5.75 x 4.75 x 1.68 in bare (2.5 in published overall); all deck parts seat via surfaceAt() on the flat deck - no hardcoded y on knobs/LED/switch. Six knobs in one row (BLEND/LEVEL/FEEDBACK/CHRS-VIBR/DEPTH/DELAY), bypass LED is spec.led. Shared-library gap: the real pedal has a second red OVERLOAD LED at (-1.35, -0.54, face centroid 298.6,420.1 px, side-view corroborated) but spec/assemblePedal support only one led, so the hero page stages an extra led() part at that measured position and keeps it lit; adding a spec-level second LED (e.g. led2 / leds[]) to parts.js + validate.html is the shared fix. Top art: silver ground, black diagonal wedge, DELUXE/MEMORY/MAN wordmarks, diagonal Echo/Chorus/Vibrato and the electro-harmonix script are in textures/ehx-deluxe-memory-man-decal.png (canvas-drawn); knob/edge/24V words are vector textLabels above it. Positions are photo-derived from references/ehx-deluxe-memory-man_measurements.md (face homography + side/back corroboration); left-three knob x are spacing-fit provisional to 0.05 in as flagged there."
+}

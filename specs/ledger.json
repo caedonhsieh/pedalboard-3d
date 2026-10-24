@@ -131,9 +131,9 @@
       "enclosure": "custom",
       "id": "ehx-deluxe-memory-man",
       "name": "Deluxe Memory Man",
-      "notes": "Large box.",
+      "notes": "Spec specs/ehx-deluxe-memory-man.json + ehx-deluxe-memory-man.html standalone hero (XO). Validate PASS (A 0.38mm, B 99.5%, C 1.26mm) 2026-10-24.",
       "priority": 2,
-      "status": "planned"
+      "status": "hero"
     },
     {
       "brand": "Strymon",

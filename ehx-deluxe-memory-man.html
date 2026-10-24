@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="icon" href="data:,">
+<title>EHX Deluxe Memory Man Hero — pedalboard-3d</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #060607;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, Helvetica, Arial, sans-serif;
+    -webkit-user-select: none; user-select: none; }
+  #app { position: fixed; inset: 0; }
+  canvas { display: block; }
+  .hud { position: fixed; z-index: 10; color: #e8e9ec; }
+  #title { top: max(18px, env(safe-area-inset-top)); left: 20px; pointer-events: none; }
+  #title h1 { margin: 0; font-size: clamp(22px, 5.5vw, 34px); font-weight: 700; letter-spacing: -0.02em; }
+  #title h1 .accent { color: #e03128; }
+  #title p { margin: 6px 0 0; font-size: clamp(12px, 3.2vw, 14px); color: #9aa0ab; font-weight: 500; }
+  #badge { top: max(18px, env(safe-area-inset-top)); right: 20px; text-align: right; pointer-events: none;
+    font-size: clamp(11px, 3vw, 12px); color: #6b7078; font-weight: 600; letter-spacing: 0.08em; }
+  #badge .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: #ff2a18; margin-right: 6px; box-shadow: 0 0 8px #ff2a18; vertical-align: 1px; }
+  #hint { top: 92px; left: 50%; transform: translateX(-50%); right: auto; text-align: center; pointer-events: none;
+    font-size: clamp(12px, 3.2vw, 14px); color: #9aa0ab; font-weight: 500; white-space: nowrap;
+    background: rgba(8,8,10,.78); padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.07); }
+  #loader { top: 50%; left: 0; right: 0; text-align: center; color: #6b7078; pointer-events: none;
+    font-size: 14px; font-weight: 500; transition: opacity 0.6s ease; }
+  #controls { left: 0; right: 0; bottom: max(14px, env(safe-area-inset-bottom)); display: flex;
+    justify-content: center; gap: 8px; flex-wrap: wrap; padding: 0 12px; }
+  #controls button { pointer-events: auto; background: rgba(22,22,26,.92); color: #e8e9ec;
+    border: 1px solid #2b2b31; border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 600;
+    cursor: pointer; backdrop-filter: blur(8px); }
+  #controls button:hover { background: rgba(38,38,44,.95); border-color: #3a3a43; }
+  #controls button.active { border-color: #e03128; color: #ff8a80; }
+  #specbar { left: 20px; top: max(98px, env(safe-area-inset-top)); max-width: min(320px, calc(100vw - 40px));
+    font-size: 11px; line-height: 1.55; color: #9aa0ab; pointer-events: none;
+    background: rgba(10,10,12,.62); border: 1px solid rgba(255,255,255,.06); border-radius: 10px; padding: 8px 10px; backdrop-filter: blur(8px); }
+  #specbar b { color: #d6d8dd; font-weight: 650; }
+  #err { display: none; left: 12px; right: 12px; top: 12px; z-index: 30;
+    background: rgba(60,10,8,.96); border: 1px solid #ff5147; color: #ffe1de; border-radius: 10px;
+    padding: 12px 14px; font-size: 13px; line-height: 1.5; white-space: pre-wrap; }
+  canvas { touch-action: none; }
+  @media (max-width: 600px) {
+    #title { left: 16px; } #title h1 { font-size: 24px; } #badge { display: none; }
+    #hint { display: none; } #specbar { display: none; }
+  }
+  @media (max-height: 500px) { #title p { display: none; } #hint { display: none; } }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/three.module.js",
+    "three/addons/": "./vendor/three/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app"></div>
+<div class="hud" id="title">
+  <h1><span class="accent">EHX</span> Deluxe Memory Man</h1>
+  <p>Analog delay / chorus / vibrato &middot; parametric part-library hero &middot; standalone for board adaptation</p>
+</div>
+<div class="hud" id="badge"><span class="dot"></span>STANDALONE&nbsp;HERO</div>
+<div class="hud" id="specbar"><b>EHX Deluxe Memory Man (XO reissue)</b> &middot; 5.75 &times; 4.75 in footprint, flat box 1.68 in bare (2.5 in overall with knobs) &middot; silver box, black wedge print &middot; BLEND / LEVEL / FEEDBACK / CHRS/VIBR / DEPTH / DELAY, 2 red LEDs, round stomp, side jacks + back 24V</div>
+<div class="hud" id="hint">drag to orbit &nbsp;&middot;&nbsp; scroll to zoom &nbsp;&middot;&nbsp; drag the knobs &nbsp;&middot;&nbsp; hold the stomp, release to toggle LED</div>
+<div class="hud" id="loader">warming up the delay&hellip;</div>
+<div class="hud" id="controls" aria-label="Camera views">
+  <button data-view="hero" class="active">3/4 view</button>
+  <button data-view="top">Top</button>
+  <button data-view="front">Front</button>
+  <button data-view="side">Side</button>
+  <button data-view="back">Back</button>
+</div>
+<div class="hud" id="err" role="alert"></div>
+
+<script type="module">
+/* EHX Deluxe Memory Man (XO) — thin consumer of the shared part library (parts.js).
+   All geometry lives in specs/ehx-deluxe-memory-man.json + parts.js; this page only
+   stages the studio, assembles the spec, and wires view buttons. */
+import * as THREE from 'three';
+import { studioScene, assemblePedal, applyDecal, led } from './parts.js';
+
+const errBox = document.getElementById('err');
+function showErr(msg) { errBox.style.display = 'block'; errBox.textContent = 'Could not start the 3D view.\n' + msg; document.getElementById('loader').style.opacity = '0'; }
+window.addEventListener('error', (e) => showErr(e.message || 'Unknown error'));
+window.addEventListener('unhandledrejection', (e) => showErr((e.reason && e.reason.message) || String(e.reason)));
+
+try {
+  const spec = await (await fetch('./specs/ehx-deluxe-memory-man.json')).json();
+
+  // Responsive camera: on narrow/portrait screens the horizontal field is
+  // the limit (pedal width 5.75in), so pull back instead of pushing in.
+  const aspect = window.innerWidth / window.innerHeight;
+  let cameraPos = [6.8, 6.2, 9.2]; // big box: farther hero so the whole top reads
+  if (aspect < 1) {
+    const s = 1.88 - 0.55 * aspect; // aspect 0.46 -> ~1.63x farther, fits width + diagonal
+    cameraPos = cameraPos.map(v => v * s);
+  }
+
+  const S = studioScene(document.getElementById('app'), {
+    cameraPos, target: [0, 0.85, 0], autoRotate: true, exposure: 1.1,
+  });
+  // Solid backdrop + matched fog so the floor edge never shows as a seam.
+  // Fog pushed past the farthest (portrait) camera so the pedal never blacks out.
+  S.scene.background = new THREE.Color(0x070708);
+  S.scene.fog = new THREE.Fog(0x070708, 22, 65);
+  // Key low and to the side so the flat silver top is modelled, not blown,
+  // and a soft front fill keeps the silver sides and print in contrast.
+  let keyLight = null;
+  S.scene.traverse((o) => {
+    if (o.isDirectionalLight && o.intensity > 1) {
+      o.intensity = 1.3;
+      o.position.set(6, 3.6, 2.5);
+      o.color.set(0xffffff);
+      keyLight = o;
+    }
+  });
+  // Darken the studio floor so its light pool does not read as a
+  // white spotlight column behind the pedal.
+  S.scene.traverse((o) => {
+    if (o.isMesh && o.geometry && o.geometry.type === 'CircleGeometry') {
+      o.material = new THREE.MeshStandardMaterial({ color: 0x060607, roughness: 0.95, metalness: 0 });
+    }
+  });
+  const fill = new THREE.DirectionalLight(0xffffff, 0.55);
+  fill.position.set(-3.5, 2.5, 6.5);
+  S.scene.add(fill);
+  // Low side fill so the long walls model with a gradient, not flat grey.
+  const sideFill = new THREE.DirectionalLight(0xf2f4f7, 0.45);
+  sideFill.position.set(-6, 1.6, -3);
+  S.scene.add(sideFill);
+  S.scene.traverse((o) => {
+    if (o.isHemisphereLight) {
+      o.color.set(0xdfe6ee);
+      o.groundColor.set(0x11131a);
+      o.intensity = 0.3;
+    }
+  });
+
+  // Keep free orbit upright: no upside-down pedal, no under-floor camera.
+  S.controls.minPolarAngle = 0.12;
+  S.controls.maxPolarAngle = 1.62;
+  S.controls.minDistance = 5;
+  S.controls.maxDistance = 34; // portrait hero fit pulls past the desktop range
+  const A = assemblePedal(spec);
+  A.group.position.y = 0.005;
+  S.scene.add(A.group);
+  // OVERLOAD LED: the real pedal has two red domes but the shared spec
+  // supports one led (the bypass LED in spec.led). Stage the measured
+  // overload dome here at (-1.35, -0.54) on the flat deck and keep it lit.
+  {
+    const overload = led();
+    overload.position.set(-1.35, spec.dims.h + 0.005, -0.54);
+    A.group.add(overload);
+  }
+
+  // Soft contact shadow directly under the enclosure (works even where
+  // shadow maps are off on a software renderer, so the pedal never floats).
+  {
+    const c = document.createElement('canvas'); c.width = c.height = 256;
+    const g2 = c.getContext('2d');
+    const grd = g2.createRadialGradient(128, 128, 18, 128, 128, 126);
+    grd.addColorStop(0, 'rgba(0,0,0,0.92)'); grd.addColorStop(0.55, 'rgba(0,0,0,0.6)');
+    grd.addColorStop(1, 'rgba(0,0,0,0)');
+    g2.fillStyle = grd; g2.fillRect(0, 0, 256, 256);
+    const tex = new THREE.CanvasTexture(c);
+    const sh = new THREE.Mesh(
+      new THREE.PlaneGeometry(spec.dims.w + 1.0, spec.dims.d + 1.0),
+      new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false })
+    );
+    sh.rotation.x = -Math.PI / 2;
+    sh.position.y = 0.006;
+    sh.renderOrder = 1;
+    S.scene.add(sh);
+  }
+
+  // Aspect-aware elevations: distance fits subject width on portrait too.
+  const fitDist = (subjectW, subjectH, margin = 1.45) => {
+    const vTan = Math.tan(THREE.MathUtils.degToRad(S.camera.fov / 2));
+    const hTan = vTan * S.camera.aspect;
+    return Math.max(subjectW / 2 / hTan, subjectH / 2 / vTan) * margin;
+  };
+  // Centre fit plus the half-extent toward the camera (front face is
+  // D/2 nearer than the centre, so a centre-only fit crops it).
+  const dFront = fitDist(spec.dims.w, 3.0, 1.65) + spec.dims.d / 2;
+  const dSide = fitDist(spec.dims.d, 3.0, 1.65) + spec.dims.w / 2;
+  const dTop = fitDist(spec.dims.w, spec.dims.d, 1.45) + 3.0;
+  // Portrait hero must fit the projected diagonal, not just the width.
+  let heroPos = cameraPos;
+  if (aspect < 1) {
+    const need = fitDist(9.2, 4.2, 1.12);
+    const dir = new THREE.Vector3(...cameraPos).normalize();
+    heroPos = dir.multiplyScalar(Math.max(new THREE.Vector3(...cameraPos).length(), need)).toArray();
+    S.camera.position.set(...heroPos);
+  }
+  const views = {
+    hero:  { pos: heroPos, tgt: [0, 0.85, 0] },
+    top:   { pos: [0, Math.max(11, dTop), 0.9], tgt: [0, 0.85, 0] },
+    front: { pos: [0, 2.2, dFront], tgt: [0, 0.85, 0] },
+    side:  { pos: [dSide, 2.2, 0], tgt: [0, 0.85, 0] },
+    back:  { pos: [0, 2.2, -dFront], tgt: [0, 0.85, 0] },
+  };
+  const buttons = [...document.querySelectorAll('#controls button')];
+  function setView(name) {
+    const v = views[name]; if (!v) return;
+    S.controls.autoRotate = false;
+    S.camera.position.set(...v.pos);
+    S.controls.target.set(...v.tgt);
+    S.controls.update();
+    // Key on the camera side of each preset (reference is top-lit;
+    // elevations get modelling light, not a shadow-side wall).
+    if (keyLight) {
+      keyLight.color.set(0xffffff);
+      if (name === 'top') { keyLight.position.set(2, 8, 2); keyLight.intensity = 1.2; }
+      else if (name === 'front') { keyLight.position.set(3, 6, 8); keyLight.intensity = 1.25; }
+      else if (name === 'side') { keyLight.position.set(8, 4, 3); keyLight.intensity = 1.25; }
+      else if (name === 'back') { keyLight.position.set(-3, 6, -8); keyLight.intensity = 1.25; }
+      else { keyLight.position.set(6, 3.6, 2.5); keyLight.intensity = 1.3; }
+    }
+    buttons.forEach(b => b.classList.toggle('active', b.dataset.view === name));
+  }
+  buttons.forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+
+  /* Pedal's own interaction: drag BLEND/LEVEL/FEEDBACK/CHRS-VIBR/DEPTH/DELAY, hold the stomp for the LED. */
+  const knobAnchors = A.anchors.filter(a => a.kind === 'knob');
+  const fsA = A.anchors.find(a => a.kind === 'footswitch');
+  const ledA = A.anchors.find(a => a.kind === 'led');
+  let ledOn = true; // reference photos show the red LED lit
+  function setLed(on) {
+    ledOn = on;
+    if (!ledA) return;
+    const u = ledA.obj.userData;
+    if (u.lensMat) u.lensMat.emissiveIntensity = on ? 2.4 : 0.05;
+    if (u.glow) u.glow.intensity = on ? 0.14 : 0;
+    if (u.dome) u.dome.material.color.set(on ? 0x2a0505 : 0x571008);
+  }
+  setLed(true);
+  const ray = new THREE.Raycaster();
+  const ptr = new THREE.Vector2();
+  let knobDrag = null, downInfo = null;
+  function pick(e) {
+    const r = S.renderer.domElement.getBoundingClientRect();
+    ptr.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+    ptr.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+    ray.setFromCamera(ptr, S.camera);
+    const targets = [...knobAnchors.map(a => a.obj), fsA?.obj].filter(Boolean);
+    if (!targets.length) return null;
+    const hits = ray.intersectObjects(targets, true);
+    if (!hits.length) return null;
+    let o = hits[0].object;
+    while (o) {
+      const kn = knobAnchors.find(a => a.obj === o);
+      if (kn) return { kind: 'knob', anchor: kn };
+      if (fsA && o === fsA.obj) return { kind: 'footswitch' };
+      o = o.parent;
+    }
+    return null;
+  }
+  function setPlunger(down) {
+    const plunger = fsA && fsA.obj.userData.plunger;
+    if (plunger) plunger.position.y = down ? -0.09 : 0;
+  }
+  S.renderer.domElement.addEventListener('pointerdown', (e) => {
+    const hit = pick(e);
+    downInfo = { x: e.clientX, y: e.clientY, hit };
+    if (hit && hit.kind === 'knob' && hit.anchor) {
+      knobDrag = { anchor: hit.anchor, x: e.clientX, y: e.clientY, rot: hit.anchor.obj.rotation.y };
+      S.controls.enabled = false;
+      S.controls.autoRotate = false;
+    }
+    // The plunger sinks while held, like the real footswitch.
+    if (hit && hit.kind === 'footswitch') setPlunger(true);
+  });
+  S.renderer.domElement.addEventListener('pointermove', (e) => {
+    if (!knobDrag) return;
+    // Horizontal and vertical drag both turn the knob (players try vertical first).
+    const delta = (e.clientX - knobDrag.x) - (e.clientY - knobDrag.y);
+    knobDrag.anchor.obj.rotation.y = THREE.MathUtils.clamp(knobDrag.rot + delta * 0.011, -2.35, 2.35);
+  });
+  S.renderer.domElement.addEventListener('pointerup', (e) => {
+    if (knobDrag) { knobDrag = null; S.controls.enabled = true; }
+    if (downInfo && downInfo.hit && downInfo.hit.kind === 'footswitch') {
+      const moved = Math.hypot(e.clientX - downInfo.x, e.clientY - downInfo.y);
+      setPlunger(false); // springs back on release
+      if (moved < 6) setLed(!ledOn);
+    }
+    downInfo = null;
+  });
+  S.renderer.domElement.addEventListener('pointercancel', () => {
+    if (knobDrag) { knobDrag = null; S.controls.enabled = true; }
+    setPlunger(false);
+    downInfo = null;
+  });
+  // Fade the spec card while the player is orbiting/zooming close.
+  const specbar = document.getElementById('specbar');
+  specbar.style.transition = 'opacity 0.4s ease';
+  // Resume gentle auto-rotate after idle, unless user chose a fixed view recently.
+  let idleT = null;
+  S.controls.addEventListener('start', () => { clearTimeout(idleT); specbar.style.opacity = '0.25'; });
+  S.controls.addEventListener('change', () => {
+    const close = S.camera.position.distanceTo(S.controls.target) < 5.2;
+    specbar.style.opacity = close ? '0.25' : '1';
+  });
+  S.controls.addEventListener('end', () => {
+    clearTimeout(idleT);
+    specbar.style.opacity = '1';
+    idleT = setTimeout(() => {
+      if (!document.querySelector('#controls button.active[data-view="top"], #controls button.active[data-view="front"], #controls button.active[data-view="side"], #controls button.active[data-view="back"]')) {
+        S.controls.autoRotate = true;
+      }
+    }, 3000);
+  });
+
+  if (spec.decal) {
+    new THREE.TextureLoader().load(spec.decal,
+      (tex) => {
+        applyDecal(A, tex, { anisotropy: S.renderer.capabilities.getMaxAnisotropy() });
+        document.getElementById('loader').style.opacity = '0';
+      },
+      undefined,
+      () => { document.getElementById('loader').style.opacity = '0'; }
+    );
+  } else {
+    document.getElementById('loader').style.opacity = '0';
+  }
+
+  S.start();
+} catch (e) {
+  showErr(e && e.message || String(e));
+  console.error(e);
+}
+</script>
+</body>
+</html>
