@@ -35,6 +35,10 @@
         1.5731
       ],
       [
+        -0.835,
+        1.695
+      ],
+      [
         -0.7854,
         1.8204
       ]
@@ -51,11 +55,12 @@
       "x": 0.0,
       "z": -1.352,
       "style": "boss-smooth",
-      "size": "large",
+      "size": "small",
       "rot": 0.3,
-      "note": "MEASURED from ds1_top.png: 16.3mm left of center, 16.9mm from back, 19.6mm dia. Scale 1.45 for 18mm height (V3 measured).",
+      "note": "Centre small knob. Position shared Boss compact drilling; identity/size from references/boss-sd1_top.jpg (LEVEL/DRIVE large, TONE centre small). Deck height baked from shared DS-1 profile.",
       "measured": true,
       "tickRing": false,
+      "diaScale": 0.85,
       "baseRing": false,
       "surfaceY": 1.5925
     },
@@ -66,7 +71,7 @@
       "style": "boss",
       "size": "large",
       "rot": -0.2,
-      "note": "MEASURED from ds1_top.png: 16.5mm right of center, 17.1mm from back, 19.8mm dia. Scale 1.45 for 18mm height (V3 measured).",
+      "note": "Right large knob. Position shared Boss compact drilling; identity/size from references/boss-sd1_top.jpg (LEVEL/DRIVE large, TONE centre small). Deck height baked from shared DS-1 profile.",
       "measured": true,
       "tickRing": false,
       "baseRing": true,
@@ -77,12 +82,11 @@
       "x": -0.678,
       "z": -1.901,
       "style": "boss",
-      "size": "small",
+      "size": "large",
       "rot": 0.1,
-      "note": "MEASURED from ds1_top.png: centered, 29.9mm from back, 14.3mm dia (smaller).",
+      "note": "Left large knob. Position shared Boss compact drilling; identity/size from references/boss-sd1_top.jpg (LEVEL/DRIVE large, TONE centre small). Deck height baked from shared DS-1 profile.",
       "measured": true,
       "tickRing": false,
-      "diaScale": 0.85,
       "surfaceY": 1.5895,
       "baseRing": true
     }
@@ -105,7 +109,7 @@
     {
       "text": "TONE",
       "x": 0.0,
-      "z": -1.65,
+      "z": -1.82,
       "w": 0.9,
       "h": 0.24,
       "spaced": false,
@@ -149,13 +153,14 @@
   "powerJack": {
     "x": 0,
     "y": 0.56,
-    "note": "DC 9V in, centered on back face, below label per ds1_gc_back.jpg"
+    "style": "round",
+    "note": "DC 9V in, centered on back face (references/boss-sd1_back.jpg)"
   },
   "thumbscrew": {
     "x": 0,
     "z": 2.62,
     "y": 1.643,
-    "r": 0.2,
+    "r": 0.15,
     "note": "Battery thumbscrew on treadle toe, front center"
   },
   "notes": "Boss SD-1 Super OverDrive. Same enclosure as DS-1 (Boss compact). Yellow.",
@@ -202,7 +207,7 @@
       ]
     ],
     "width": 2.362,
-    "color": "#907030",
+    "color": "#6b5518",
     "note": "Caedon nodes EFGH, DEFC/NHGI collinear 2026-10-01"
   },
   "padProfile": {
@@ -1123,5 +1128,6 @@
     "color": "#8a8d92",
     "note": "Caedon L1/L2 division 2026-10-01, correct coordinate transform"
   },
-  "treadleDecal": "./textures/sd1_treadle_decal.png?v=20261001h"
+  "treadleDecal": "./textures/sd1_treadle_decal.png?v=20261024a",
+  "padDecal": "./textures/sd1_pad_decal.png"
 }

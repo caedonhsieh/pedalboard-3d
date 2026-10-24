@@ -1,0 +1,4 @@
+BOSS-SD1 back reference
+Source: https://thumbs.static-thomann.de/thumb/padthumb600x600/pics/bdb/_10/103975/7536068_800.jpg
+Retrieved: 2026-09-29 (fetch_views.py)
+View: back

@@ -77,9 +77,9 @@
       "enclosure": "boss_compact",
       "id": "boss-sd1",
       "name": "SD-1",
-      "notes": "",
+      "notes": "Spec specs/sd1.json + boss-sd1.html standalone hero. Validate PASS (A 0.94mm, C 1.32mm; B skipped, no full-top decal) 2026-10-24.",
       "priority": 2,
-      "status": "planned"
+      "status": "hero"
     },
     {
       "brand": "Boss",
