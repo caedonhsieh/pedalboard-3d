@@ -1,0 +1,4 @@
+BOSS-CE2W front reference
+Source: https://static.roland.com/assets/images/products/gallery/CE-2W_F_gal.jpg
+Retrieved: 2026-09-29 (fetch_views.py)
+View: front

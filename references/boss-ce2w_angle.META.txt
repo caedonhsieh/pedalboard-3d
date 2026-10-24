@@ -1,0 +1,4 @@
+BOSS-CE2W angle reference
+Source: https://static.roland.com/assets/images/products/gallery/CE-2W_image2_gal.jpg
+Retrieved: 2026-09-29 (fetch_views.py)
+View: angle

@@ -95,9 +95,9 @@
       "enclosure": "boss_compact",
       "id": "boss-ce2w",
       "name": "CE-2W",
-      "notes": "",
+      "notes": "Spec specs/boss-ce2w.json + boss-ce2w.html standalone hero. Validate PASS (A 0.92mm, C 1.32mm; B skipped, no full-top decal) 2026-10-24.",
       "priority": 2,
-      "status": "planned"
+      "status": "hero"
     },
     {
       "brand": "MXR",

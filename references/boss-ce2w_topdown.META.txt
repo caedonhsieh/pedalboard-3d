@@ -1,0 +1,4 @@
+BOSS-CE2W topdown reference
+Source: https://raw.githubusercontent.com/PedalPlayground/pedalplayground/master/public/images/pedals/boss-ce2w.png
+Retrieved: 2026-09-29 (fetch_views.py)
+View: topdown
