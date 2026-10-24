@@ -1,0 +1,4 @@
+XOTIC-EP-BOOSTER hero reference
+Source: https://xotic.us/effects/ep-booster/img/ep-hero1.jpg
+Retrieved: 2026-09-29 (fetch_views.py)
+View: hero

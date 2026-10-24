@@ -185,9 +185,9 @@
       "enclosure": "custom",
       "id": "xotic-ep-booster",
       "name": "EP Booster",
-      "notes": "Mini enclosure.",
+      "notes": "Spec specs/xotic-ep-booster.json + xotic-ep-booster.html standalone hero. Validate PASS (A 0.38mm, C 0.93mm; B skipped, no full-top decal) 2026-10-24.",
       "priority": 2,
-      "status": "planned"
+      "status": "hero"
     },
     {
       "brand": "Dunlop",

@@ -1,0 +1,144 @@
+{
+  "id": "xotic-ep-booster",
+  "brand": "Xotic",
+  "name": "EP Booster",
+  "dims": {
+    "w": 1.5,
+    "d": 3.5,
+    "h": 1.5,
+    "source": "Official Xotic product page via data/spec_sheets_staging.json (verified): 'Dimensions (W/D/H): 3.5 x 1.5 x 1.5 in (89 x 38 x 38 mm)' with W/D labels rotated relative to physical orientation; remapped w=left-right 1.5 in, d=front-back 3.5 in, h=1.5 in bare enclosure adopted (knob inclusion unknown; see references/xotic-ep-booster_measurements.md)"
+  },
+  "enclosure": {
+    "type": "box",
+    "color": "#141518",
+    "edgeRadius": 0.06,
+    "note": "Custom mini box 38 x 89 x 38 mm; no PRESETS entry fits. Per-model dims override. Black top, charcoal brushed sides on the real pedal rendered as single near-black powder coat."
+  },
+  "knobs": [
+    {
+      "id": "gain",
+      "style": "mxr",
+      "x": 0,
+      "z": -0.93,
+      "rot": 0,
+      "scale": 0.85,
+      "diaScale": 0.82,
+      "tickRing": false,
+      "note": "Single clear gain knob centred. Two-view: topdown z -0.88, front render z -0.98 (see measurements). Clear acrylic on the real pedal; library mxr Davies scaled to measured ~0.76 in dia. No tick ring on the real pedal."
+    }
+  ],
+  "led": {
+    "x": 0,
+    "z": -0.28,
+    "note": "Blue status LED centred below the knob. Two-view blue-core centroid z -0.283 in both topdown and front (see measurements). Library led() is red; hero page retints blue locally."
+  },
+  "footswitch": {
+    "style": "round",
+    "x": 0,
+    "z": 1.2,
+    "note": "Round chrome true-bypass stomp centred. Two-view: topdown z +1.26, front z +1.14 (see measurements)."
+  },
+  "jacks": [
+    {
+      "id": "input",
+      "side": "right",
+      "z": -0.3,
+      "y": 0.75,
+      "note": "INPUT on right wall, rear jack. Two-view z -0.28/-0.34 (see measurements). y mid-wall provisional."
+    },
+    {
+      "id": "output",
+      "side": "left",
+      "z": 0.35,
+      "y": 0.75,
+      "note": "OUTPUT on left wall, forward of INPUT. Photo z +0.39 dominates squashed render +0.19; provisional +/-0.10 in (see measurements)."
+    }
+  ],
+  "powerJack": {
+    "x": 0,
+    "y": 0.85,
+    "style": "round",
+    "note": "9V round barrel centred on back wall under the + -C- - print (parts diagram + detail6). y provisional single-view."
+  },
+  "labels": [
+    {
+      "id": "power-symbol",
+      "text": "+ -C- -",
+      "x": 0,
+      "z": -1.58,
+      "w": 0.62,
+      "h": 0.12,
+      "spaced": false,
+      "bold": false,
+      "color": "#f2f2f2",
+      "note": "DC polarity print centred on back edge (both top views)."
+    },
+    {
+      "id": "ep-script",
+      "text": "EP",
+      "x": 0,
+      "z": 0.18,
+      "w": 1.02,
+      "h": 0.48,
+      "spaced": false,
+      "bold": false,
+      "script": true,
+      "color": "#f2f2f2",
+      "note": "Large brush script EP centred (detail1). Vector script approximation; letterform differs from the hand-drawn original."
+    },
+    {
+      "id": "booster-script",
+      "text": "-booster",
+      "x": 0,
+      "z": 0.58,
+      "w": 1.12,
+      "h": 0.26,
+      "spaced": false,
+      "bold": false,
+      "script": true,
+      "color": "#f2f2f2",
+      "note": "Script -booster under EP, dash leading (detail1)."
+    },
+    {
+      "id": "by-xotic",
+      "text": "BY xotic usa",
+      "x": 0,
+      "z": 0.82,
+      "w": 0.88,
+      "h": 0.1,
+      "spaced": false,
+      "bold": false,
+      "color": "#f2f2f2",
+      "note": "Small sans under -booster; xotic lower-case as printed."
+    },
+    {
+      "id": "in-label",
+      "text": "IN",
+      "x": 0.58,
+      "z": -0.3,
+      "w": 0.34,
+      "h": 0.11,
+      "spaced": false,
+      "bold": true,
+      "color": "#f2f2f2",
+      "rot": -1.5708,
+      "note": "Vertical IN print on right edge by INPUT jack (rot -90deg so it reads unmirrored from above; +90deg mirrored in Top view)."
+    },
+    {
+      "id": "out-label",
+      "text": "OUT",
+      "x": -0.58,
+      "z": 0.35,
+      "w": 0.42,
+      "h": 0.11,
+      "spaced": false,
+      "bold": true,
+      "color": "#f2f2f2",
+      "rot": 1.5708,
+      "note": "Vertical OUT print on left edge by OUTPUT jack."
+    }
+  ],
+  "faceImage": "https://raw.githubusercontent.com/PedalPlayground/pedalplayground/master/public/images/pedals/xotic-ep.png",
+  "decal": null,
+  "notes": "Xotic EP Booster mini hero. Custom mini box (38 x 89 mm); all deck parts seat via surfaceAt() on the flat deck (h=1.50) - no hardcoded y on knob/LED/switch. Positions two-view from references/xotic-ep-booster_measurements.md; OUTPUT z and jack/power y flagged provisional there. Print is vector textLabels (no full-top decal, so validate CHECK B skips); the EP/-booster hand script is approximated with the library script face. Real clear knob and blue LED are retinted locally by xotic-ep-booster.html (library knob is opaque black, library LED is red) - reusable clear-knob/blue-LED builders are reported as shared needs, parts.js untouched."
+}
