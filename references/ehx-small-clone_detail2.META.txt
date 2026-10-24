@@ -1,0 +1,4 @@
+EHX-SMALL-CLONE detail2 reference
+Source: https://b2155914.assetcdn.net/2155914/wp-content/uploads/2020/10/clone-2.jpg
+Retrieved: 2026-09-29 (fetch_views.py)
+View: detail2

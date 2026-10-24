@@ -1,0 +1,62 @@
+{
+  "id": "ehx-small-clone",
+  "brand": "EHX",
+  "name": "Small Clone",
+  "dims": {
+    "w": 3.38,
+    "d": 5.25,
+    "h": 2.09,
+    "source": "EHX spec block via data/spec_sheets_staging.json (verified 3.38 x 5.25 x 2.75 in); bare-enclosure back height 2.09 in measured from side photo (references/ehx-small-clone_measurements.md) — 2.75 in is overall including knobs (side-view knob-top 2.63 in corroborates)"
+  },
+  "enclosure": {
+    "type": "profile",
+    "color": "#17181a",
+    "bevel": 0.05,
+    "points": [
+      [-2.625, 2.09],
+      [2.625, 1.32]
+    ],
+    "backColor": "#c9c9c7",
+    "notes": "Single straight slope measured from side views: bare back 2.09 in to bare front 1.32 in over 5.25 in depth. Black lower box; brushed-silver top plate and print supplied by textures/ehx-small-clone-decal.png so sides stay black."
+  },
+  "knobs": [
+    {
+      "id": "rate",
+      "style": "ehx",
+      "x": 0.15,
+      "z": -1.65,
+      "rot": 0.0,
+      "scale": 1.0,
+      "diaScale": 1.15,
+      "tickRing": false,
+      "note": "Photo-derived: single RATE hockey-puck knob ~1.05 in dia near back. Ticks are baked into the decal."
+    }
+  ],
+  "led": { "x": 0.95, "z": -1.65, "note": "Red STATUS LED right of RATE (front + detail1 views)." },
+  "footswitch": { "style": "round", "x": 0, "z": 1.25, "note": "Round chrome stomp centred in purple panel." },
+  "depthSwitch": { "x": -0.85, "z": -1.65, "note": "DEPTH slide toggle left of RATE. SHARED NEED: parts.js has no toggle/slide-switch builder and assemblePedal ignores this field; hero page renders a page-local toggle until a reusable builder lands." },
+  "jacks": [
+    { "id": "input", "face": "back", "x": 1.02, "y": 0.95, "note": "INPUT back wall, right in top view (detail2 image-left)." },
+    { "id": "output", "face": "back", "x": -1.02, "y": 0.95, "note": "OUTPUT back wall, left in top view (detail2 image-right)." }
+  ],
+  "powerJack": { "x": 0, "y": 0.95, "style": "round", "note": "9V round barrel centred on back wall (detail2)." },
+  "labels": [
+    { "id": "output-label", "text": "OUTPUT", "x": -1.15, "z": -2.38, "w": 0.95, "h": 0.16, "spaced": false, "bold": true, "color": "#f2f2f2", "note": "Back edge left, white on black panel." },
+    { "id": "9v-label", "text": "9V", "x": 0, "z": -2.38, "w": 0.4, "h": 0.16, "spaced": false, "bold": true, "color": "#f2f2f2", "note": "Back edge centre." },
+    { "id": "input-label", "text": "INPUT", "x": 1.15, "z": -2.38, "w": 0.8, "h": 0.16, "spaced": false, "bold": true, "color": "#f2f2f2", "note": "Back edge right." },
+    { "id": "depth-label", "text": "DEPTH", "x": -0.85, "z": -1.02, "w": 0.75, "h": 0.15, "spaced": false, "bold": true, "color": "#f2f2f2", "note": "Below DEPTH toggle." },
+    { "id": "rate-label", "text": "RATE", "x": 0.15, "z": -1.0, "w": 0.65, "h": 0.15, "spaced": false, "bold": true, "color": "#f2f2f2", "note": "Below RATE knob." },
+    { "id": "status-label", "text": "STATUS", "x": 0.95, "z": -1.02, "w": 0.85, "h": 0.15, "spaced": false, "bold": true, "color": "#f2f2f2", "note": "Below STATUS LED." }
+  ],
+  "screws": [
+    { "id": "screw-bl", "x": -1.35, "z": -2.3 },
+    { "id": "screw-br", "x": 1.35, "z": -2.3 },
+    { "id": "screw-ml", "x": -1.35, "z": -1.05 },
+    { "id": "screw-mr", "x": 1.35, "z": -1.05 },
+    { "id": "screw-fl", "x": -1.35, "z": 2.05 },
+    { "id": "screw-fr", "x": 1.35, "z": 2.05 }
+  ],
+  "faceImage": "https://b2155914.assetcdn.net/2155914/wp-content/uploads/2020/10/clone-1.jpg",
+  "decal": "./textures/ehx-small-clone-decal.png",
+  "notes": "EHX Small Clone EH 4600 hero. Sloped steel box like Big Muff Pi, scaled to 3.38x5.25. Deck parts seat via surfaceAt() on single sloped deck — no hardcoded y on knobs/LED/switch. Back-wall jacks/power (face:'back'). Top art (black back panel, purple SMALL CLONE panel, front ELECTRO HARMONIX strip, RATE ticks) in decal; remaining words are vector labels. Positions photo-derived, provisional where single-view. SHARED NEED: reusable DEPTH toggle builder in parts.js (spec.depthSwitch currently ignored by assemblePedal; hero page draws it locally)."
+}

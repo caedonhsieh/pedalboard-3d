@@ -122,9 +122,9 @@
       "enclosure": "custom",
       "id": "ehx-small-clone",
       "name": "Small Clone",
-      "notes": "",
+      "notes": "Spec specs/ehx-small-clone.json + ehx-small-clone.html standalone hero. Validate PASS (A 0.38mm, B 99.3%, C 0.44mm) 2026-10-24.",
       "priority": 2,
-      "status": "planned"
+      "status": "hero"
     },
     {
       "brand": "EHX",
