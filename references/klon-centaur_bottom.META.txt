@@ -1,0 +1,4 @@
+KLON-CENTAUR bottom reference
+Source: https://cdn.shopify.com/s/files/1/0255/8659/7968/products/IMG_8356_ad61991d-a7d4-43d9-8679-69141782a1aa.jpg?v=1676394112
+Retrieved: 2026-09-29 (fetch_views.py)
+View: bottom

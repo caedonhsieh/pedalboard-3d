@@ -68,9 +68,9 @@
       "enclosure": "custom",
       "id": "klon-centaur",
       "name": "Centaur",
-      "notes": "Custom enclosure, gold finish.",
+      "notes": "Custom enclosure, gold finish. Spec specs/klon-centaur.json + klon-centaur.html standalone hero. Validate PASS (A 0.00mm, B 99.5%, C 0.18mm) 2026-10-24.",
       "priority": 1,
-      "status": "planned"
+      "status": "hero"
     },
     {
       "brand": "Boss",

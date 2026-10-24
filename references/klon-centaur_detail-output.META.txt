@@ -1,0 +1,4 @@
+KLON-CENTAUR detail-output reference
+Source: https://cdn.shopify.com/s/files/1/0255/8659/7968/products/IMG_8333_60f64b2b-7c2e-45f5-a565-b5eec27b64ac.jpg?v=1676394381
+Retrieved: 2026-09-29 (fetch_views.py)
+View: detail-output

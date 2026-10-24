@@ -1,0 +1,4 @@
+KLON-CENTAUR top reference
+Source: https://raw.githubusercontent.com/PedalPlayground/pedalplayground/master/public/images/pedals/klon-centaur-gold.png
+Retrieved: 2026-09-29 (fetch_views.py)
+View: top

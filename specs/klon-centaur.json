@@ -1,0 +1,100 @@
+{
+  "id": "klon-centaur",
+  "brand": "Klon",
+  "name": "Centaur",
+  "dims": {
+    "w": 6.63,
+    "d": 5.0,
+    "h": 1.98,
+    "source": "Dealer measurement verified in data/spec_sheets_staging.json (Reverb 90989796: 6 5/8 x 5 x 2 in, secondary, knob inclusion unstated); W/D adopted from it (6.63 x 5.00), bare H 1.98 resolved from calibrated back photo (references/klon-centaur_measurements.md). Conflicts flagged there: heights.json footprint 6.50 x 5.03 corroborates, its 1.87 in height is an enclosure inference (rejected); Warm Audio Centavo clone 6.75 x 5.00 x 2.25 corroborates footprint, its 2.25 is knob-inclusive overall (not bare)."
+  },
+  "enclosure": {
+    "type": "profile",
+    "color": "#c9972f",
+    "bevel": 0.06,
+    "smooth": false,
+    "points": [
+      [
+        -2.5,
+        1.98
+      ],
+      [
+        2.5,
+        1.7
+      ]
+    ],
+    "notes": "Single gentle slope measured from back/front/hero views (see references/klon-centaur_measurements.md): bare back 1.98 in to bare front 1.70 in over 5.00 in depth. Gold cast box; stepped perimeter flange in the photos is a constant-width simplification (profile extrudes uniform width)."
+  },
+  "knobs": [
+    {
+      "id": "gain",
+      "style": "mxr",
+      "x": -2.1,
+      "z": -1.32,
+      "rot": 0.1,
+      "scale": 0.85,
+      "diaScale": 1.22,
+      "tickRing": false,
+      "note": "Photo-derived blob centroid on klon-centaur_top.jpg, symmetrised (see measurements). Oxblood tapered knob ~1.08 in dia; closest parts.js knob is mxr Davies (black) scaled dia 1.22 / height 0.85."
+    },
+    {
+      "id": "treble",
+      "style": "mxr",
+      "x": 0.05,
+      "z": -1.32,
+      "rot": 0.0,
+      "scale": 0.85,
+      "diaScale": 1.22,
+      "tickRing": false,
+      "note": "Photo-derived centre knob, same row as GAIN/OUTPUT."
+    },
+    {
+      "id": "output",
+      "style": "mxr",
+      "x": 2.2,
+      "z": -1.32,
+      "rot": -0.1,
+      "scale": 0.85,
+      "diaScale": 1.22,
+      "tickRing": false,
+      "note": "Photo-derived right knob, same row."
+    }
+  ],
+  "led": {
+    "x": -2.85,
+    "z": -0.55,
+    "note": "Red LED left of the GAIN label, forward of the knob row (top view red-mask centroid; corroborated in hero/detail-gain)."
+  },
+  "footswitch": {
+    "style": "round",
+    "x": 0.95,
+    "z": 1.35,
+    "note": "Round chrome stomp front-right of the centaur graphic (top-view highlight centroid, provisional; corroborated in hero/detail-output)."
+  },
+  "jacks": [
+    {
+      "id": "input",
+      "face": "back",
+      "x": 1.05,
+      "y": 0.95,
+      "note": "IN on the back wall, pedal right (+x) — image-left viewed from behind (back view)."
+    },
+    {
+      "id": "output",
+      "face": "back",
+      "x": -0.8,
+      "y": 0.95,
+      "note": "OUT on the back wall, centre-left in pedal coords (back view)."
+    }
+  ],
+  "powerJack": {
+    "x": -1.9,
+    "y": 0.95,
+    "style": "round",
+    "note": "9V round barrel on the back wall left of OUT (back view, image-far-right = pedal left)."
+  },
+  "labels": [],
+  "faceImage": "https://raw.githubusercontent.com/PedalPlayground/pedalplayground/master/public/images/pedals/klon-centaur-gold.png",
+  "decal": "./textures/klon-centaur-decal.png",
+  "notes": "Klon Centaur original gold (horsey) hero. Custom cast enclosure as a single gentle profile slope (1.98 back / 1.70 front); all deck parts seat via surfaceAt() — no hardcoded y on knobs/LED/switch. Audio jacks + 9V on the back wall (face:'back'). Top print (GAIN/TREBLE/OUTPUT serif, centaur line graphic, CENTAUR-TM) is in textures/klon-centaur-decal.png (serif + line art vector labels cannot reproduce). Back-wall IN/OUT/9V print is inventoried in the measurements file but omitted from labels[]: parts.js already positions face:'back' labels correctly, but validate.html expectedPos() has no face-back label case (anchors get deck-height/NaN expectations), so any back label fails check A — shared-validator fix listed in the build report. Knob positions are photo-derived blob centroids (measurements file); footswitch and jack heights are provisional single-view values as flagged there. Knob colour: library mxr knob is black; the real oxblood tapered knob needs a reusable parts.js builder (listed in the build report, not edited here)."
+}
