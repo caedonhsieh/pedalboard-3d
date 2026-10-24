@@ -1,0 +1,4 @@
+MXR-CARBON-COPY hero reference
+Source: https://cdn11.bigcommerce.com/s-n26aknlnlm/images/stencil/1280x1280/products/607/6299/11169000001.MAIN__89194.1663874794.jpg?c=2
+Retrieved: 2026-09-29 (fetch_views.py)
+View: hero

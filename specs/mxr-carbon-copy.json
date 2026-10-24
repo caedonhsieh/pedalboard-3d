@@ -1,0 +1,207 @@
+{
+  "id": "mxr-carbon-copy",
+  "brand": "MXR",
+  "name": "Carbon Copy",
+  "dims": {
+    "w": 2.362,
+    "d": 4.37,
+    "h": 1.26,
+    "source": "preset mxr_standard 60 x 111 x 32 mm bare enclosure (parts.js PRESETS, high confidence); verified_mxr_ehx.json MXR | Carbon Copy 1.25in (repeated dealer specs) corroborates height"
+  },
+  "enclosure": {
+    "type": "box",
+    "preset": "mxr_standard",
+    "color": "#1c5a2c",
+    "edgeRadius": 0.06
+  },
+  "knobs": [
+    {
+      "id": "regen",
+      "style": "mxr",
+      "x": -0.74,
+      "z": -1.02,
+      "rot": 0.05,
+      "tickRing": false,
+      "note": "REGEN left knob. Photo references/mxr-carbon-copy_hero.jpg top-down + front elevation; see references/mxr-carbon-copy_measurements.md."
+    },
+    {
+      "id": "mix",
+      "style": "mxr",
+      "x": 0.08,
+      "z": -1.58,
+      "rot": 0.0,
+      "tickRing": false,
+      "note": "MIX top-centre knob, behind the REGEN/DELAY row. Hero + back elevation."
+    },
+    {
+      "id": "delay",
+      "style": "mxr",
+      "x": 0.74,
+      "z": -1.02,
+      "rot": -0.05,
+      "tickRing": false,
+      "note": "DELAY right knob, same row as REGEN. Hero + front elevation."
+    }
+  ],
+  "led": {
+    "x": 0,
+    "z": 0.18,
+    "note": "Effect (bypass) LED below the MXR logo, blue on the real pedal, dark in the reference photos (pedal off). Hero starts ON; see mxr-carbon-copy.html."
+  },
+  "footswitch": {
+    "style": "round",
+    "x": 0,
+    "z": 0.78,
+    "note": "Round chrome stomp switch, centred. Hero + front/side elevations."
+  },
+  "jacks": [
+    {
+      "id": "input",
+      "side": "right",
+      "z": -0.3,
+      "y": 0.65,
+      "note": "INPUT on right wall. Hero protrusion + right side view."
+    },
+    {
+      "id": "output",
+      "side": "left",
+      "z": -0.3,
+      "y": 0.65,
+      "note": "OUTPUT on left wall. Hero protrusion + left side view."
+    }
+  ],
+  "powerSide": {
+    "side": "right",
+    "z": 0.55,
+    "y": 0.65,
+    "note": "9V DC socket on the RIGHT wall forward of INPUT (references/mxr-carbon-copy_right.jpg). No back-wall power jack on this pedal. parts.js powerJack() is back-wall only, so spec.powerJack stays null and mxr-carbon-copy.html builds this socket from powerSide. Provisional +-0.1in (single clear view)."
+  },
+  "modSwitch": {
+    "x": -0.5,
+    "z": -1.82,
+    "note": "MOD push-switch, translucent pale cap at back-left of deck (hero + left side). Built by mxr-carbon-copy.html; no parts.js builder yet."
+  },
+  "modLed": {
+    "x": -0.36,
+    "z": -1.58,
+    "note": "Small MOD indicator LED just forward-right of the MOD cap (hero, single clear view, provisional +-0.06in). Built by mxr-carbon-copy.html."
+  },
+  "powerJack": null,
+  "labels": [
+    {
+      "id": "mod-label",
+      "text": "MOD",
+      "x": -0.86,
+      "z": -1.82,
+      "w": 0.44,
+      "h": 0.13,
+      "spaced": false,
+      "bold": true,
+      "color": "#eef2ee",
+      "note": "White MOD print left of the MOD cap."
+    },
+    {
+      "id": "mix-label",
+      "text": "MIX",
+      "x": 0.08,
+      "z": -1.0,
+      "w": 0.42,
+      "h": 0.13,
+      "spaced": false,
+      "bold": true,
+      "color": "#eef2ee",
+      "note": "White MIX print below the MIX knob, between REGEN and DELAY."
+    },
+    {
+      "id": "regen-label",
+      "text": "REGEN",
+      "x": -0.74,
+      "z": -0.44,
+      "w": 0.62,
+      "h": 0.13,
+      "spaced": false,
+      "bold": true,
+      "color": "#eef2ee",
+      "note": "White REGEN print below the REGEN knob."
+    },
+    {
+      "id": "delay-label",
+      "text": "DELAY",
+      "x": 0.74,
+      "z": -0.44,
+      "w": 0.58,
+      "h": 0.13,
+      "spaced": false,
+      "bold": true,
+      "color": "#eef2ee",
+      "note": "White DELAY print below the DELAY knob."
+    },
+    {
+      "id": "mxr-logo",
+      "text": "MXR",
+      "x": 0,
+      "z": -0.08,
+      "w": 1.3,
+      "h": 0.32,
+      "spaced": false,
+      "bold": true,
+      "color": "#eef2ee",
+      "note": "Boxed MXR logo centred. Vector bold text; the rounded-rect border is drawn by mxr-carbon-copy.html (no shared builder change)."
+    },
+    {
+      "id": "output-label",
+      "text": "OUTPUT",
+      "x": -1.0,
+      "z": -0.3,
+      "w": 0.68,
+      "h": 0.14,
+      "spaced": false,
+      "bold": true,
+      "color": "#eef2ee",
+      "rot": 1.5708,
+      "note": "Vertical OUTPUT print on top edge by left jack."
+    },
+    {
+      "id": "input-label",
+      "text": "INPUT",
+      "x": 1.0,
+      "z": -0.3,
+      "w": 0.62,
+      "h": 0.14,
+      "spaced": false,
+      "bold": true,
+      "color": "#eef2ee",
+      "rot": 1.5708,
+      "note": "Vertical INPUT print on top edge by right jack."
+    },
+    {
+      "id": "carbon-copy-label",
+      "text": "carbon copy",
+      "x": 0,
+      "z": 1.52,
+      "w": 1.9,
+      "h": 0.27,
+      "spaced": false,
+      "bold": false,
+      "rounded": true,
+      "color": "#eef2ee",
+      "note": "Lowercase rounded front lettering."
+    },
+    {
+      "id": "analog-delay-label",
+      "text": "analog delay",
+      "x": 0,
+      "z": 1.8,
+      "w": 1.4,
+      "h": 0.19,
+      "spaced": false,
+      "bold": false,
+      "rounded": true,
+      "color": "#eef2ee",
+      "note": "Smaller lowercase line under carbon copy."
+    }
+  ],
+  "faceImage": "https://cdn11.bigcommerce.com/s-n26aknlnlm/images/stencil/1280x1280/products/607/6299/11169000001.MAIN__89194.1663874794.jpg?c=2",
+  "decal": null,
+  "notes": "MXR Carbon Copy (M169) hero. Bare-enclosure dims from parts.js PRESETS.mxr_standard (60x111x32mm, high), corroborated by verified_mxr_ehx.json. Dark metallic green box, 3x mxr Davies knobs (REGEN/MIX/DELAY), MOD push-switch + MOD LED at back-left, effect LED + round footswitch. Coordinates: back=-z (knob side), front=+z (carbon copy text). All deck parts seat via surfaceAt() (flat deck h=1.26) - no hardcoded y on knobs/LED/switch. Side 9V socket and MOD hardware have no parts.js builder; they are spec'd here (powerSide/modSwitch/modLed) and built by mxr-carbon-copy.html. White print is vector textLabels (decal null, so validate CHECK B is skipped per PROCESS.md)."
+}

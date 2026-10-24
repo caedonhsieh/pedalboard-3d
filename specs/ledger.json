@@ -113,9 +113,9 @@
       "enclosure": "mxr_standard",
       "id": "mxr-carbon-copy",
       "name": "Carbon Copy",
-      "notes": "",
+      "notes": "Spec specs/mxr-carbon-copy.json + mxr-carbon-copy.html standalone hero. Validate PASS (A 0.38mm, C 0.89mm; B skipped, no full-top decal) 2026-10-24.",
       "priority": 2,
-      "status": "planned"
+      "status": "hero"
     },
     {
       "brand": "EHX",

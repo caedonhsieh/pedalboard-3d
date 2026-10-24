@@ -1,0 +1,4 @@
+MXR-CARBON-COPY bottom reference
+Source: https://cdn11.bigcommerce.com/s-n26aknlnlm/images/stencil/1280x1280/products/607/6303/11169000001.BOTT__25675.1663874794.jpg?c=2
+Retrieved: 2026-09-29 (fetch_views.py)
+View: bottom
