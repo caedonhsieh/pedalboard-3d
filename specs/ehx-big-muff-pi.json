@@ -1,0 +1,201 @@
+{
+  "id": "ehx-big-muff-pi",
+  "brand": "EHX",
+  "name": "Big Muff Pi",
+  "dims": {
+    "w": 5.5,
+    "d": 6.88,
+    "h": 2.16,
+    "source": "EHX product page via data/spec_sheets_staging.json (verified 5.5 x 6.88 x 2.95 in overall); bare-enclosure back height 2.16 in measured from side photo (references/ehx-big-muff-pi_measurements.md) \u2014 2.95 in is overall including knobs (side-view knob-top height 2.92 in corroborates)"
+  },
+  "enclosure": {
+    "type": "profile",
+    "color": "#17181a",
+    "bevel": 0.05,
+    "points": [
+      [
+        -3.44,
+        2.16
+      ],
+      [
+        3.44,
+        1.37
+      ]
+    ],
+    "notes": "Single straight slope measured from the side views (see references/ehx-big-muff-pi_measurements.md): bare back 2.16 in to bare front 1.37 in over 6.88 in depth. Black lower box; brushed-silver top plate and print are supplied by textures/ehx-big-muff-pi-decal.png so the sides stay black.",
+    "backColor": "#c9c9c7"
+  },
+  "knobs": [
+    {
+      "id": "volume",
+      "style": "ehx",
+      "x": -1.93,
+      "z": -2.45,
+      "rot": 0.0,
+      "scale": 1.15,
+      "diaScale": 1.05,
+      "tickRing": false,
+      "note": "Photo-derived (homography of detail1, symmetrised): VOLUME left knob. Black hockey-puck knob ~1.06 in dia, ~0.74 in tall above deck \u2014 mxr body scaled dia 1.15, height 1.35."
+    },
+    {
+      "id": "tone",
+      "style": "ehx",
+      "x": 0,
+      "z": -2.45,
+      "rot": 0.0,
+      "scale": 1.15,
+      "diaScale": 1.05,
+      "tickRing": false,
+      "note": "Photo-derived: TONE centre knob, same row as VOLUME/SUSTAIN."
+    },
+    {
+      "id": "sustain",
+      "style": "ehx",
+      "x": 1.93,
+      "z": -2.45,
+      "rot": 0.0,
+      "scale": 1.15,
+      "diaScale": 1.05,
+      "tickRing": false,
+      "note": "Photo-derived: SUSTAIN right knob, same row."
+    }
+  ],
+  "led": {
+    "x": -0.9,
+    "z": -1.82,
+    "note": "Red LED between VOLUME and TONE, forward of the knob row (front + detail1 views)."
+  },
+  "footswitch": {
+    "style": "round",
+    "x": 0,
+    "z": 1.97,
+    "note": "Round chrome stomp centred in the black lower field (homography of detail1)."
+  },
+  "jacks": [
+    {
+      "id": "input",
+      "face": "back",
+      "x": 1.88,
+      "y": 0.85,
+      "note": "INPUT on the back wall, right in top view (detail2 viewed from behind: image-left = pedal right). Back-wall layout, not a side jack."
+    },
+    {
+      "id": "amplifier",
+      "face": "back",
+      "x": -2.01,
+      "y": 0.85,
+      "note": "AMPLIFIER (output) on the back wall, left in top view (detail2 image-right)."
+    }
+  ],
+  "powerJack": {
+    "x": -0.05,
+    "y": 0.85,
+    "style": "round",
+    "note": "9V round barrel centred on the back wall between the audio jacks (detail2)."
+  },
+  "labels": [
+    {
+      "id": "amplifier-label",
+      "text": "AMPLIFIER",
+      "x": -2.02,
+      "z": -3.3,
+      "w": 1.15,
+      "h": 0.16,
+      "spaced": false,
+      "bold": true,
+      "note": "Above VOLUME knob at the back edge (front view)."
+    },
+    {
+      "id": "input-label",
+      "text": "INPUT",
+      "x": 2.02,
+      "z": -3.3,
+      "w": 0.8,
+      "h": 0.16,
+      "spaced": false,
+      "bold": true,
+      "note": "Above SUSTAIN knob at the back edge."
+    },
+    {
+      "id": "volume-label",
+      "text": "VOLUME",
+      "x": -1.93,
+      "z": -1.78,
+      "w": 0.95,
+      "h": 0.16,
+      "spaced": false,
+      "bold": true,
+      "note": "Below VOLUME knob."
+    },
+    {
+      "id": "tone-label",
+      "text": "TONE",
+      "x": 0.35,
+      "z": -1.78,
+      "w": 0.65,
+      "h": 0.16,
+      "spaced": false,
+      "bold": true,
+      "note": "Below TONE knob, offset right of the LED."
+    },
+    {
+      "id": "sustain-label",
+      "text": "SUSTAIN",
+      "x": 1.93,
+      "z": -1.78,
+      "w": 1.0,
+      "h": 0.16,
+      "spaced": false,
+      "bold": true,
+      "note": "Below SUSTAIN knob."
+    },
+    {
+      "id": "ehx-script",
+      "text": "electro-harmonix",
+      "x": 0,
+      "z": 3.08,
+      "w": 2.4,
+      "h": 0.3,
+      "spaced": false,
+      "bold": false,
+      "script": true,
+      "note": "Script logo at the front edge (front view)."
+    },
+    {
+      "id": "usa",
+      "text": "USA",
+      "x": 0,
+      "z": 3.32,
+      "w": 0.5,
+      "h": 0.13,
+      "spaced": false,
+      "bold": false,
+      "note": "Beneath the electro-harmonix script."
+    }
+  ],
+  "faceImage": "https://b2155914.assetcdn.net/2155914/wp-content/uploads/2020/10/usbm-f.jpg",
+  "decal": "./textures/ehx-big-muff-pi-decal.png",
+  "notes": "EHX Big Muff Pi NYC reissue big box hero. Dims: width/depth from the verified EHX spec; enclosure height is the measured bare slope (2.16 in back, 1.37 in front) because the published 2.95 in includes the knobs. All deck parts seat via surfaceAt() on the single sloped deck \u2014 no hardcoded y on knobs/LED/switch. Audio jacks and power are on the back wall (face:'back' in parts.js), confirmed in detail2. Top art: silver plate, red rules, BIG MUFF wordmark, black lower field, pi badge and corner screws are in the decal; the remaining words are vector textLabels above it. Positions are photo-derived from references/ehx-big-muff-pi_measurements.md and marked provisional where single-view.",
+  "screws": [
+    {
+      "id": "screw-back-left",
+      "x": -2.45,
+      "z": -3.18
+    },
+    {
+      "id": "screw-back-right",
+      "x": 2.45,
+      "z": -3.18
+    },
+    {
+      "id": "screw-front-left",
+      "x": -2.45,
+      "z": 2.78
+    },
+    {
+      "id": "screw-front-right",
+      "x": 2.45,
+      "z": 2.78
+    }
+  ]
+}

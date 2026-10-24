@@ -1,0 +1,4 @@
+EHX-BIG-MUFF-PI detail1 reference
+Source: https://b2155914.assetcdn.net/2155914/wp-content/uploads/2020/10/usbm-1.jpg
+Retrieved: 2026-09-29 (fetch_views.py)
+View: detail1

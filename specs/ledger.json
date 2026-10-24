@@ -32,9 +32,9 @@
       "enclosure": "custom",
       "id": "ehx-big-muff-pi",
       "name": "Big Muff Pi",
-      "notes": "NYC reissue big box.",
+      "notes": "NYC reissue big box. Spec specs/ehx-big-muff-pi.json + ehx-big-muff-pi.html standalone hero. Validate PASS (A 0.38mm, B 99.4%, C 0.19mm) 2026-10-24.",
       "priority": 1,
-      "status": "planned"
+      "status": "hero"
     },
     {
       "brand": "ProCo",

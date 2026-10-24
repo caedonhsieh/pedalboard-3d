@@ -348,6 +348,19 @@ export function knob(style = 'ts9', pointerRot = 0, scale = 1, diaScale = null) 
     pointer.position.set(0, 0.552, -0.14);
     const pg = new THREE.Group(); pg.add(pointer); pg.rotation.y = pointerRot;
     k.add(body, top, pg);
+  } else if (style === 'ehx') {
+    // EHX big-box hockey-puck knob: smooth flat-top black puck, white line.
+    // No silver cap — the real top is flat black and reads black from above.
+    const puckMat = new THREE.MeshPhysicalMaterial({
+      color: 0x111113, roughness: 0.52, metalness: 0.0,
+      clearcoat: 0.15, clearcoatRoughness: 0.5, envMapIntensity: 0.4,
+    });
+    const body = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.50, 0.62, 48), puckMat));
+    body.position.y = 0.31;
+    const pointer = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.014, 0.34), FIN.pointer);
+    pointer.position.set(0, 0.627, -0.13);
+    const pg = new THREE.Group(); pg.add(pointer); pg.rotation.y = pointerRot;
+    k.add(body, pg);
   } else if (style === 'boss') {
     // Boss knob: fluted black body ~0.72in dia over a thin base flange,
     // wide silver cap covering most of the top (measured knobs 19.6mm dia).
@@ -788,6 +801,24 @@ export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', bg = nul
   return g;
 }
 
+/** Shallow domed deck screw head with a real slot. Origin at deck (y=0). */
+export function screw() {
+  const g = new THREE.Group();
+  g.userData.kind = 'screw';
+  const mat = hardwareChrome();
+  mat.color.set(0xb9bec4);
+  const head = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.095, 0.03, 28), mat));
+  head.position.y = 0.015;
+  const dome = shadowed(new THREE.Mesh(new THREE.SphereGeometry(0.082, 28, 14, 0, Math.PI * 2, 0, Math.PI / 2), mat));
+  dome.scale.y = 0.45;
+  dome.position.y = 0.03;
+  const slot = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.012, 0.022),
+    new THREE.MeshStandardMaterial({ color: 0x2a2c2f, roughness: 0.8 }));
+  slot.position.y = 0.062;
+  g.add(head, dome, slot);
+  return g;
+}
+
 /** LED: lathed metal bezel + 3mm lens + tight local glow. Origin at deck. */
 export function led() {
   const g = new THREE.Group();
@@ -1098,6 +1129,20 @@ export function assemblePedal(spec) {
         smooth: enc.smooth ?? true,
       });
   group.add(enclosureMesh);
+  if (enc.backColor) {
+    // Silver back panel (EHX big box: the brushed top sheet wraps the back
+    // face where the jacks/power mount, while the sides stay black).
+    const backH = enc.type === 'profile' && enc.points ? Math.max(...enc.points.filter(p => p[0] < -d / 2 + 0.1).map(p => p[1]), h) : h;
+    const panel = shadowed(new THREE.Mesh(
+      new THREE.BoxGeometry(w - 0.04, backH, 0.03),
+      new THREE.MeshStandardMaterial({ color: new THREE.Color(enc.backColor), roughness: 0.38, metalness: 0.55, envMapIntensity: 0.8 })
+    ));
+    // Sit proud of the back wall, never coplanar with it: flush faces
+    // z-fight and the enclosure's black grain crawls through the panel.
+    panel.position.set(0, backH / 2, -d / 2 - 0.005);
+    panel.userData.kind = 'backpanel';
+    group.add(panel);
+  }
   group.add(basePlate({ w, d }));
 
   // Measured-profile parts (DS-1 v4, 2026-10-01). Absolute coords, no seating.
@@ -1226,6 +1271,7 @@ export function assemblePedal(spec) {
     }
   }
   if (spec.led) seat(led(), spec.led.x, spec.led.z, 'led', 'led');
+  for (const s of spec.screws || []) seat(screw(), s.x, s.z, s.id || 'screw', 'screw');
   if (spec.footswitch) {
     const fs = spec.footswitch;
     // Get the deck pitch so the treadle can cancel it (stay horizontal)
@@ -1241,6 +1287,17 @@ export function assemblePedal(spec) {
   }
   for (const j of spec.jacks || []) {
     const part = jack();
+    if (j.face === 'back' || j.side === 'back') {
+      // Back-wall audio jack (EHX big-box layout): the jack() barrel runs
+      // along +X, so rotate it to face -z (out the back). Spec carries the
+      // measured x/y; z is the back wall itself.
+      part.rotation.y = Math.PI / 2;
+      const z = -(d / 2 - 0.018);
+      part.position.set(j.x ?? 0, j.y ?? 0.85, z);
+      group.add(part); parts.push(part);
+      anchors.push({ id: j.id || 'jack-back', kind: 'jack', x: j.x ?? 0, z, obj: part });
+      continue;
+    }
     // Position jack so washer sits flush on the wall surface.
     // Wall at x=±w/2. Washer center at +0.018 relative, so origin at w/2 - 0.018.
     const x = (j.side === 'left' ? -1 : 1) * (w / 2 - 0.018);
