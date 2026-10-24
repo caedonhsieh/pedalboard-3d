@@ -1,0 +1,137 @@
+{
+  "id": "fulltone-ocd",
+  "brand": "Fulltone",
+  "name": "OCD",
+  "dims": {
+    "w": 2.43,
+    "d": 4.53,
+    "h": 1.39,
+    "source": "Photo-measured bare enclosure (references/fulltone-ocd_measurements.md): W 302px/D 563px on the orthographic topdown at D=4.53in (115mm staging, data/spec_sheets_staging.json; retailer 4.5in corroborates); bare H 228px at 164px/in from both side views. Published 2.5 x 4.5 x 2.1in is overall (height includes knobs: measured knob tops give ~2.0in overall) — spec h is bare enclosure per spec-schema."
+  },
+  "enclosure": {
+    "type": "box",
+    "color": "#e8dec4",
+    "edgeRadius": 0.06,
+    "notes": "Custom cream box, flat deck (no slope) — measured dims override any preset. Colour sampled from lit non-specular patches (front #e0d8c3, topdown #d8d2b1)."
+  },
+  "knobs": [
+    {
+      "id": "volume",
+      "style": "mxr",
+      "x": -0.65,
+      "z": -1.48,
+      "rot": 0,
+      "diaScale": 0.82,
+      "tickRing": false,
+      "note": "Photo-derived in two views (topdown + front, symmetrised; measurements file). Black fluted knob 0.75in dia (mxr body diaScale 0.82). Rotation arrows are in the decal, so no tickRing. Pointer at 12 o'clock in the front reference."
+    },
+    {
+      "id": "drive",
+      "style": "mxr",
+      "x": 0.65,
+      "z": -1.48,
+      "rot": 0,
+      "diaScale": 0.82,
+      "tickRing": false,
+      "note": "Photo-derived: DRIVE right knob, same row as VOLUME."
+    },
+    {
+      "id": "tone",
+      "style": "mxr",
+      "x": 0,
+      "z": -0.63,
+      "rot": 0,
+      "diaScale": 0.82,
+      "tickRing": false,
+      "note": "Photo-derived: TONE centre knob below the LED."
+    }
+  ],
+  "led": {
+    "x": 0,
+    "z": -1.47,
+    "note": "Blue LED between VOLUME/DRIVE below the HP/LP toggle (blue-mask centroid in topdown + front). Lit in both lit references; hero starts ON. parts.js led() is red — the hero page re-colours it blue locally."
+  },
+  "footswitch": {
+    "style": "round",
+    "x": 0,
+    "z": 1.15,
+    "note": "Round chrome 3PDT stomp centred below the OCD wordmark (front washer centre + topdown, ±0.05in)."
+  },
+  "jacks": [
+    {
+      "id": "input",
+      "side": "right",
+      "z": 0,
+      "y": 0.45,
+      "note": "INPUT on the right wall, centred along z (V2 trait; V1.7 sat toward the front). Bore centroid in side-input view. Right=INPUT confirmed by wall print."
+    },
+    {
+      "id": "output",
+      "side": "left",
+      "z": 0,
+      "y": 0.45,
+      "note": "OUTPUT on the left wall, centred along z (side-output view)."
+    }
+  ],
+  "powerJack": null,
+  "labels": [
+    {
+      "id": "volume-label",
+      "text": "Volume",
+      "x": -0.65,
+      "z": -2.02,
+      "w": 0.78,
+      "h": 0.15,
+      "spaced": false,
+      "bold": true,
+      "note": "Above the VOLUME knob at the back edge (front + topdown). Case as printed."
+    },
+    {
+      "id": "drive-label",
+      "text": "Drive",
+      "x": 0.65,
+      "z": -2.02,
+      "w": 0.66,
+      "h": 0.15,
+      "spaced": false,
+      "bold": true,
+      "note": "Above the DRIVE knob."
+    },
+    {
+      "id": "hp-label",
+      "text": "HP",
+      "x": 0,
+      "z": -1.98,
+      "w": 0.32,
+      "h": 0.13,
+      "spaced": false,
+      "bold": true,
+      "note": "Above the HP/LP toggle (toggle at z -1.70, hero-page staged; parts.js has no toggle builder)."
+    },
+    {
+      "id": "lp-label",
+      "text": "LP",
+      "x": -0.19,
+      "z": -1.6,
+      "w": 0.26,
+      "h": 0.13,
+      "spaced": false,
+      "bold": true,
+      "note": "Below-left of the toggle, left of the LED (front view)."
+    },
+    {
+      "id": "tone-label",
+      "text": "Tone",
+      "x": 0.72,
+      "z": -0.63,
+      "w": 0.56,
+      "h": 0.15,
+      "spaced": false,
+      "bold": true,
+      "note": "Right of the TONE knob (front + topdown)."
+    }
+  ],
+  "faceImage": "https://raw.githubusercontent.com/PedalPlayground/pedalplayground/master/public/images/pedals/fulltone-ocd-v2.png",
+  "decal": "./textures/fulltone-ocd-decal.png",
+  "notes": "Fulltone OCD V2 hero (2017 final version — see references/fulltone-ocd_measurements.md for V1.7-vs-V2 evidence: Built in the USA print + side jacks centred at z=0). Flat cream box; all deck parts seat via surfaceAt() (flat deck h=1.39) — no hardcoded y on knobs/LED/switch. Top print split: Volume/Drive/Tone/HP/LP are vector labels; knob arrows, OCD wordmark, Fulltone script and Built in the USA are canvas-drawn in textures/fulltone-ocd-decal.png (custom letterforms). NOT in spec (no shared-library support; hero page stages them locally, ProCo precedent): HP/LP mini-toggle at (0,-1.70) bat toward back=HP, 9-18VDC side power jack on the left wall at (z +0.85, y 0.44), four side thumbscrews (z ±1.74, y 0.26, provisional), front-wall OCD/Fulltone print and side-wall Input/Output/9-18VDC print. Shared-library needs are listed in the build report — parts.js was not edited."
+}

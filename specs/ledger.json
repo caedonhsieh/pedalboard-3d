@@ -176,9 +176,9 @@
       "enclosure": "custom",
       "id": "fulltone-ocd",
       "name": "OCD",
-      "notes": "",
+      "notes": "Spec specs/fulltone-ocd.json + fulltone-ocd.html standalone hero (OCD V2). Validate PASS (A 0.38mm, B 99.5%, C 0.77mm) 2026-10-24.",
       "priority": 2,
-      "status": "planned"
+      "status": "hero"
     },
     {
       "brand": "Xotic",

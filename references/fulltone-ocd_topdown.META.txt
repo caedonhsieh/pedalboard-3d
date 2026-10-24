@@ -1,0 +1,4 @@
+FULLTONE-OCD topdown reference
+Source: https://raw.githubusercontent.com/PedalPlayground/pedalplayground/master/public/images/pedals/fulltone-ocd-v2.png
+Retrieved: 2026-09-29 (fetch_views.py)
+View: topdown
