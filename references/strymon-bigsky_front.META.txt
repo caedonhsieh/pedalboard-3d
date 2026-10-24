@@ -1,0 +1,4 @@
+STRYMON-BIGSKY front reference
+Source: https://www.strymon.net/wp-content/uploads/2015/07/BigSky_knobs_1600-1024x754.jpg
+Retrieved: 2026-09-29 (fetch_views.py)
+View: front

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="icon" href="data:,">
+<title>Strymon BigSky Hero — pedalboard-3d</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #060607;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, Helvetica, Arial, sans-serif;
+    -webkit-user-select: none; user-select: none; }
+  #app { position: fixed; inset: 0; }
+  canvas { display: block; }
+  .hud { position: fixed; z-index: 10; color: #e8e9ec; }
+  #title { top: max(18px, env(safe-area-inset-top)); left: 20px; pointer-events: none; }
+  #title h1 { margin: 0; font-size: clamp(22px, 5.5vw, 34px); font-weight: 700; letter-spacing: -0.02em; }
+  #title h1 .accent { color: #35b6e8; }
+  #title p { margin: 6px 0 0; font-size: clamp(12px, 3.2vw, 14px); color: #9aa0ab; font-weight: 500; }
+  #badge { top: max(18px, env(safe-area-inset-top)); right: 20px; text-align: right; pointer-events: none;
+    font-size: clamp(11px, 3vw, 12px); color: #6b7078; font-weight: 600; letter-spacing: 0.08em; }
+  #badge .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: #3fd97c; margin-right: 6px; box-shadow: 0 0 8px #3fd97c; vertical-align: 1px; }
+  #hint { top: max(16px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); right: auto; text-align: center; pointer-events: none;
+    font-size: clamp(12px, 3.2vw, 14px); color: #9aa0ab; font-weight: 500; white-space: nowrap;
+    background: rgba(8,8,10,.78); padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.07); }
+  #loader { top: 50%; left: 0; right: 0; text-align: center; color: #6b7078; pointer-events: none;
+    font-size: 14px; font-weight: 500; transition: opacity 0.6s ease; }
+  #controls { left: 0; right: 0; bottom: max(14px, env(safe-area-inset-bottom)); display: flex;
+    justify-content: center; gap: 8px; flex-wrap: wrap; padding: 0 12px; }
+  #controls button { pointer-events: auto; background: rgba(22,22,26,.92); color: #e8e9ec;
+    border: 1px solid #2b2b31; border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 600;
+    cursor: pointer; backdrop-filter: blur(8px); }
+  #controls button:hover { background: rgba(38,38,44,.95); border-color: #3a3a43; }
+  #controls button.active { border-color: #35b6e8; color: #8fd8f5; }
+  #specbar { left: 20px; top: max(98px, env(safe-area-inset-top)); max-width: min(340px, calc(100vw - 40px));
+    font-size: 11px; line-height: 1.55; color: #9aa0ab; pointer-events: none;
+    background: rgba(10,10,12,.62); border: 1px solid rgba(255,255,255,.06); border-radius: 10px; padding: 8px 10px; backdrop-filter: blur(8px); }
+  #specbar b { color: #d6d8dd; font-weight: 650; }
+  #err { display: none; left: 12px; right: 12px; top: 12px; z-index: 30;
+    background: rgba(60,10,8,.96); border: 1px solid #ff5147; color: #ffe1de; border-radius: 10px;
+    padding: 12px 14px; font-size: 13px; line-height: 1.5; white-space: pre-wrap; }
+  canvas { touch-action: none; }
+  @media (max-width: 600px) {
+    #title { left: 16px; } #title h1 { font-size: 24px; } #badge { right: 16px; font-size: 10px; }
+    #hint { display: none; } #specbar { display: none; }
+  }
+  @media (max-height: 500px) { #title p { display: none; } #hint { display: none; } }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/three.module.js",
+    "three/addons/": "./vendor/three/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app"></div>
+<div class="hud" id="title">
+  <h1><span class="accent">Strymon</span> BigSky</h1>
+  <p>Multidimensional Reverb &middot; parametric part-library hero &middot; standalone for board adaptation</p>
+</div>
+<div class="hud" id="badge"><span class="dot"></span>STANDALONE&nbsp;HERO</div>
+<div class="hud" id="specbar"><b>Strymon BigSky</b> &middot; 6.75 &times; 5.00 &times; 1.87 in bare enclosure &middot; sky-blue box &middot; 9 knobs, LCD, TYPE ring, 3 stomps (A/B/C), stereo + EXP + MIDI rear</div>
+<div class="hud" id="hint">drag to orbit &nbsp;&middot;&nbsp; scroll to zoom &nbsp;&middot;&nbsp; drag any knob &nbsp;&middot;&nbsp; hold a stomp, release for its LED</div>
+<div class="hud" id="loader">warming up the reverb&hellip;</div>
+<div class="hud" id="controls" aria-label="Camera views">
+  <button data-view="hero" class="active">3/4 view</button>
+  <button data-view="top">Top</button>
+  <button data-view="front">Front</button>
+  <button data-view="side">Side</button>
+  <button data-view="back">Back</button>
+</div>
+<div class="hud" id="err" role="alert"></div>
+
+<script type="module">
+/* Strymon BigSky — consumer of the shared part library (parts.js).
+   Enclosure/knobs/jacks live in specs/strymon-bigsky.json + parts.js.
+   The LCD, TYPE LED ring, extra stomps/LEDs, MIDI DINs and CAB toggle
+   have no parts.js builder yet, so this page builds them from
+   spec.display / spec.typeRing / spec.footswitches / spec.leds /
+   spec.midi / spec.cabFilter (proposal in the build report). */
+import * as THREE from 'three';
+import { studioScene, assemblePedal, footswitch, led } from './parts.js';
+
+const errBox = document.getElementById('err');
+function showErr(msg) { errBox.style.display = 'block'; errBox.textContent = 'Could not start the 3D view.\n' + msg; document.getElementById('loader').style.opacity = '0'; }
+window.addEventListener('error', (e) => showErr(e.message || 'Unknown error'));
+window.addEventListener('unhandledrejection', (e) => showErr((e.reason && e.reason.message) || String(e.reason)));
+
+try {
+  const spec = await (await fetch('./specs/strymon-bigsky.json')).json();
+  const H = spec.dims.h, W = spec.dims.w, D = spec.dims.d;
+
+  const aspect = window.innerWidth / window.innerHeight;
+  let cameraPos = [8.0, 6.8, 10.5];
+  if (aspect < 1) {
+    const s = 1.88 - 0.55 * aspect;
+    cameraPos = cameraPos.map(v => v * s);
+  }
+
+  const S = studioScene(document.getElementById('app'), {
+    cameraPos, target: [0, 1.0, 0], autoRotate: true, exposure: 1.1,
+  });
+  S.scene.background = new THREE.Color(0x070708);
+  S.scene.fog = new THREE.Fog(0x070708, 20, 60);
+  let keyLight = null;
+  S.scene.traverse((o) => {
+    if (o.isDirectionalLight && o.intensity > 1) {
+      o.intensity = 1.35;
+      o.position.set(6, 3.6, 2.5);
+      o.color.set(0xf2f7ff);
+      keyLight = o;
+    }
+  });
+  S.scene.traverse((o) => {
+    if (o.isMesh && o.geometry && o.geometry.type === 'CircleGeometry') {
+      o.material = new THREE.MeshStandardMaterial({ color: 0x060607, roughness: 0.95, metalness: 0 });
+    }
+  });
+  const fill = new THREE.DirectionalLight(0xeef4ff, 0.55);
+  fill.position.set(-3.5, 2.5, 6.5);
+  S.scene.add(fill);
+  const sideFill = new THREE.DirectionalLight(0xdcecff, 0.45);
+  sideFill.position.set(-6, 1.6, -3);
+  S.scene.add(sideFill);
+  S.scene.traverse((o) => {
+    if (o.isHemisphereLight) {
+      o.color.set(0xdcecf8);
+      o.groundColor.set(0x0c141c);
+      o.intensity = 0.5;
+    }
+  });
+
+  S.controls.minPolarAngle = 0.12;
+  S.controls.maxPolarAngle = 1.62;
+  const A = assemblePedal(spec);
+  A.group.position.y = 0.005;
+  S.scene.add(A.group);
+
+  /* ---- LCD (no parts.js builder yet; built from spec.display) ----
+     Black bezel + lit green readout only, as photographed. */
+  {
+    const dsp = spec.display;
+    const bezel = new THREE.Mesh(
+      new THREE.BoxGeometry(dsp.w + 0.14, 0.07, dsp.d + 0.14),
+      new THREE.MeshStandardMaterial({ color: 0x0a0c0e, roughness: 0.35, metalness: 0.2 })
+    );
+    bezel.position.set(dsp.x, H + 0.035, dsp.z);
+    bezel.castShadow = true; bezel.receiveShadow = true;
+    A.group.add(bezel);
+    const lc = document.createElement('canvas'); lc.width = 512; lc.height = 128;
+    const lg = lc.getContext('2d');
+    lg.fillStyle = '#04140a'; lg.fillRect(0, 0, 512, 128);
+    lg.fillStyle = '#39ff6a';
+    lg.font = '700 64px "Courier New", monospace';
+    lg.textAlign = 'center'; lg.textBaseline = 'middle';
+    lg.fillText(dsp.text, 256, 58);
+    lg.font = '600 22px Arial, sans-serif'; lg.fillStyle = '#1f9d4d';
+    lg.fillText('DECAY', 256, 106);
+    const lTex = new THREE.CanvasTexture(lc);
+    lTex.colorSpace = THREE.SRGBColorSpace;
+    const screen = new THREE.Mesh(
+      new THREE.PlaneGeometry(dsp.w, dsp.d),
+      new THREE.MeshStandardMaterial({ map: lTex, emissive: 0xffffff, emissiveMap: lTex, emissiveIntensity: 0.85, roughness: 0.25 })
+    );
+    screen.rotation.x = -Math.PI / 2;
+    screen.position.set(dsp.x, H + 0.072, dsp.z);
+    A.group.add(screen);
+  }
+
+  /* ---- TYPE machine LED ring (spec.typeRing) ---- */
+  const ringState = { lit: spec.typeRing.lit || 'ROOM' };
+  {
+    const R = spec.typeRing;
+    const names = ['ROOM', 'HALL', 'PLATE', 'SPRING', 'SWELL', 'BLOOM', 'CLOUD', 'CHORALE', 'SHIMMER', 'MAGNETO', 'NONLINEAR', 'REFLECTIONS'];
+    // Label offsets from spec.labels, normalised onto the dot radius.
+    const offs = names.map((n) => {
+      const lb = (spec.labels || []).find(l => l.text === n);
+      const dx = (lb ? lb.x : R.x) - R.x, dz = (lb ? lb.z : R.z) - R.z;
+      const len = Math.hypot(dx, dz) || 1;
+      return [dx / len * R.r, dz / len * R.r];
+    });
+    names.forEach((n, i) => {
+      const on = n === ringState.lit;
+      const dot = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.045, 0.045, 0.025, 16),
+        new THREE.MeshStandardMaterial({ color: on ? 0x1d5c33 : 0x14302a, emissive: 0x2bff5e, emissiveIntensity: on ? 1.6 : 0.0, roughness: 0.4 })
+      );
+      dot.position.set(R.x + offs[i][0], H + 0.013, R.z + offs[i][1]);
+      A.group.add(dot);
+    });
+  }
+
+  /* ---- Extra stomps + LEDs (spec.footswitches / spec.leds) ----
+     Switch B and LED A come from assemblePedal; A/C are built here
+     with the same library builders so all three behave identically. */
+  const switchEntries = [];
+  {
+    const fsAnchor = A.anchors.find(a => a.kind === 'footswitch');
+    const ledAnchor = A.anchors.find(a => a.kind === 'led');
+    for (const f of spec.footswitches || []) {
+      let obj = null, plunger = null;
+      if (fsAnchor && Math.abs(f.x - fsAnchor.x) < 0.01 && Math.abs(f.z - fsAnchor.z) < 0.01) {
+        obj = fsAnchor.obj; plunger = obj.userData.plunger || null;
+      } else {
+        obj = footswitch({ style: 'round' });
+        obj.position.set(f.x, H, f.z);
+        A.group.add(obj);
+        plunger = obj.userData.plunger || null;
+      }
+      const lspec = (spec.leds || []).find(l => l.id === f.id) || { x: f.x, z: f.z - 0.92, on: false };
+      let ledObj = null;
+      if (ledAnchor && Math.abs(lspec.x - ledAnchor.x) < 0.01 && Math.abs(lspec.z - ledAnchor.z) < 0.01) {
+        ledObj = ledAnchor.obj;
+      } else {
+        ledObj = led();
+        ledObj.position.set(lspec.x, H, lspec.z);
+        A.group.add(ledObj);
+      }
+      const entry = { id: f.id, obj, plunger, ledObj, on: !!lspec.on, plungerY: plunger ? plunger.position.y : 0 };
+      switchEntries.push(entry);
+    }
+  }
+  function applyLed(e) {
+    if (!e.ledObj) return;
+    const u = e.ledObj.userData;
+    if (u.lensMat) u.lensMat.emissiveIntensity = e.on ? 1.35 : 0.1;
+    if (u.glow) u.glow.intensity = e.on ? 0.04 : 0;
+    if (u.dome) u.dome.material.color.set(e.on ? 0x2a0505 : 0x180404);
+    // BigSky preset LEDs read green when active, grey when dark.
+    if (u.lensMat) { u.lensMat.emissive.set(e.on ? 0x2bff5e : 0x000000); u.lensMat.color.set(e.on ? 0x0a2a12 : 0x3a3f45); }
+  }
+  switchEntries.forEach(applyLed);
+
+  /* ---- MIDI DINs + CAB toggle + rear print (spec.midi/cabFilter) ---- */
+  {
+    const dinCanvas = document.createElement('canvas'); dinCanvas.width = dinCanvas.height = 256;
+    const dg = dinCanvas.getContext('2d');
+    dg.fillStyle = '#101214'; dg.beginPath(); dg.arc(128, 128, 126, 0, Math.PI * 2); dg.fill();
+    dg.fillStyle = '#c8ccd2';
+    for (const [px, py] of [[128, 62], [78, 98], [178, 98], [98, 168], [158, 168]]) {
+      dg.beginPath(); dg.arc(px, py, 15, 0, Math.PI * 2); dg.fill();
+    }
+    const dinTex = new THREE.CanvasTexture(dinCanvas); dinTex.colorSpace = THREE.SRGBColorSpace;
+    for (const m of spec.midi || []) {
+      const body = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.27, 0.27, 0.09, 28),
+        new THREE.MeshStandardMaterial({ color: 0x17181a, roughness: 0.6 })
+      );
+      body.rotation.x = Math.PI / 2;
+      body.position.set(m.x, m.y, -D / 2 - 0.028);
+      A.group.add(body);
+      const face = new THREE.Mesh(
+        new THREE.CircleGeometry(0.25, 28),
+        new THREE.MeshStandardMaterial({ map: dinTex, transparent: true, roughness: 0.6 })
+      );
+      face.position.set(m.x, m.y, -D / 2 - 0.076);
+      face.rotation.y = Math.PI;
+      A.group.add(face);
+    }
+    if (spec.cabFilter) {
+      const cf = spec.cabFilter;
+      const plate = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.34, 0.05),
+        new THREE.MeshStandardMaterial({ color: 0x17181a, roughness: 0.6 }));
+      plate.position.set(cf.x, cf.y, -D / 2 - 0.026);
+      A.group.add(plate);
+      const nub = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.1, 12),
+        new THREE.MeshStandardMaterial({ color: 0x9aa2aa, roughness: 0.35, metalness: 0.6 }));
+      nub.rotation.x = Math.PI / 2;
+      nub.position.set(cf.x, cf.y + 0.05, -D / 2 - 0.09);
+      A.group.add(nub);
+    }
+    // Rear print strip: one canvas facing -z (labels sit above the jacks).
+    const rc = document.createElement('canvas'); rc.width = 2048; rc.height = 160;
+    const rg = rc.getContext('2d');
+    rg.clearRect(0, 0, 2048, 160);
+    rg.fillStyle = '#eef4f6'; rg.textAlign = 'center'; rg.textBaseline = 'middle';
+    // Plane is rotated to face -z: canvas u runs toward world -x on
+    // screen, so flip the mapping or every label lands on the wrong jack.
+    const toU = (x) => ((W / 2 - x) / W) * 2048;
+    rg.font = '700 34px Arial, sans-serif';
+    for (const j of spec.jacks || []) {
+      const names = { 'left-in': 'LEFT IN', 'right-in': 'RIGHT IN', 'left-out': 'LEFT OUT', 'right-out': 'RIGHT OUT', 'exp': 'EXP' };
+      if (names[j.id]) rg.fillText(names[j.id], toU(j.x), 52);
+    }
+    rg.font = '700 30px Arial, sans-serif';
+    for (const m of spec.midi || []) rg.fillText(m.label, toU(m.x), 52);
+    rg.font = '700 22px Arial, sans-serif';
+    if (spec.cabFilter) rg.fillText('CAB FILTER', toU(spec.cabFilter.x), 52);
+    rg.font = '700 24px Arial, sans-serif';
+    rg.fillText('9VDC', toU(spec.powerJack.x), 52);
+    rg.font = '600 30px Arial, sans-serif';
+    if (spec.cabFilter) { rg.fillText('OFF', toU(spec.cabFilter.x), 108); }
+    const rTex = new THREE.CanvasTexture(rc); rTex.colorSpace = THREE.SRGBColorSpace;
+    const strip = new THREE.Mesh(new THREE.PlaneGeometry(W - 0.2, 0.55),
+      new THREE.MeshStandardMaterial({ map: rTex, transparent: true, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -2 }));
+    strip.rotation.y = Math.PI;
+    strip.position.set(0, 1.48, -D / 2 - 0.008);
+    A.group.add(strip);
+    // Bank rules flank the BANK DOWN/UP print (never strike through it).
+    const ruleMat = new THREE.MeshStandardMaterial({ color: 0xeef4f6, roughness: 0.6 });
+    for (const [cx, len] of [[-2.12, 0.5], [-0.55, 0.45], [0.57, 0.5], [2.12, 0.5]]) {
+      const rule = new THREE.Mesh(new THREE.BoxGeometry(len, 0.012, 0.022), ruleMat);
+      rule.position.set(cx, H + 0.008, 1.72);
+      A.group.add(rule);
+    }
+  }
+
+  // Soft contact shadow directly under the enclosure.
+  {
+    const c = document.createElement('canvas'); c.width = c.height = 256;
+    const g2 = c.getContext('2d');
+    const grd = g2.createRadialGradient(128, 128, 18, 128, 128, 126);
+    grd.addColorStop(0, 'rgba(0,0,0,0.92)'); grd.addColorStop(0.55, 'rgba(0,0,0,0.6)');
+    grd.addColorStop(1, 'rgba(0,0,0,0)');
+    g2.fillStyle = grd; g2.fillRect(0, 0, 256, 256);
+    const tex = new THREE.CanvasTexture(c);
+    const sh = new THREE.Mesh(
+      new THREE.PlaneGeometry(W + 1.0, D + 1.0),
+      new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false })
+    );
+    sh.rotation.x = -Math.PI / 2;
+    sh.position.y = 0.006;
+    sh.renderOrder = 1;
+    S.scene.add(sh);
+  }
+
+  const fitDist = (subjectW, subjectH, margin = 1.45) => {
+    const vTan = Math.tan(THREE.MathUtils.degToRad(S.camera.fov / 2));
+    const hTan = vTan * S.camera.aspect;
+    return Math.max(subjectW / 2 / hTan, subjectH / 2 / vTan) * margin;
+  };
+  const dFront = fitDist(W, 2.6, 1.65) + D / 2;
+  const dSide = fitDist(D, 2.6, 1.65) + W / 2;
+  const dTop = fitDist(W, D, 1.25) + H;
+  let heroPos = cameraPos;
+  if (aspect < 1) {
+    const need = fitDist(9.2, 3.6, 1.1);
+    const dir = new THREE.Vector3(...cameraPos).normalize();
+    heroPos = dir.multiplyScalar(Math.max(new THREE.Vector3(...cameraPos).length(), need)).toArray();
+    S.camera.position.set(...heroPos);
+  }
+  S.controls.minDistance = 5;
+  S.controls.maxDistance = Math.max(30, new THREE.Vector3(...heroPos).length() * 1.5);
+  const views = {
+    hero:  { pos: heroPos, tgt: [0, 1.0, 0] },
+    top:   { pos: [0, Math.max(11, dTop), 0.9], tgt: [0, 0.9, 0] },
+    front: { pos: [0, 2.4, dFront], tgt: [0, 1.0, 0] },
+    side:  { pos: [dSide, 2.4, 0], tgt: [0, 1.0, 0] },
+    back:  { pos: [0, 2.4, -dFront], tgt: [0, 1.0, 0] },
+  };
+  const buttons = [...document.querySelectorAll('#controls button')];
+  function setView(name) {
+    const v = views[name]; if (!v) return;
+    S.controls.autoRotate = false;
+    S.camera.position.set(...v.pos);
+    S.controls.target.set(...v.tgt);
+    S.controls.update();
+    if (keyLight) {
+      keyLight.color.set(0xf2f7ff);
+      if (name === 'top') { keyLight.position.set(2, 8, 2); keyLight.intensity = 1.2; }
+      else if (name === 'front') { keyLight.position.set(3, 6, 8); keyLight.intensity = 1.25; }
+      else if (name === 'side') { keyLight.position.set(8, 4, 3); keyLight.intensity = 1.25; }
+      else if (name === 'back') { keyLight.position.set(-3, 6, -8); keyLight.intensity = 1.25; }
+      else { keyLight.position.set(6, 3.6, 2.5); keyLight.intensity = 1.3; }
+    }
+    buttons.forEach(b => b.classList.toggle('active', b.dataset.view === name));
+  }
+  buttons.forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+
+  /* Knobs: drag with dx - dy, clamped. Stomps: hold dips, release toggles LED. */
+  const knobAnchors = A.anchors.filter(a => a.kind === 'knob');
+  const ray = new THREE.Raycaster();
+  const ptr = new THREE.Vector2();
+  let knobDrag = null, downInfo = null, heldSwitch = null;
+  function pick(e) {
+    const r = S.renderer.domElement.getBoundingClientRect();
+    ptr.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+    ptr.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+    ray.setFromCamera(ptr, S.camera);
+    const targets = [...knobAnchors.map(a => a.obj), ...switchEntries.map(s => s.obj)].filter(Boolean);
+    const hits = ray.intersectObjects(targets, true);
+    if (!hits.length) return null;
+    let o = hits[0].object;
+    while (o) {
+      const kn = knobAnchors.find(a => a.obj === o);
+      if (kn) return { kind: 'knob', anchor: kn };
+      const sw = switchEntries.find(s => s.obj === o);
+      if (sw) return { kind: 'switch', entry: sw };
+      o = o.parent;
+    }
+    return null;
+  }
+  function setDip(entry, on) {
+    if (!entry || !entry.plunger) return;
+    entry.plunger.position.y = on ? entry.plungerY - 0.05 : entry.plungerY;
+  }
+  S.renderer.domElement.addEventListener('pointerdown', (e) => {
+    const hit = pick(e);
+    downInfo = { x: e.clientX, y: e.clientY, hit };
+    if (hit && hit.kind === 'knob') {
+      knobDrag = { anchor: hit.anchor, x: e.clientX, y: e.clientY, rot: hit.anchor.obj.rotation.y };
+      S.controls.enabled = false;
+      S.controls.autoRotate = false;
+    }
+    if (hit && hit.kind === 'switch') { heldSwitch = hit.entry; setDip(heldSwitch, true); }
+  });
+  S.renderer.domElement.addEventListener('pointermove', (e) => {
+    if (!knobDrag) return;
+    const dx = e.clientX - knobDrag.x, dy = e.clientY - knobDrag.y;
+    knobDrag.anchor.obj.rotation.y = THREE.MathUtils.clamp(knobDrag.rot + (dx - dy) * 0.011, -2.35, 2.35);
+  });
+  S.renderer.domElement.addEventListener('pointerup', (e) => {
+    if (knobDrag) { knobDrag = null; S.controls.enabled = true; }
+    if (heldSwitch) {
+      const moved = downInfo ? Math.hypot(e.clientX - downInfo.x, e.clientY - downInfo.y) : 99;
+      setDip(heldSwitch, false);
+      if (moved < 6) { heldSwitch.on = !heldSwitch.on; applyLed(heldSwitch); }
+      heldSwitch = null;
+    }
+    downInfo = null;
+  });
+  S.renderer.domElement.addEventListener('pointercancel', () => {
+    if (knobDrag) { knobDrag = null; S.controls.enabled = true; }
+    if (heldSwitch) { setDip(heldSwitch, false); heldSwitch = null; }
+    downInfo = null;
+  });
+  const specbar = document.getElementById('specbar');
+  specbar.style.transition = 'opacity 0.4s ease';
+  let idleT = null;
+  S.controls.addEventListener('start', () => { clearTimeout(idleT); specbar.style.opacity = '0.25'; });
+  S.controls.addEventListener('change', () => {
+    const close = S.camera.position.distanceTo(S.controls.target) < 5.2;
+    specbar.style.opacity = close ? '0.25' : '1';
+  });
+  S.controls.addEventListener('end', () => {
+    clearTimeout(idleT);
+    specbar.style.opacity = '1';
+    idleT = setTimeout(() => {
+      if (!document.querySelector('#controls button.active[data-view="top"], #controls button.active[data-view="front"], #controls button.active[data-view="side"], #controls button.active[data-view="back"]')) {
+        S.controls.autoRotate = true;
+      }
+    }, 3000);
+  });
+
+  document.getElementById('loader').style.opacity = '0';
+  S.start();
+} catch (e) {
+  showErr(e && e.message || String(e));
+  console.error(e);
+}
+</script>
+</body>
+</html>

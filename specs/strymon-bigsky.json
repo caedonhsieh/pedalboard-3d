@@ -1,0 +1,92 @@
+{
+  "id": "strymon-bigsky",
+  "brand": "Strymon",
+  "name": "BigSky",
+  "dims": {
+    "w": 6.75,
+    "d": 5.0,
+    "h": 1.87,
+    "source": "Strymon BigSky User Manual Rev B specs: 5 deep x 6.75 wide x 1.87 tall (bare enclosure); corroborated by verified_strymon_jhs_walrus.json and data/heights.json strymon_large. Product-page 6.75x5.1x2.7 is overall incl. knobs/jacks - see references/strymon-bigsky_measurements.md"
+  },
+  "enclosure": {
+    "type": "box",
+    "color": "#1a8ab4",
+    "edgeRadius": 0.08,
+    "notes": "Custom wide box (no parts.js PRESETS entry at this footprint). Flat top, vertical walls in front/rear/hero34 references; brushed sky-blue sampled #248cb1-#1f7da1, spec mid #1a8ab4."
+  },
+  "knobs": [
+    { "id": "value", "style": "mxr", "x": -0.58, "z": -1.82, "rot": 0.0, "scale": 1.05, "diaScale": 0.64, "tickRing": false, "note": "VALUE encoder, back row. Photo-derived (front.jpg bbox 144.7px/in); mxr Davies scaled to measured 0.59in dia." },
+    { "id": "decay", "style": "mxr", "x": 0.42, "z": -1.82, "rot": 0.0, "scale": 1.05, "diaScale": 0.64, "tickRing": false, "note": "DECAY, back row 1.00in grid." },
+    { "id": "predelay", "style": "mxr", "x": 1.42, "z": -1.82, "rot": 0.0, "scale": 1.05, "diaScale": 0.64, "tickRing": false, "note": "PRE-DELAY, back row." },
+    { "id": "mix", "style": "mxr", "x": 2.42, "z": -1.82, "rot": 0.0, "scale": 1.05, "diaScale": 0.64, "tickRing": false, "note": "MIX, back row." },
+    { "id": "type", "style": "mxr", "x": -2.17, "z": -0.46, "rot": 0.0, "scale": 1.05, "diaScale": 0.64, "tickRing": false, "note": "TYPE encoder, front row left, ringed by 12 machine LEDs (hero-page typeRing)." },
+    { "id": "tone", "style": "mxr", "x": -0.45, "z": -0.46, "rot": 0.0, "scale": 1.05, "diaScale": 0.64, "tickRing": false, "note": "TONE, front row." },
+    { "id": "param1", "style": "mxr", "x": 0.69, "z": -0.46, "rot": 0.0, "scale": 1.05, "diaScale": 0.64, "tickRing": false, "note": "PARAM 1 (assignable), front row." },
+    { "id": "param2", "style": "mxr", "x": 1.73, "z": -0.46, "rot": 0.0, "scale": 1.05, "diaScale": 0.64, "tickRing": false, "note": "PARAM 2 (assignable), front row." },
+    { "id": "mod", "style": "mxr", "x": 2.77, "z": -0.46, "rot": 0.0, "scale": 1.05, "diaScale": 0.64, "tickRing": false, "note": "MOD, front row right." }
+  ],
+  "led": { "x": -2.65, "z": 0.83, "note": "LED A (green, lit in references). Canonical validator LED; B/C LEDs in spec.leds for the hero page." },
+  "footswitch": { "style": "round", "x": 0.0, "z": 1.75, "note": "Footswitch B (centre), canonical validator switch. All three switches in spec.footswitches for the hero page." },
+  "footswitches": [
+    { "id": "a", "x": -2.65, "z": 1.75, "label": "A" },
+    { "id": "b", "x": 0.0, "z": 1.75, "label": "B" },
+    { "id": "c", "x": 2.65, "z": 1.75, "label": "C" }
+  ],
+  "leds": [
+    { "id": "a", "x": -2.65, "z": 0.83, "on": true },
+    { "id": "b", "x": 0.0, "z": 0.83, "on": false },
+    { "id": "c", "x": 2.65, "z": 0.83, "on": false }
+  ],
+  "display": { "x": -2.0, "z": -1.85, "w": 2.18, "d": 0.5, "text": "9.30 mS", "note": "LCD window measured 315x70px in front.jpg. Lit display only (green decay readout as photographed); built by hero page - no parts.js LCD builder yet." },
+  "typeRing": { "x": -2.17, "z": -0.46, "r": 0.55, "lit": "ROOM", "note": "12 machine LEDs around TYPE; ROOM lit green in references. Built by hero page." },
+  "jacks": [
+    { "id": "left-in", "face": "back", "x": 2.63, "y": 0.9, "note": "LEFT IN (mono in) on back wall, pedal-right. Rear view viewed from behind (image-left = +x); provisional single-view." },
+    { "id": "right-in", "face": "back", "x": 1.65, "y": 0.9, "note": "RIGHT IN on back wall." },
+    { "id": "left-out", "face": "back", "x": 0.68, "y": 0.9, "note": "LEFT OUT on back wall." },
+    { "id": "right-out", "face": "back", "x": -0.3, "y": 0.9, "note": "RIGHT OUT on back wall." },
+    { "id": "exp", "face": "back", "x": -1.25, "y": 0.9, "note": "EXP expression input on back wall." }
+  ],
+  "midi": [
+    { "id": "midi-in", "x": -2.06, "y": 0.9, "label": "MIDI IN" },
+    { "id": "midi-out", "x": -2.7, "y": 0.9, "label": "MIDI OUT" }
+  ],
+  "cabFilter": { "x": -1.62, "y": 0.9, "note": "CAB FILTER OFF/ON mini toggle between EXP and MIDI IN (rear view). Built by hero page." },
+  "powerJack": { "x": -3.05, "y": 0.9, "style": "boss-square", "note": "9VDC square socket at back-wall left end (measured -3.11, pulled to -3.05 so the 0.59in bezel stays on the wall). Provisional single-view y." },
+  "labels": [
+    { "id": "value-label", "text": "VALUE", "x": -0.58, "z": -1.22, "w": 0.85, "h": 0.16, "spaced": false, "bold": true, "color": "#eef4f6", "note": "Below VALUE knob (front view)." },
+    { "id": "value-sub1", "text": "push (param)", "x": -0.58, "z": -1.02, "w": 1.0, "h": 0.11, "spaced": false, "color": "#eef4f6", "note": "VALUE subprint line 1 (single-line labels: textLabel multi-line overflows)." },
+    { "id": "value-sub2", "text": "hold (global)", "x": -0.58, "z": -0.9, "w": 1.0, "h": 0.11, "spaced": false, "color": "#eef4f6", "note": "VALUE subprint line 2." },
+    { "id": "decay-label", "text": "DECAY", "x": 0.42, "z": -1.22, "w": 0.85, "h": 0.16, "spaced": false, "bold": true, "color": "#eef4f6" },
+    { "id": "predelay-label", "text": "PRE-DELAY", "x": 1.42, "z": -1.22, "w": 1.1, "h": 0.16, "spaced": false, "bold": true, "color": "#eef4f6" },
+    { "id": "mix-label", "text": "MIX", "x": 2.42, "z": -1.22, "w": 0.6, "h": 0.16, "spaced": false, "bold": true, "color": "#eef4f6" },
+    { "id": "type-label", "text": "TYPE", "x": -2.17, "z": 0.18, "w": 0.7, "h": 0.16, "spaced": false, "bold": true, "color": "#eef4f6" },
+    { "id": "type-sub1", "text": "push (bank/time)", "x": -2.17, "z": 0.36, "w": 1.15, "h": 0.11, "spaced": false, "color": "#eef4f6", "note": "TYPE subprint line 1." },
+    { "id": "type-sub2", "text": "hold (save)", "x": -2.17, "z": 0.48, "w": 0.9, "h": 0.11, "spaced": false, "color": "#eef4f6", "note": "TYPE subprint line 2." },
+    { "id": "tone-label", "text": "TONE", "x": -0.45, "z": 0.14, "w": 0.7, "h": 0.16, "spaced": false, "bold": true, "color": "#eef4f6" },
+    { "id": "param1-label", "text": "PARAM 1", "x": 0.69, "z": 0.14, "w": 0.95, "h": 0.16, "spaced": false, "bold": true, "color": "#eef4f6" },
+    { "id": "param2-label", "text": "PARAM 2", "x": 1.73, "z": 0.14, "w": 0.95, "h": 0.16, "spaced": false, "bold": true, "color": "#eef4f6" },
+    { "id": "mod-label", "text": "MOD", "x": 2.77, "z": 0.14, "w": 0.6, "h": 0.16, "spaced": false, "bold": true, "color": "#eef4f6" },
+    { "id": "room-label", "text": "ROOM", "x": -2.62, "z": 0.28, "w": 0.55, "h": 0.1, "spaced": false, "color": "#eef4f6", "note": "TYPE ring name (lit position)." },
+    { "id": "hall-label", "text": "HALL", "x": -3.02, "z": -0.02, "w": 0.5, "h": 0.1, "spaced": false, "color": "#eef4f6", "note": "TYPE ring name." },
+    { "id": "plate-label", "text": "PLATE", "x": -3.12, "z": -0.42, "w": 0.55, "h": 0.1, "spaced": false, "color": "#eef4f6", "note": "TYPE ring name." },
+    { "id": "spring-label", "text": "SPRING", "x": -3.08, "z": -0.82, "w": 0.65, "h": 0.1, "spaced": false, "color": "#eef4f6", "note": "TYPE ring name." },
+    { "id": "swell-label", "text": "SWELL", "x": -2.9, "z": -1.18, "w": 0.6, "h": 0.1, "spaced": false, "color": "#eef4f6", "note": "TYPE ring name." },
+    { "id": "bloom-label", "text": "BLOOM", "x": -2.55, "z": -1.42, "w": 0.6, "h": 0.1, "spaced": false, "color": "#eef4f6", "note": "TYPE ring name." },
+    { "id": "cloud-label", "text": "CLOUD", "x": -1.82, "z": -1.42, "w": 0.6, "h": 0.1, "spaced": false, "color": "#eef4f6", "note": "TYPE ring name." },
+    { "id": "chorale-label", "text": "CHORALE", "x": -1.42, "z": -1.14, "w": 0.75, "h": 0.1, "spaced": false, "color": "#eef4f6", "note": "TYPE ring name." },
+    { "id": "shimmer-label", "text": "SHIMMER", "x": -1.32, "z": -0.8, "w": 0.75, "h": 0.1, "spaced": false, "color": "#eef4f6", "note": "TYPE ring name." },
+    { "id": "magneto-label", "text": "MAGNETO", "x": -1.3, "z": -0.44, "w": 0.8, "h": 0.1, "spaced": false, "color": "#eef4f6", "note": "TYPE ring name." },
+    { "id": "nonlinear-label", "text": "NONLINEAR", "x": -1.38, "z": -0.08, "w": 0.9, "h": 0.1, "spaced": false, "color": "#eef4f6", "note": "TYPE ring name." },
+    { "id": "reflections-label", "text": "REFLECTIONS", "x": -1.55, "z": 0.28, "w": 1.0, "h": 0.1, "spaced": false, "color": "#eef4f6", "note": "TYPE ring name." },
+    { "id": "strymon-label", "text": "strymon.", "x": -0.85, "z": -0.08, "w": 1.05, "h": 0.22, "spaced": false, "bold": true, "color": "#eef4f6", "note": "Small brand sans left of the script wordmark." },
+    { "id": "bigsky-script", "text": "BigSky", "x": 0.25, "z": 0.52, "w": 2.9, "h": 0.95, "spaced": false, "script": true, "color": "#ffffff", "note": "Large script wordmark (vector script approximation; no decal)." },
+    { "id": "a-label", "text": "A", "x": -2.32, "z": 0.83, "w": 0.3, "h": 0.2, "spaced": false, "bold": true, "color": "#eef4f6" },
+    { "id": "b-label", "text": "B", "x": 0.33, "z": 0.83, "w": 0.3, "h": 0.2, "spaced": false, "bold": true, "color": "#eef4f6" },
+    { "id": "c-label", "text": "C", "x": 2.98, "z": 0.83, "w": 0.3, "h": 0.2, "spaced": false, "bold": true, "color": "#eef4f6" },
+    { "id": "bank-down", "text": "BANK DOWN", "x": -1.32, "z": 1.72, "w": 1.0, "h": 0.14, "spaced": false, "color": "#eef4f6", "note": "Between A-B switches (rules drawn by hero page)." },
+    { "id": "bank-up", "text": "BANK UP", "x": 1.32, "z": 1.72, "w": 0.9, "h": 0.14, "spaced": false, "color": "#eef4f6", "note": "Between B-C switches." }
+  ],
+  "faceImage": "https://raw.githubusercontent.com/PedalPlayground/pedalplayground/master/public/images/pedals/strymon-bigsky.png",
+  "decal": null,
+  "notes": "Strymon BigSky hero. Wide flat box (6.75x5.00x1.87 manual dims), 9 black encoders/knobs in two rows, LCD at back-left, TYPE LED ring, 3 round stomps (A/B/C). All deck parts seat via surfaceAt() on the flat deck (h=1.87) - no y on knobs/LED/switch. Shared-library gaps (NOT patched here, hero page builds from spec): single footswitch/led fields only (extras in footswitches/leds), no LCD builder (display), no TYPE-ring builder (typeRing), no MIDI DIN or cab-toggle builder (midi/cabFilter). No decal: white print is vector textLabels, so validate B is skipped. Rear labels are drawn by the hero page on the back wall (face:back deck labels would fail validate A - see klon-centaur notes)."
+}

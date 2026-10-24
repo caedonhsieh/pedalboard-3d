@@ -1,0 +1,4 @@
+STRYMON-BIGSKY topdown reference
+Source: https://www.strymon.net/wp-content/uploads/2015/07/bigsky_topdowncrop_1600.jpg
+Retrieved: 2026-09-29 (fetch_views.py)
+View: topdown

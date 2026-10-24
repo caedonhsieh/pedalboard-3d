@@ -149,9 +149,9 @@
       "enclosure": "custom",
       "id": "strymon-bigsky",
       "name": "BigSky",
-      "notes": "",
+      "notes": "Spec specs/strymon-bigsky.json + strymon-bigsky.html standalone hero. Validate PASS (A 0.38mm, C 1.80mm; B skipped, no full-top decal) 2026-10-24.",
       "priority": 2,
-      "status": "planned"
+      "status": "hero"
     },
     {
       "brand": "TC Electronic",
