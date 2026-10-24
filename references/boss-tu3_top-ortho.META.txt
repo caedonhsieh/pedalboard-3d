@@ -1,0 +1,4 @@
+BOSS-TU3 top-ortho reference
+Source: https://static.roland.com/products/tu-3/image/tu-3_top.png
+Retrieved: 2026-09-29 (fetch_views.py)
+View: top-ortho

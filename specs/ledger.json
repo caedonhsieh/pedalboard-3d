@@ -59,9 +59,9 @@
       "enclosure": "boss_compact",
       "id": "boss-tu3",
       "name": "TU-3",
-      "notes": "",
+      "notes": "Spec specs/boss-tu3.json + boss-tu3.html standalone hero. Validate PASS (A 1.35mm, C 2.29mm; B skipped, no full-top decal) 2026-10-24.",
       "priority": 1,
-      "status": "planned"
+      "status": "hero"
     },
     {
       "brand": "Klon",

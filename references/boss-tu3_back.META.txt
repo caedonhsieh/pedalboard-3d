@@ -1,0 +1,4 @@
+BOSS-TU3 back reference
+Source: https://static.roland.com/products/tu-3/image/tu-3_rear_gal.jpg
+Retrieved: 2026-09-29 (fetch_views.py)
+View: back

@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="icon" href="data:,">
+<title>Boss TU-3 Hero — pedalboard-3d</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #060607;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, Helvetica, Arial, sans-serif;
+    -webkit-user-select: none; user-select: none; }
+  #app { position: fixed; inset: 0; }
+  canvas { display: block; }
+  .hud { position: fixed; z-index: 10; color: #e8e9ec; }
+  #title { top: max(18px, env(safe-area-inset-top)); left: 20px; pointer-events: none; }
+  #title h1 { margin: 0; font-size: clamp(22px, 5.5vw, 34px); font-weight: 700; letter-spacing: -0.02em; }
+  #title h1 .accent { color: #e0483a; }
+  #title p { margin: 6px 0 0; font-size: clamp(12px, 3.2vw, 14px); color: #9aa0ab; font-weight: 500; }
+  #badge { top: max(18px, env(safe-area-inset-top)); right: 20px; text-align: right; pointer-events: none;
+    font-size: clamp(11px, 3vw, 12px); color: #6b7078; font-weight: 600; letter-spacing: 0.08em; }
+  #badge .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: #3fd97c; margin-right: 6px; box-shadow: 0 0 8px #3fd97c; vertical-align: 1px; }
+  #hint { top: max(16px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); right: auto; text-align: center; pointer-events: none;
+    font-size: clamp(12px, 3.2vw, 14px); color: #9aa0ab; font-weight: 500; white-space: nowrap;
+    background: rgba(8,8,10,.78); padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.07); }
+  #loader { top: 50%; left: 0; right: 0; text-align: center; color: #6b7078; pointer-events: none;
+    font-size: 14px; font-weight: 500; transition: opacity 0.6s ease; }
+  #controls { left: 0; right: 0; bottom: max(14px, env(safe-area-inset-bottom)); display: flex;
+    justify-content: center; gap: 8px; flex-wrap: wrap; padding: 0 12px; }
+  #controls button { pointer-events: auto; background: rgba(22,22,26,.92); color: #e8e9ec;
+    border: 1px solid #2b2b31; border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 600;
+    cursor: pointer; backdrop-filter: blur(8px); }
+  #controls button:hover { background: rgba(38,38,44,.95); border-color: #3a3a43; }
+  #controls button.active { border-color: #e0483a; color: #ff9a8a; }
+  #specbar { left: 20px; top: max(98px, env(safe-area-inset-top)); max-width: min(320px, calc(100vw - 40px));
+    font-size: 11px; line-height: 1.55; color: #9aa0ab; pointer-events: none;
+    background: rgba(10,10,12,.62); border: 1px solid rgba(255,255,255,.06); border-radius: 10px; padding: 8px 10px; backdrop-filter: blur(8px); }
+  #specbar b { color: #d6d8dd; font-weight: 650; }
+  #err { display: none; left: 12px; right: 12px; top: 12px; z-index: 30;
+    background: rgba(60,10,8,.96); border: 1px solid #ff5147; color: #ffe1de; border-radius: 10px;
+    padding: 12px 14px; font-size: 13px; line-height: 1.5; white-space: pre-wrap; }
+  canvas { touch-action: none; }
+  @media (max-width: 600px) {
+    #title { left: 16px; } #title h1 { font-size: 24px; } #badge { right: 16px; font-size: 10px; }
+    #hint { display: none; } #specbar { display: none; }
+  }
+  @media (max-height: 500px) { #title p { display: none; } #hint { display: none; } }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/three.module.js",
+    "three/addons/": "./vendor/three/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app"></div>
+<div class="hud" id="title">
+  <h1><span class="accent">Boss</span> TU-3</h1>
+  <p>Chromatic Tuner &middot; parametric part-library hero &middot; standalone for board adaptation</p>
+</div>
+<div class="hud" id="badge"><span class="dot"></span>HERO&nbsp;MODEL</div>
+<div class="hud" id="specbar"><b>Boss TU-3 Chromatic Tuner</b> &middot; 2.88 &times; 5.08 &times; 2.32 in &middot; white powder coat &middot; 21-LED meter, MODE / STREAM buttons, treadle, 3 side jacks, DC IN/OUT</div>
+<div class="hud" id="hint">drag to orbit &nbsp;&middot;&nbsp; scroll to zoom &nbsp;&middot;&nbsp; click MODE / STREAM &nbsp;&middot;&nbsp; stomp the treadle to tune</div>
+<div class="hud" id="loader">warming up the tuner&hellip;</div>
+<div class="hud" id="controls" aria-label="Camera views">
+  <button data-view="hero" class="active">3/4 view</button>
+  <button data-view="top">Top</button>
+  <button data-view="front">Front</button>
+  <button data-view="side">Side</button>
+  <button data-view="back">Back</button>
+</div>
+<div class="hud" id="err" role="alert"></div>
+
+<script type="module">
+/* Boss TU-3 — consumer of the shared part library (parts.js).
+   Enclosure/treadle geometry lives in specs/boss-tu3.json + parts.js.
+   The meter panel, LED array, buttons and DC OUT jack have no parts.js
+   builder yet, so this page builds them from spec.meter / spec.buttons /
+   spec.powerOut (proposal for a reusable builder is in the ship report). */
+import * as THREE from 'three';
+import { studioScene, assemblePedal, applyDecal, applyTreadleDecal, applyPadDecal, powerJack, surfaceAt } from './parts.js';
+
+const errBox = document.getElementById('err');
+function showErr(msg) { errBox.style.display = 'block'; errBox.textContent = 'Could not start the 3D view.\n' + msg; document.getElementById('loader').style.opacity = '0'; }
+window.addEventListener('error', (e) => showErr(e.message || 'Unknown error'));
+window.addEventListener('unhandledrejection', (e) => showErr((e.reason && e.reason.message) || String(e.reason)));
+
+try {
+  const spec = await (await fetch('./specs/boss-tu3.json')).json();
+
+  // Responsive camera: on narrow/portrait screens the horizontal field is
+  // the limit (pedal width 2.88in), so pull back instead of pushing in.
+  const aspect = window.innerWidth / window.innerHeight;
+  let cameraPos = [5.2, 5.4, 7.2];
+  if (aspect < 1) {
+    const s = 1.88 - 0.55 * aspect;
+    cameraPos = cameraPos.map(v => v * s);
+  }
+
+  const S = studioScene(document.getElementById('app'), {
+    cameraPos, target: [0, 1.05, 0], autoRotate: true, exposure: 1.1,
+  });
+  // Solid backdrop + matched fog so the floor edge never shows as a seam.
+  S.scene.background = new THREE.Color(0x070708);
+  S.scene.fog = new THREE.Fog(0x070708, 20, 60); // portrait hero sits ~24 away: keep it out of the fog
+  // Warm key light found by traversing (DirectionalLight intensity > 1)
+  // with per-view repositioning below.
+  let keyLight = null;
+  S.scene.traverse((o) => {
+    if (o.isDirectionalLight && o.intensity > 1) {
+      o.intensity = 1.35;
+      o.position.set(6, 3.6, 2.5);
+      o.color.set(0xf4f7ff);
+      keyLight = o;
+    }
+  });
+  // Darken the studio floor so its light pool does not read as a
+  // white spotlight column behind the pedal.
+  S.scene.traverse((o) => {
+    if (o.isMesh && o.geometry && o.geometry.type === 'CircleGeometry') {
+      o.material = new THREE.MeshStandardMaterial({ color: 0x060607, roughness: 0.95, metalness: 0 });
+    }
+  });
+  const fill = new THREE.DirectionalLight(0xeef2ff, 0.55);
+  fill.position.set(-3.5, 2.5, 6.5);
+  S.scene.add(fill);
+  // Low side fill so the long walls model with a gradient, not flat colour.
+  const sideFill = new THREE.DirectionalLight(0xdfe8ff, 0.45);
+  sideFill.position.set(-6, 1.6, -3);
+  S.scene.add(sideFill);
+  S.scene.traverse((o) => {
+    if (o.isHemisphereLight) {
+      o.color.set(0xe8eefc);
+      o.groundColor.set(0x14161c);
+      o.intensity = 0.5;
+    }
+  });
+
+  // Keep free orbit upright: no upside-down pedal, no under-floor camera.
+  S.controls.minPolarAngle = 0.12;
+  S.controls.maxPolarAngle = 1.62;
+  S.controls.minDistance = 3.5;
+  S.controls.maxDistance = 30; // portrait hero fit pulls past 16
+  const A = assemblePedal(spec);
+  A.group.position.y = 0.005;
+  S.scene.add(A.group);
+
+  /* ---- TU-3 meter panel (no parts.js builder yet; built from spec) ----
+     Black bezel on the flat back deck, clear arc lens, 21 LED pips,
+     red note display, MODE / STREAM buttons, 4 corner screws.
+     Real behaviour: stomp ON lights CHECK + meter + note together. */
+  const meterState = { on: true, stream: false, note: 'A', needle: 10 };
+  const meterPips = [];
+  let noteMesh = null;
+  const buttonMeshes = [];
+  {
+    const M = spec.meter;
+    const topY = M.surfaceY;
+    const panel = new THREE.Mesh(
+      new THREE.BoxGeometry(M.w, 0.07, M.d),
+      new THREE.MeshStandardMaterial({ color: 0x101114, roughness: 0.42, metalness: 0.1 })
+    );
+    panel.position.set(M.x, topY - 0.035, M.z);
+    panel.castShadow = true; panel.receiveShadow = true;
+    A.group.add(panel);
+    // 21 LED pips along a shallow arc (centre bowed to the back, as
+    // photographed), then a clear lens tube swept along the same arc.
+    const pipGeo = new THREE.BoxGeometry(0.075, 0.03, 0.13);
+    const arcPts = [];
+    for (let i = 0; i < M.ledCount; i++) {
+      const t = i / (M.ledCount - 1); // 0 = -50 (left), 1 = +50 (right)
+      const ang = (t - 0.5) * 1.85;
+      const col = i === 10 ? 0x2bff5e : (i < 4 || i > 16) ? 0xff2a18 : (i < 7 || i > 13) ? 0xff8c1a : 0xffd21a;
+      const mat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, emissive: col, emissiveIntensity: 0, roughness: 0.4 });
+      const pip = new THREE.Mesh(pipGeo, mat);
+      pip.position.set(M.x + Math.sin(ang) * 1.02, topY + 0.012, -2.00 + (1 - Math.cos(ang)) * 0.35);
+      pip.rotation.y = -ang;
+      A.group.add(pip);
+      meterPips.push(mat);
+      arcPts.push(pip.position.clone().setY(0.02));
+    }
+    const lens = new THREE.Mesh(
+      new THREE.TubeGeometry(new THREE.CatmullRomCurve3(arcPts), 32, 0.085, 10),
+      new THREE.MeshPhysicalMaterial({ color: 0xcfd6dd, roughness: 0.12, metalness: 0, transparent: true, opacity: 0.35 })
+    );
+    lens.scale.y = 0.6;
+    lens.position.y = topY + 0.01;
+    A.group.add(lens);
+    // Flat/sharp triangle indicators (orange, flank CHECK).
+    const triShape = new THREE.Shape();
+    triShape.moveTo(-0.07, -0.05); triShape.lineTo(0.07, -0.05); triShape.lineTo(0, 0.06); triShape.closePath();
+    for (const sx of [-1, 1]) {
+      const tri = new THREE.Mesh(new THREE.ShapeGeometry(triShape),
+        new THREE.MeshStandardMaterial({ color: 0x2a1a08, emissive: 0xff9a1a, emissiveIntensity: 0, side: THREE.DoubleSide }));
+      tri.rotation.x = -Math.PI / 2;
+      tri.rotation.z = sx > 0 ? -Math.PI / 2 : Math.PI / 2;
+      tri.position.set(M.x + sx * 0.62, topY + 0.006, -2.24);
+      A.group.add(tri);
+      meterPips.push(tri.material);
+    }
+    // Red note display (canvas 7-segment-style letter).
+    const nc = document.createElement('canvas'); nc.width = 128; nc.height = 160;
+    const drawNote = (ch) => {
+      const g = nc.getContext('2d');
+      g.fillStyle = '#2a0508'; g.fillRect(0, 0, 128, 160);
+      g.fillStyle = '#ff2438'; g.font = '900 110px "Courier New", monospace';
+      g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText(ch, 64, 86);
+    };
+    drawNote(meterState.note);
+    const noteTex = new THREE.CanvasTexture(nc);
+    noteTex.colorSpace = THREE.SRGBColorSpace;
+    noteMesh = new THREE.Mesh(new THREE.PlaneGeometry(0.42, 0.52),
+      new THREE.MeshStandardMaterial({ map: noteTex, roughness: 0.35, emissive: 0xffffff, emissiveMap: noteTex, emissiveIntensity: 0.9 }));
+    noteMesh.rotation.x = -Math.PI / 2;
+    noteMesh.position.set(0, topY + 0.006, -1.47);
+    A.group.add(noteMesh);
+    meterState.redrawNote = () => { drawNote(meterState.note); noteTex.needsUpdate = true; };
+    // MODE / STREAM buttons + panel corner screws.
+    for (const b of spec.buttons || []) {
+      const btn = new THREE.Mesh(
+        new THREE.BoxGeometry(b.w, 0.07, b.d),
+        new THREE.MeshStandardMaterial({ color: 0x17181a, roughness: 0.55, metalness: 0.05 })
+      );
+      btn.position.set(b.x, topY + 0.035, b.z);
+      btn.castShadow = true;
+      btn.userData.buttonId = b.id;
+      A.group.add(btn);
+      buttonMeshes.push(btn);
+    }
+    const screwMat = new THREE.MeshStandardMaterial({ color: 0x3a3d42, roughness: 0.4, metalness: 0.6 });
+    for (const [sx, sz] of [[-1.10, -2.19], [1.10, -2.19], [-1.10, -0.98], [1.10, -0.98]]) {
+      const sc = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.035, 20), screwMat);
+      sc.position.set(sx, topY + 0.017, sz);
+      A.group.add(sc);
+    }
+    // DC OUT twin + back-wall sticker art (DC IN comes from assemblePedal).
+    if (spec.powerOut) {
+      const out = powerJack({ style: 'boss-square' });
+      out.position.set(spec.powerOut.x, spec.powerOut.y, -(spec.dims.d / 2 - 0.02));
+      A.group.add(out);
+    }
+    const bc = document.createElement('canvas'); bc.width = 1024; bc.height = 512;
+    const bg2 = bc.getContext('2d');
+    bg2.fillStyle = '#d8dde2'; bg2.fillRect(120, 40, 784, 300);
+    bg2.fillStyle = '#c0273a'; bg2.textAlign = 'center';
+    bg2.font = '700 44px Arial, sans-serif';
+    bg2.fillText('DC 9V Out jack: Total of', 512, 110);
+    bg2.fillText('consumption current must not', 512, 165);
+    bg2.fillText('be exceeded the rating current', 512, 220);
+    bg2.fillText('of PSA adaptor you use.', 512, 275);
+    bg2.font = '700 52px Arial, sans-serif';
+    bg2.fillText('IN', 330, 420); bg2.fillText('OUT', 694, 420);
+    const bTex = new THREE.CanvasTexture(bc);
+    bTex.colorSpace = THREE.SRGBColorSpace;
+    const sticker = new THREE.Mesh(new THREE.PlaneGeometry(2.30, 1.15),
+      new THREE.MeshStandardMaterial({ map: bTex, transparent: true, roughness: 0.6 }));
+    sticker.rotation.y = Math.PI;
+    sticker.position.set(0, 1.62, -(spec.dims.d / 2) - 0.006);
+    A.group.add(sticker);
+    // Embossed BOSS on the rubber pad (canvas plane; joins moving set below).
+    const pc = document.createElement('canvas'); pc.width = 512; pc.height = 128;
+    const pg2 = pc.getContext('2d');
+    pg2.clearRect(0, 0, 512, 128);
+    pg2.fillStyle = '#26262a'; pg2.font = '900 84px Arial, sans-serif';
+    pg2.textAlign = 'center'; pg2.textBaseline = 'middle';
+    pg2.fillText('BOSS', 256, 66);
+    const pTex = new THREE.CanvasTexture(pc);
+    pTex.colorSpace = THREE.SRGBColorSpace;
+    const padLogo = new THREE.Mesh(new THREE.PlaneGeometry(1.55, 0.39),
+      new THREE.MeshStandardMaterial({ map: pTex, transparent: true, roughness: 0.85 }));
+    padLogo.rotation.x = -Math.PI / 2;
+    padLogo.position.set(0, 2.19, 1.62);
+    padLogo.userData.kind = 'paddecal';
+    A.group.add(padLogo);
+  }
+
+  // Soft contact shadow directly under the enclosure (works even where
+  // shadow maps are off on a software renderer, so the pedal never floats).
+  {
+    const c = document.createElement('canvas'); c.width = c.height = 256;
+    const g2 = c.getContext('2d');
+    const grd = g2.createRadialGradient(128, 128, 18, 128, 128, 126);
+    grd.addColorStop(0, 'rgba(0,0,0,0.92)'); grd.addColorStop(0.55, 'rgba(0,0,0,0.6)');
+    grd.addColorStop(1, 'rgba(0,0,0,0)');
+    g2.fillStyle = grd; g2.fillRect(0, 0, 256, 256);
+    const tex = new THREE.CanvasTexture(c);
+    const sh = new THREE.Mesh(
+      new THREE.PlaneGeometry(spec.dims.w + 1.0, spec.dims.d + 1.0),
+      new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false })
+    );
+    sh.rotation.x = -Math.PI / 2;
+    sh.position.y = 0.006;
+    sh.renderOrder = 1;
+    S.scene.add(sh);
+  }
+
+  // Aspect-aware elevations: distance fits subject width on portrait too.
+  // DS-1 is taller (enclosure 2.32in, ~2.6in with knobs/treadle), so the
+  // subject height is 2.6 here vs MXR's 1.75.
+  const fitDist = (subjectW, subjectH, margin = 1.45) => {
+    const vTan = Math.tan(THREE.MathUtils.degToRad(S.camera.fov / 2));
+    const hTan = vTan * S.camera.aspect;
+    return Math.max(subjectW / 2 / hTan, subjectH / 2 / vTan) * margin;
+  };
+  // Centre fit plus the half-extent toward the camera (front face is
+  // D/2 nearer than the centre, so a centre-only fit crops it).
+  const dFront = fitDist(spec.dims.w, 2.6, 1.65) + spec.dims.d / 2;
+  const dSide = fitDist(spec.dims.d, 2.6, 1.65) + spec.dims.w / 2;
+  const dTop = fitDist(spec.dims.w, spec.dims.d, 1.25) + spec.dims.h;
+  // Portrait hero must fit the projected diagonal, not just the width.
+  let heroPos = cameraPos;
+  if (aspect < 1) {
+    // Projected diagonal of the 2.88 x 5.08in body in the 3/4 view is
+    // ~6.5in wide once knobs/jacks are included; fit that, not the width.
+    const need = fitDist(7.2, 3.8, 1.12);
+    const dir = new THREE.Vector3(...cameraPos).normalize();
+    heroPos = dir.multiplyScalar(Math.max(new THREE.Vector3(...cameraPos).length(), need)).toArray();
+    S.camera.position.set(...heroPos);
+  }
+  const views = {
+    hero:  { pos: heroPos, tgt: [0, 1.05, 0] },
+    top:   { pos: [0, Math.max(9.5, dTop), 0.9], tgt: [0, 0.9, 0] },
+    front: { pos: [0, 2.2, dFront], tgt: [0, 1.02, 0] },
+    side:  { pos: [dSide, 2.2, 0], tgt: [0, 1.02, 0] },
+    back:  { pos: [0, 2.2, -dFront], tgt: [0, 1.02, 0] },
+  };
+  const buttons = [...document.querySelectorAll('#controls button')];
+  function setView(name) {
+    const v = views[name]; if (!v) return;
+    S.controls.autoRotate = false;
+    S.camera.position.set(...v.pos);
+    S.controls.target.set(...v.tgt);
+    S.controls.update();
+    // Key on the camera side of each preset (reference is top-lit;
+    // elevations get modelling light, not a shadow-side wall).
+    if (keyLight) {
+      keyLight.color.set(0xf4f7ff);
+      if (name === 'top') { keyLight.position.set(2, 8, 2); keyLight.intensity = 1.2; }
+      else if (name === 'front') { keyLight.position.set(3, 6, 8); keyLight.intensity = 1.25; }
+      else if (name === 'side') { keyLight.position.set(8, 4, 3); keyLight.intensity = 1.25; }
+      else if (name === 'back') { keyLight.position.set(-3, 6, -8); keyLight.intensity = 1.25; }
+      else { keyLight.position.set(6, 3.6, 2.5); keyLight.intensity = 1.3; }
+    }
+    buttons.forEach(b => b.classList.toggle('active', b.dataset.view === name));
+  }
+  buttons.forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+
+  /* Pedal's own interaction: drag TONE/DIST/LEVEL, click treadle for CHECK LED. */
+  const knobAnchors = A.anchors.filter(a => a.kind === 'knob');
+  const ledA = A.anchors.find(a => a.kind === 'led');
+  // Everything printed or screwed onto the treadle moves with it on a
+  // press: the measured treadle/pad profiles, both treadle decals (added
+  // when their textures land, below), the labels the spec marks
+  // onTreadle (OUTPUT / INPUT / BYPASS / Chromatic / Tuner / TU-3 — the
+  // meter-panel labels stay fixed), and the toe thumbscrew.
+  const MOVING_KINDS = ['treadle', 'pad', 'paddecal', 'treadledecal'];
+  const treadleObjs = [];
+  A.group.traverse((o) => {
+    if (o.userData && MOVING_KINDS.includes(o.userData.kind)) treadleObjs.push(o);
+  });
+  for (const a of A.anchors) {
+    if (a.kind === 'label' && a.onTreadle) treadleObjs.push(a.obj);
+    if (a.kind === 'thumbscrew') treadleObjs.push(a.obj);
+  }
+  let ledOn = true; // TU-3 reference photos show the tuner ON (CHECK + meter lit)
+  function setLed(on) {
+    ledOn = on;
+    meterState.on = on;
+    if (ledA) {
+      const u = ledA.obj.userData;
+      if (u.lensMat) u.lensMat.emissiveIntensity = on ? 1.35 : 0.1;
+      if (u.glow) u.glow.intensity = on ? 0.04 : 0;
+      if (u.dome) u.dome.material.color.set(on ? 0x2a0505 : 0x180404);
+    }
+    // Real TU-3: display is dark in bypass. Note + meter follow CHECK.
+    if (noteMesh) {
+      noteMesh.material.emissiveIntensity = on ? 0.9 : 0.0;
+      noteMesh.material.color.set(on ? 0xffffff : 0x40161a);
+    }
+    if (!on) for (const m of meterPips) m.emissiveIntensity = 0;
+  }
+  setLed(true);
+  // Meter needle: Cent mode lights one pip; Stream flows. No audio in,
+  // so the needle rests on the centre (in-tune) pip as photographed.
+  function tickMeter(now) {
+    if (!meterState.on) return;
+    const active = meterState.stream ? Math.floor(now / 90) % 21 : meterState.needle;
+    for (let i = 0; i < meterPips.length; i++) {
+      if (i < 21) meterPips[i].emissiveIntensity = (i === active) ? 1.6 : 0.06;
+      else meterPips[i].emissiveIntensity = 0.9; // flat/sharp triangles
+    }
+  }
+  const ray = new THREE.Raycaster();
+  const ptr = new THREE.Vector2();
+  let knobDrag = null, downInfo = null;
+  function pick(e) {
+    const r = S.renderer.domElement.getBoundingClientRect();
+    ptr.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+    ptr.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+    ray.setFromCamera(ptr, S.camera);
+    const targets = [...knobAnchors.map(a => a.obj), ...treadleObjs, ...buttonMeshes].filter(Boolean);
+    if (!targets.length) return null;
+    const hits = ray.intersectObjects(targets, true);
+    if (!hits.length) return null;
+    let o = hits[0].object;
+    while (o) {
+      const kn = knobAnchors.find(a => a.obj === o);
+      if (kn) return { kind: 'knob', anchor: kn };
+      if (o.userData && o.userData.buttonId) return { kind: 'button', id: o.userData.buttonId, obj: o };
+      if (o.userData && MOVING_KINDS.includes(o.userData.kind)) return { kind: 'treadle' };
+      // Also match a moving part directly (labels / thumbscrew / decals).
+      if (treadleObjs.includes(o)) return { kind: 'treadle' };
+      o = o.parent;
+    }
+    return null;
+  }
+  // Treadle press: rotate the whole moving set about the pedal origin
+  // (the same pivot the extruded treadle geometry already uses), so each
+  // part's centre travels on the treadle's arc and its tilt matches —
+  // decals and labels stay glued to the surface instead of spinning in
+  // place while the panel moves under them.
+  const DIP = 0.045;
+  const dipBase = new Map();
+  function setDip(on) {
+    const c = Math.cos(DIP), s = Math.sin(DIP);
+    for (const o of treadleObjs) {
+      if (!dipBase.has(o)) dipBase.set(o, { p: o.position.clone(), rx: o.rotation.x });
+      const b = dipBase.get(o);
+      if (on) {
+        o.position.set(b.p.x, b.p.y * c - b.p.z * s, b.p.y * s + b.p.z * c);
+        o.rotation.x = b.rx + DIP;
+      } else {
+        o.position.copy(b.p);
+        o.rotation.x = b.rx;
+      }
+    }
+  }
+  S.renderer.domElement.addEventListener('pointerdown', (e) => {
+    const hit = pick(e);
+    downInfo = { x: e.clientX, y: e.clientY, hit };
+    if (hit && hit.kind === 'knob' && hit.anchor) {
+      knobDrag = { anchor: hit.anchor, x: e.clientX, rot: hit.anchor.obj.rotation.y };
+      S.controls.enabled = false;
+      S.controls.autoRotate = false;
+    }
+    // The treadle sinks while held, like the real footswitch.
+    if (hit && hit.kind === 'treadle') setDip(true);
+    // Meter buttons dip while held; action fires on release (below).
+    if (hit && hit.kind === 'button') hit.obj.position.y -= 0.02;
+  });
+  S.renderer.domElement.addEventListener('pointermove', (e) => {
+    if (!knobDrag) return;
+    const next = knobDrag.rot + (e.clientX - knobDrag.x) * 0.011;
+    knobDrag.anchor.obj.rotation.y = THREE.MathUtils.clamp(next, -2.35, 2.35);
+  });
+  S.renderer.domElement.addEventListener('pointerup', (e) => {
+    if (knobDrag) { knobDrag = null; S.controls.enabled = true; }
+    if (downInfo && downInfo.hit && downInfo.hit.kind === 'button') {
+      downInfo.hit.obj.position.y += 0.02;
+      const moved = Math.hypot(e.clientX - downInfo.x, e.clientY - downInfo.y);
+      if (moved < 6 && meterState.on) {
+        if (downInfo.hit.id === 'mode') {
+          const notes = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+          meterState.note = notes[(notes.indexOf(meterState.note) + 1) % notes.length];
+          meterState.redrawNote();
+          meterState.needle = 8 + Math.floor(Math.random() * 5);
+        } else {
+          meterState.stream = !meterState.stream;
+        }
+      }
+    }
+    if (downInfo && downInfo.hit && downInfo.hit.kind === 'treadle') {
+      const moved = Math.hypot(e.clientX - downInfo.x, e.clientY - downInfo.y);
+      setDip(false); // springs back on release
+      if (moved < 6) setLed(!ledOn);
+    }
+    downInfo = null;
+  });
+  S.renderer.domElement.addEventListener('pointercancel', () => {
+    if (knobDrag) { knobDrag = null; S.controls.enabled = true; }
+    if (downInfo && downInfo.hit && downInfo.hit.kind === 'button') downInfo.hit.obj.position.y += 0.02;
+    setDip(false);
+    downInfo = null;
+  });
+  // Fade the spec card while the player is orbiting/zooming close.
+  const specbar = document.getElementById('specbar');
+  specbar.style.transition = 'opacity 0.4s ease';
+  // Resume gentle auto-rotate after idle, unless user chose a fixed view recently.
+  let idleT = null;
+  S.controls.addEventListener('start', () => { clearTimeout(idleT); specbar.style.opacity = '0.25'; });
+  S.controls.addEventListener('change', () => {
+    const close = S.camera.position.distanceTo(S.controls.target) < 5.2;
+    specbar.style.opacity = close ? '0.25' : '1';
+  });
+  S.controls.addEventListener('end', () => {
+    clearTimeout(idleT);
+    specbar.style.opacity = '1';
+    idleT = setTimeout(() => {
+      if (!document.querySelector('#controls button.active[data-view="top"], #controls button.active[data-view="front"], #controls button.active[data-view="side"], #controls button.active[data-view="back"]')) {
+        S.controls.autoRotate = true;
+      }
+    }, 3000);
+  });
+
+  // Decals: top face (if spec carries one) + treadle face, loader fades
+  // once both have settled (same pending pattern as the original page).
+  let pending = 0;
+  const done = () => { if (--pending <= 0) document.getElementById('loader').style.opacity = '0'; };
+  if (spec.decal) {
+    pending++;
+    new THREE.TextureLoader().load(spec.decal,
+      (tex) => { applyDecal(A, tex, { anisotropy: S.renderer.capabilities.getMaxAnisotropy() }); done(); },
+      undefined, done);
+  }
+  if (spec.treadleDecal) {
+    pending++;
+    new THREE.TextureLoader().load(spec.treadleDecal,
+      (tex) => {
+        // Decals land after the moving set was collected: join it, so the
+        // treadle print dips with the panel instead of staying behind.
+        const m = applyTreadleDecal(A, tex, { anisotropy: S.renderer.capabilities.getMaxAnisotropy() });
+        if (m) treadleObjs.push(m);
+        done();
+      },
+      undefined, done);
+  }
+  if (spec.padDecal) {
+    pending++;
+    new THREE.TextureLoader().load(spec.padDecal,
+      (tex) => {
+        const m = applyPadDecal(A, tex, { anisotropy: S.renderer.capabilities.getMaxAnisotropy() });
+        if (m) treadleObjs.push(m);
+        done();
+      },
+      undefined, done);
+  }
+  if (pending === 0) document.getElementById('loader').style.opacity = '0';
+
+  S.start();
+  // Drive the meter (stream flow) inside the studio render loop.
+  S.renderer.setAnimationLoop((now) => {
+    tickMeter(now || 0);
+    S.controls.update();
+    S.renderer.render(S.scene, S.camera);
+  });
+} catch (e) {
+  showErr(e && e.message || String(e));
+  console.error(e);
+}
+</script>
+</body>
+</html>
