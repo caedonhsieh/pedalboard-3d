@@ -5,6 +5,10 @@ boxes for the long tail. A hero model is never hand-modeled per pedal — it is
 a **spec** (`specs/<id>.json`) assembled by the shared part library
 (`parts.js`). Correcting a model means editing data, not geometry code.
 
+**Building a new pedal? Follow [docs/new-pedal-guide.md](docs/new-pedal-guide.md)**
+— the step-by-step recipe (references → measure → spec → hero page →
+validate → critique loop → ship) distilled from the MXR/DS-1/TS9 builds.
+
 ## The pipeline: measure → spec → validate → ship
 
 ### 1. Measure

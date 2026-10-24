@@ -5,18 +5,18 @@
       "enclosure": "custom (wedge profile)",
       "id": "ibanez-ts9",
       "name": "TS9 Tube Screamer",
-      "notes": "Hero model 01. Spec: specs/ts9.json. Hexagon profile auto-fitted 2026-09-28 (silhouette 0.98px PASS, knobs 3.20px PASS). Awaiting Caedon visual acceptance.",
+      "notes": "Spec specs/ts9.json + ibanez-ts9.html standalone hero. Validate PASS (A 0.38mm, C 1.91mm; B skipped, no full-top decal) 2026-10-24. Fresh-critic verdict: ready (round 6).",
       "priority": 1,
-      "status": "in-progress"
+      "status": "hero"
     },
     {
       "brand": "Boss",
       "enclosure": "boss_compact",
       "id": "boss-ds1",
       "name": "DS-1",
-      "notes": "",
+      "notes": "Spec specs/ds1.json + boss-ds1.html standalone hero. Validate PASS (A 0.94mm, C 1.32mm; B skipped, no full-top decal) 2026-10-24. Fresh-critic verdict: ready (round 3).",
       "priority": 1,
-      "status": "planned"
+      "status": "hero"
     },
     {
       "brand": "MXR",
