@@ -13,6 +13,51 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 export const IN = 25.4; // mm per inch
 
 /* ---------------- procedural micro-textures ---------------- */
+/* Orange-peel powder-coat grain: soft blobs at a scale the eye can see
+ * (per-pixel noise is subpixel at render size and read as smooth plastic). */
+export function powderGrainTexture({ size = 256 } = {}) {
+  const c = document.createElement('canvas'); c.width = c.height = size;
+  const g = c.getContext('2d');
+  g.fillStyle = '#808080'; g.fillRect(0, 0, size, size);
+  for (let i = 0; i < 1500; i++) {
+    const x = Math.random() * size, y = Math.random() * size;
+    const r = 4 + Math.random() * 6;
+    const v = 108 + Math.floor(Math.random() * 40);
+    const grd = g.createRadialGradient(x, y, 0, x, y, r);
+    grd.addColorStop(0, `rgba(${v},${v},${v},0.26)`);
+    grd.addColorStop(1, 'rgba(128,128,128,0)');
+    g.fillStyle = grd;
+    g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(4, 4);
+  return t;
+}
+const POWDER_GRAIN = typeof document !== 'undefined' ? powderGrainTexture() : null;
+
+/* Subtle diffuse speckle so the grain reads even under a top light
+ * (bump alone only shows at grazing angles). Near-white, so it tints
+ * the base colour by a few percent, orange-peel style. */
+export function powderColorTexture({ size = 256 } = {}) {
+  const c = document.createElement('canvas'); c.width = c.height = size;
+  const g = c.getContext('2d');
+  g.fillStyle = '#fafafa'; g.fillRect(0, 0, size, size);
+  for (let i = 0; i < 2600; i++) {
+    const x = Math.random() * size, y = Math.random() * size;
+    const r = 1 + Math.random() * 2.5;
+    const v = 190 + Math.floor(Math.random() * 60);
+    g.fillStyle = `rgba(${v},${v},${v},0.16)`;
+    g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(4, 4);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+const POWDER_COLOR = typeof document !== 'undefined' ? powderColorTexture() : null;
+
 export function stripeTexture({ horizontal = true, stripes = 24, size = 256 } = {}) {
   const c = document.createElement('canvas'); c.width = c.height = size;
   const g = c.getContext('2d');
@@ -68,11 +113,20 @@ export const FIN = {
 };
 FIN.knobRib.bumpMap.repeat.set(3, 1);
 
-/** Powder-coat enclosure finish in any color (same PBR recipe as the TS9 green). */
+/** Powder-coat enclosure finish: matte, fine grain, no clearcoat
+ * (clearcoat Fresnel washed the top to peach at hero glancing angles). */
 export function powderCoat(color) {
   return new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color(color), roughness: 0.38, metalness: 0.0,
-    clearcoat: 0.55, clearcoatRoughness: 0.28, envMapIntensity: 0.85,
+    color: new THREE.Color(color), roughness: 0.58, metalness: 0.0,
+    clearcoat: 0, clearcoatRoughness: 0.55, envMapIntensity: 0.5,
+    map: POWDER_COLOR, bumpMap: POWDER_GRAIN, bumpScale: 0.32,
+  });
+}
+
+/* Bright hardware that still reads on a software renderer (no env map). */
+export function hardwareChrome() {
+  return new THREE.MeshStandardMaterial({
+    color: 0x969fa8, roughness: 0.32, metalness: 0.4, envMapIntensity: 1.15,
   });
 }
 
@@ -267,12 +321,28 @@ export function knob(style = 'ts9', pointerRot = 0, scale = 1, diaScale = null) 
   const k = new THREE.Group();
   k.userData.kind = 'knob';
   if (style === 'mxr') {
-    const body = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.27, 0.31, 0.42, 32), FIN.knobRib));
-    body.position.y = 0.21;
-    const top = new THREE.Mesh(new THREE.CylinderGeometry(0.27, 0.27, 0.03, 32), FIN.blackPlastic);
-    top.position.y = 0.425; top.castShadow = true;
-    const pointer = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.014, 0.20), FIN.pointer);
-    pointer.position.set(0, 0.44, -0.055);
+    // Davies-style MXR knob, measured from mxr-m101.png: dia ~0.92in
+    // (42% of the 2.362in width), height ~0.52in. Glossy faceted body
+    // (photo shows a specular wedge, not matte charcoal).
+    const body = flutedKnobBody({ rTop: 0.41, rBottom: 0.46, h: 0.49, flutes: 14, fluteAmp: 0.008 });
+    body.material = new THREE.MeshPhysicalMaterial({
+      color: 0x101010, roughness: 0.24, metalness: 0.0,
+      clearcoat: 1.0, clearcoatRoughness: 0.22, envMapIntensity: 1.15,
+      bumpMap: FIN.knobRib.bumpMap, bumpScale: 0.06,
+    });
+    body.position.y = 0.245;
+    const topPts = [
+      new THREE.Vector2(0.001, 0.49), new THREE.Vector2(0.32, 0.491),
+      new THREE.Vector2(0.385, 0.498), new THREE.Vector2(0.37, 0.522),
+      new THREE.Vector2(0.001, 0.545),
+    ];
+    const topMat = body.material.clone();
+    topMat.bumpMap = null; // smooth glossy cap; stripe bump belongs on the fluted side only
+    topMat.roughness = 0.3;
+    topMat.clearcoat = 0.5;
+    const top = shadowed(new THREE.Mesh(new THREE.LatheGeometry(topPts, 48), topMat));
+    const pointer = new THREE.Mesh(new THREE.BoxGeometry(0.028, 0.014, 0.36), FIN.pointer);
+    pointer.position.set(0, 0.552, -0.14);
     const pg = new THREE.Group(); pg.add(pointer); pg.rotation.y = pointerRot;
     k.add(body, top, pg);
   } else if (style === 'boss') {
@@ -333,11 +403,39 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
   const g = new THREE.Group();
   g.userData.kind = 'treadle';
   if (style === 'round') {
-    const washer = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.30, 0.30, 0.04, 32), FIN.chrome));
-    washer.position.y = 0.02;
-    const btn = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.24, 0.22, 32), FIN.chrome));
-    btn.position.y = 0.14;
-    g.add(washer, btn);
+    // MXR 3PDT stomp from mxr-m101.png: thin washer + hex + flat
+    // 0.40in actuator (photo ratio washer:button ~1.3:1, all chrome).
+    const hw = hardwareChrome();
+    const washerMat = hardwareChrome();
+    washerMat.color.set(0x848b94); // washer sits in the nut's shadow: keep it off-white-free
+    washerMat.roughness = 0.5;
+    const washer = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.27, 0.27, 0.03, 48), washerMat));
+    washer.position.y = 0.015;
+    const nutR = 0.44 / Math.sqrt(3); // 0.44in across flats
+    const fsNutMat = hardwareChrome();
+    fsNutMat.color.set(0x565d64); // darker than washer/plunger so the stack reads from above
+    const nut = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(nutR, nutR, 0.09, 6), fsNutMat));
+    nut.rotation.y = Math.PI / 6;
+    nut.position.y = 0.03 + 0.045;
+    const collar = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.20, 0.21, 0.04, 36), hw));
+    collar.position.y = 0.12 + 0.02;
+    const pts = [
+      new THREE.Vector2(0.001, 0.16), new THREE.Vector2(0.20, 0.16),
+      new THREE.Vector2(0.20, 0.29), new THREE.Vector2(0.19, 0.315),
+      new THREE.Vector2(0.001, 0.325),
+    ];
+    const plungerMat = hardwareChrome();
+    plungerMat.color.set(0x939ba3); // actuator face is matte steel, not a mirror ball
+    plungerMat.roughness = 0.28;
+    const plunger = shadowed(new THREE.Mesh(new THREE.LatheGeometry(pts, 44), plungerMat));
+    // Soft contact ring so the stack grounds on the deck in Top view.
+    const shade = new THREE.Mesh(new THREE.RingGeometry(0.24, 0.33, 40),
+      new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.32, depthWrite: false }));
+    shade.rotation.x = -Math.PI / 2;
+    shade.position.y = 0.002;
+    g.add(shade);
+    g.add(washer, nut, collar, plunger);
+    g.userData.plunger = plunger;
   } else if (style === 'boss-pedal') {
     // Boss compact footswitch: SOLID orange plate, hinged at back,
     // with black rubber pad on top.
@@ -609,7 +707,7 @@ export function tickRing({ innerR = 0.32, outerR = 0.485, wedges = 12 } = {}) {
 
 
 /** Flat text label on the deck. Clean vector text via canvas. */
-export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', bg = null, font = null, spaced = true, arrow = null, script = false, bold = false } = {}) {
+export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', bg = null, font = null, spaced = true, arrow = null, script = false, bold = false, light = false, rounded = false } = {}) {
   // Canvas sized proportionally to plane to avoid stretch distortion.
   // Fixed pixels-per-inch so font size is consistent across labels.
   const PPI = 1200; // pixels per inch
@@ -627,6 +725,8 @@ export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', bg = nul
   // Font selection: script (italic serif), bold, or standard
   if (!font) {
     if (script) font = `italic 700 ${Math.round(canvasH * 0.75)}px Georgia, serif`;
+    else if (rounded) font = `600 ${fontPx}px "Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif`;
+    else if (light) font = `italic 500 ${fontPx}px Arial, sans-serif`;
     else if (bold) font = `800 ${Math.round(canvasH * 0.8)}px Arial, sans-serif`;
     else font = `600 ${fontPx}px Arial, sans-serif`;
   }
@@ -660,17 +760,28 @@ export function textLabel({ text, w = 0.3, h = 0.12, color = '#1a1a1a', bg = nul
   return g;
 }
 
-/** LED with chrome bezel + emissive dome + glow light. Origin at deck (y=0). */
+/** LED: lathed metal bezel + 3mm lens + tight local glow. Origin at deck. */
 export function led() {
   const g = new THREE.Group();
-  const bezel = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.098, 0.06, 32), FIN.chrome));
   g.userData.kind = 'led';
-  bezel.position.y = 0.03;
-  const dome = new THREE.Mesh(new THREE.SphereGeometry(0.062, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2), FIN.led);
-  dome.position.y = 0.055;
-  const glow = new THREE.PointLight(0xff2a18, 0.9, 0.8, 2);
-  glow.position.y = 0.35;
+  const hw = FIN.blackPlastic; // photo bezel is black, lens reads first
+  const bezPts = [
+    new THREE.Vector2(0.001, 0), new THREE.Vector2(0.092, 0),
+    new THREE.Vector2(0.092, 0.024), new THREE.Vector2(0.076, 0.048),
+    new THREE.Vector2(0.064, 0.062), new THREE.Vector2(0.001, 0.062),
+  ];
+  const bezel = shadowed(new THREE.Mesh(new THREE.LatheGeometry(bezPts, 36), hw));
+  const lensMat = FIN.led.clone();
+  lensMat.emissiveIntensity = 1.7;
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(0.08, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2), lensMat);
+  dome.scale.y = 0.78;
+  dome.position.y = 0.062;
+  const glow = new THREE.PointLight(0xff2a18, 0.14, 0.3, 2);
+  glow.position.y = 0.18;
   g.add(bezel, dome, glow);
+  g.userData.dome = dome;
+  g.userData.glow = glow;
+  g.userData.lensMat = lensMat;
   return g;
 }
 
@@ -681,36 +792,81 @@ export function led() {
  */
 export function jack() {
   const g = new THREE.Group();
-  // Washer: outer circle, against the enclosure wall
   g.userData.kind = 'jack';
-  const washerGeo = new THREE.CylinderGeometry(0.31, 0.31, 0.035, 32);
+  const hw = hardwareChrome();
+  const dark = new THREE.MeshStandardMaterial({ color: 0x060606, roughness: 0.9, metalness: 0.2 });
+  // Washer 0.48in dia against the wall.
+  const washerGeo = new THREE.CylinderGeometry(0.24, 0.24, 0.03, 40);
   washerGeo.rotateZ(Math.PI / 2);
-  const washer = shadowed(new THREE.Mesh(washerGeo, FIN.jackChrome));
-  washer.position.x = 0.018;
-  // Nut: smaller hex, in front of washer. Reduced from 0.55" to 0.48" so washer rim shows.
-  const nutGeo = new THREE.CylinderGeometry(0.48 / Math.sqrt(3), 0.48 / Math.sqrt(3), 0.09, 6);
+  const washer = shadowed(new THREE.Mesh(washerGeo, hw));
+  washer.position.x = 0.015;
+  // Hex nut 0.40in across flats.
+  const nutGeo = new THREE.CylinderGeometry(0.40 / Math.sqrt(3), 0.40 / Math.sqrt(3), 0.11, 6);
   nutGeo.rotateZ(Math.PI / 2);
-  nutGeo.rotateX(Math.PI / 6); // flat faces up/down
-  const nut = shadowed(new THREE.Mesh(nutGeo, FIN.jackChrome));
-  nut.position.x = 0.035 + 0.045;
-  // Bore: dark hole, extends in front of nut face so it's visible
-  const boreGeo = new THREE.CylinderGeometry(0.125, 0.125, 0.20, 24);
+  nutGeo.rotateX(0); // flat-top hex orientation
+  const nutMat = hardwareChrome();
+  nutMat.color.set(0xc9d1d9); // nut faces the camera in Side view: keep it bright steel
+  nutMat.metalness = 0.15;
+  const nut = shadowed(new THREE.Mesh(nutGeo, nutMat));
+  nut.position.x = 0.03 + 0.055;
+  // Threaded bushing protruding 0.16in with two thread rings + recessed bore.
+  const barrelGeo = new THREE.CylinderGeometry(0.122, 0.122, 0.16, 28);
+  barrelGeo.rotateZ(Math.PI / 2);
+  const barrel = shadowed(new THREE.Mesh(barrelGeo, hw));
+  barrel.position.x = 0.14 + 0.08;
+  for (const tx of [0.20]) {
+    const ringGeo = new THREE.TorusGeometry(0.125, 0.010, 10, 28);
+    ringGeo.rotateY(Math.PI / 2);
+    const ring = shadowed(new THREE.Mesh(ringGeo, hw));
+    ring.position.x = tx;
+    g.add(ring);
+  }
+  const boreGeo = new THREE.CylinderGeometry(0.092, 0.092, 0.025, 24);
   boreGeo.rotateZ(Math.PI / 2);
-  const bore = new THREE.Mesh(boreGeo,
-    new THREE.MeshStandardMaterial({ color: 0x060606, roughness: 0.9, metalness: 0.2 }));
-  bore.position.x = 0.08; // front face at x=0.18, in front of nut (0.125)
-  const ringGeo = new THREE.CylinderGeometry(0.062, 0.062, 0.02, 16);
-  ringGeo.rotateZ(Math.PI / 2);
-  const contact = new THREE.Mesh(ringGeo, FIN.darkMetal);
-  contact.position.x = 0.015;
-  g.add(washer, nut, bore, contact);
+  const bore = new THREE.Mesh(boreGeo, dark);
+  bore.position.x = 0.30;
+  // Bright ring at the bore mouth so the socket reads as a ringed barrel end.
+  const mouthGeo = new THREE.TorusGeometry(0.095, 0.011, 10, 28);
+  mouthGeo.rotateY(Math.PI / 2);
+  const mouth = shadowed(new THREE.Mesh(mouthGeo, nutMat));
+  mouth.position.x = 0.305;
+  g.add(mouth);
+  const contactGeo = new THREE.CylinderGeometry(0.045, 0.045, 0.02, 16);
+  contactGeo.rotateZ(Math.PI / 2);
+  const contact = new THREE.Mesh(contactGeo, FIN.darkMetal);
+  contact.position.x = 0.29;
+  g.add(washer, nut, barrel, bore, contact);
   return g;
 }
 
-/** 9V barrel power jack on the back wall (faces -z). Origin at the wall plane.
- * Boss compact: black SQUARE bezel (~15mm) with round barrel in center. */
-export function powerJack() {
+/** 9V power jack on the back wall (faces -z). Origin at the wall plane.
+ * Default Boss square bezel; style:'round' = MXR recessed round barrel. */
+export function powerJack({ style = 'boss-square' } = {}) {
   const g = new THREE.Group();
+  g.userData.kind = 'powerJack';
+  if (style === 'round') {
+    // True 9V scale (0.31in overall) with a metal rim so it reads as
+    // hardware at distance, not a black hole.
+    const rimMat = hardwareChrome();
+    rimMat.color.set(0x8a929a); // visible grey ring against the black housing
+    const rim = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.026, 36), rimMat));
+    rim.rotation.x = Math.PI / 2;
+    rim.position.z = -0.013;
+    const housing = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.125, 0.132, 0.1, 32), FIN.blackPlastic));
+    housing.rotation.x = Math.PI / 2;
+    housing.position.z = -0.07;
+    const bore = new THREE.Mesh(new THREE.CylinderGeometry(0.088, 0.088, 0.025, 24),
+      new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.9, metalness: 0.2 }));
+    bore.rotation.x = Math.PI / 2;
+    bore.position.z = -0.122;
+    const pinMat = hardwareChrome();
+    pinMat.color.set(0x9aa2aa); // centre contact reads as metal in the bore
+    const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.04, 14), pinMat);
+    pin.rotation.x = Math.PI / 2;
+    pin.position.z = -0.118;
+    g.add(rim, housing, bore, pin);
+    return g;
+  }
   // Square bezel
   const bezel = shadowed(new THREE.Mesh(new THREE.BoxGeometry(0.59, 0.59, 0.06), FIN.blackPlastic));
   bezel.position.z = -0.03;
@@ -1075,7 +1231,7 @@ export function assemblePedal(spec) {
     anchors.push({ id: j.id || `jack-${j.side}`, kind: 'jack', x, z: j.z, obj: part });
   }
   if (spec.powerJack) {
-    const part = powerJack();
+    const part = powerJack({ style: spec.powerJack.style || 'boss-square' });
     const z = -(d / 2 - 0.02);
     // y: use explicit spec value when measured; otherwise derive from surfaceAt
     // (legacy 0.474" offset below top surface at back wall).
@@ -1120,7 +1276,7 @@ export function assemblePedal(spec) {
   // Knob labels (DRIVE/TONE/LEVEL) — flat text on deck; face:"back" labels go on rear wall
   for (const lb of spec.labels || []) {
     const part = textLabel({ text: lb.text, w: lb.w ?? 0.3, h: lb.h ?? 0.12, spaced: lb.spaced ?? true,
-                             arrow: lb.arrow ?? null, script: lb.script ?? false, bold: lb.bold ?? false,
+                             arrow: lb.arrow ?? null, script: lb.script ?? false, bold: lb.bold ?? false, light: lb.light ?? false, rounded: lb.rounded ?? false,
                              color: lb.color ?? '#1a1a1a', bg: lb.bg ?? null });
     if (lb.face === 'back') {
       // Rear wall: the textLabel mesh is pre-rotated -90° x for deck use;
@@ -1145,6 +1301,7 @@ export function assemblePedal(spec) {
         group.add(part);
         part.position.set(lb.x, y + 0.015, lb.z);
       }
+      if (lb.rot) part.rotation.y = lb.rot;
     }
     parts.push(part);
     anchors.push({ id: `label-${(lb.id || lb.text).toLowerCase()}`, kind: 'label', x: lb.x, z: lb.z, obj: part });
@@ -1176,8 +1333,8 @@ export function applyDecal(assembly, texture, { anisotropy = 8 } = {}) {
   const { spec, decks } = assembly;
   const D = spec.dims.d, W = spec.dims.w;
   const mat = new THREE.MeshStandardMaterial({
-    map: texture, transparent: true, roughness: 0.42, metalness: 0.05,
-    envMapIntensity: 0.7, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
+    map: texture, transparent: true, roughness: 0.6, metalness: 0.0,
+    envMapIntensity: 0.35, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
   });
   for (const dk of decks) {
     const len = dk.z1 - dk.z0;

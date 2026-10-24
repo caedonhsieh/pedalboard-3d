@@ -23,9 +23,9 @@
       "enclosure": "mxr_standard",
       "id": "mxr-phase90",
       "name": "Phase 90",
-      "notes": "",
+      "notes": "Spec specs/mxr-phase90.json + mxr-phase90.html standalone hero. Validate PASS (A 0.38mm, B 99.5%, C 1.32mm) 2026-10-23.",
       "priority": 1,
-      "status": "planned"
+      "status": "hero"
     },
     {
       "brand": "EHX",

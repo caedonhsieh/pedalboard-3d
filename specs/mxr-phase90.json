@@ -1,0 +1,112 @@
+{
+  "id": "mxr-phase90",
+  "brand": "MXR",
+  "name": "Phase 90",
+  "dims": {
+    "w": 2.362,
+    "d": 4.37,
+    "h": 1.26,
+    "source": "preset mxr_standard 60 x 111 x 32 mm bare enclosure (parts.js PRESETS, high confidence); heights.json MXR | Phase 90 high hand-verified 1.25in overall (Sweetwater M101)"
+  },
+  "enclosure": {
+    "type": "box",
+    "preset": "mxr_standard",
+    "color": "#f57a05",
+    "edgeRadius": 0.06
+  },
+  "knobs": [
+    {
+      "id": "speed",
+      "style": "mxr",
+      "x": 0,
+      "z": -1.4,
+      "rot": 0.32,
+      "tickRing": false,
+      "note": "Centered single SPEED control. Photo-derived: top-down mxr-m101.png knob center v~0.18 -> z=(0.18-0.5)*4.37=-1.40. Pointer rot offset to match photo (~1 o'clock)."
+    }
+  ],
+  "led": {
+    "x": 0,
+    "z": 0.39,
+    "note": "Centered red LED below MXR block logo. Photo mxr-m101.png LED v~0.59 -> z=0.39."
+  },
+  "footswitch": {
+    "style": "round",
+    "x": 0,
+    "z": 0.96,
+    "note": "Round chrome stomp switch, centered. Photo v~0.72 -> z=0.96."
+  },
+  "jacks": [
+    {
+      "id": "input",
+      "side": "right",
+      "z": -0.52,
+      "y": 0.66,
+      "note": "INPUT on right wall (player's right when pedal faces forward). Photo jack axis v~0.38."
+    },
+    {
+      "id": "output",
+      "side": "left",
+      "z": -0.52,
+      "y": 0.66,
+      "note": "OUTPUT on left wall."
+    }
+  ],
+  "powerJack": {
+    "x": 0.7,
+    "y": 0.786,
+    "style": "round",
+    "note": "9V recessed round barrel on back wall, right of center. y=1.26-0.474 explicit so assembler and validator agree."
+  },
+  "labels": [
+    {
+      "id": "speed-label",
+      "text": "SPEED",
+      "x": 0,
+      "z": -0.78,
+      "w": 0.62,
+      "h": 0.14,
+      "spaced": true,
+      "bold": false,
+      "note": "Black spaced caps below SPEED knob, matches mxr-m101.png"
+    },
+    {
+      "id": "input-label",
+      "text": "INPUT",
+      "x": 1.0,
+      "z": -0.52,
+      "w": 0.62,
+      "h": 0.14,
+      "spaced": true,
+      "bold": true,
+      "rot": 1.5708,
+      "note": "Vertical INPUT print on top edge by right jack, as in mxr-m101.png"
+    },
+    {
+      "id": "output-label",
+      "text": "OUTPUT",
+      "x": -1.0,
+      "z": -0.52,
+      "w": 0.68,
+      "h": 0.14,
+      "spaced": true,
+      "bold": true,
+      "rot": 1.5708,
+      "note": "Vertical OUTPUT print on top edge by left jack, as in mxr-m101.png"
+    },
+    {
+      "id": "mxr-logo",
+      "text": "MXR",
+      "x": 0,
+      "z": -0.22,
+      "w": 1.34,
+      "h": 0.32,
+      "spaced": false,
+      "bold": true,
+      "note": "Block MXR logo centered between SPEED and LED. Real pedal has rounded-rect border; bold block text is first-pass vector (see notes)."
+    }
+  ],
+  "faceImage": "https://raw.githubusercontent.com/PedalPlayground/pedalplayground/master/public/images/pedals/mxr-m101.png",
+  "decal": "./textures/mxr-phase90-decal.png",
+  "notes": "MXR Phase 90 (M101) hero, detailed standalone for later board adaptation. Bare-enclosure dims from parts.js PRESETS.mxr_standard (60x111x32mm, high). PedalPlayground footprint 2.67x4.50 includes jack protrusion and is not used for dims. Single SPEED knob + LED + round footswitch; no treadle. Coordinates: back=-z (knob side), front=+z (phase 90 text). All deck parts seat via surfaceAt() (flat deck h=1.26) — no hardcoded y on knobs/LED/switch. MXR badge border and the phase 90 lettering (rounded sans, z=1.72) are baked into textures/mxr-phase90-decal.png so the letterforms render identically on every platform; SPEED/INPUT/OUTPUT/MXR remain vector textLabels."
+}
