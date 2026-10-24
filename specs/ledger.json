@@ -104,9 +104,9 @@
       "enclosure": "mxr_standard",
       "id": "mxr-dyna-comp",
       "name": "Dyna Comp",
-      "notes": "",
+      "notes": "Spec specs/mxr-dyna-comp.json + mxr-dyna-comp.html standalone hero. Validate PASS (A 0.38mm, B 99.5%, C 0.89mm) 2026-10-24.",
       "priority": 2,
-      "status": "planned"
+      "status": "hero"
     },
     {
       "brand": "MXR",

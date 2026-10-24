@@ -1,0 +1,141 @@
+{
+  "id": "mxr-dyna-comp",
+  "brand": "MXR",
+  "name": "Dyna Comp",
+  "dims": {
+    "w": 2.362,
+    "d": 4.37,
+    "h": 1.26,
+    "source": "preset mxr_standard 60 x 111 x 32 mm bare enclosure (parts.js PRESETS, high confidence); same MXR standard box as Phase 90. See references/mxr-dyna-comp_measurements.md."
+  },
+  "enclosure": {
+    "type": "box",
+    "preset": "mxr_standard",
+    "color": "#e8262f",
+    "edgeRadius": 0.06
+  },
+  "knobs": [
+    {
+      "id": "output",
+      "style": "mxr",
+      "x": -0.54,
+      "z": -1.3,
+      "rot": 0.0,
+      "tickRing": false,
+      "note": "OUTPUT left knob. Photo-derived from references/mxr-dyna-comp_main.jpg (see measurements.md); pointer at 12 o'clock in reference."
+    },
+    {
+      "id": "sensitivity",
+      "style": "mxr",
+      "x": 0.54,
+      "z": -1.3,
+      "rot": 0.0,
+      "tickRing": false,
+      "note": "SENSITIVITY right knob. Photo-derived, mirror of OUTPUT; pointer at 12 o'clock."
+    }
+  ],
+  "led": {
+    "x": 0,
+    "z": 0.4,
+    "note": "Centered red LED between MXR logo and footswitch (main + left side views)."
+  },
+  "footswitch": {
+    "style": "round",
+    "x": 0,
+    "z": 0.94,
+    "note": "Round chrome stomp switch, centered (main + both side views)."
+  },
+  "jacks": [
+    {
+      "id": "input",
+      "side": "right",
+      "z": -0.2,
+      "y": 0.6,
+      "note": "INPUT on right wall. Print confirmed in main; z from main + right side views."
+    },
+    {
+      "id": "output",
+      "side": "left",
+      "z": -0.2,
+      "y": 0.6,
+      "note": "OUTPUT on left wall (left side view carries this jack alone)."
+    }
+  ],
+  "powerJack": null,
+  "sidePowerJack": {
+    "side": "right",
+    "z": 0.42,
+    "y": 0.6,
+    "note": "Proposed spec field (parts.js powerJack() only mounts on the back wall; the M102 9V barrel is on the right wall front of the INPUT jack, right side view, provisional ±0.1 in). The hero page renders it from this field; board integration needs the proposed parts.js side-power support in the build report."
+  },
+  "sideSticker": {
+    "text": "CE  9V",
+    "z": 1.15,
+    "y": 0.62,
+    "w": 1.1,
+    "h": 0.45,
+    "note": "White CE / 9V polarity sticker on the front half of the right wall (right side view, provisional). Rendered by the hero page; not deck print."
+  },
+  "labels": [
+    {
+      "id": "output-label",
+      "text": "OUTPUT",
+      "x": -0.54,
+      "z": -0.78,
+      "w": 0.78,
+      "h": 0.14,
+      "spaced": false,
+      "bold": false,
+      "note": "Black caps below OUTPUT knob (main)."
+    },
+    {
+      "id": "sensitivity-label",
+      "text": "SENSITIVITY",
+      "x": 0.54,
+      "z": -0.78,
+      "w": 1.05,
+      "h": 0.14,
+      "spaced": false,
+      "bold": false,
+      "note": "Black caps below SENSITIVITY knob (main)."
+    },
+    {
+      "id": "mxr-logo",
+      "text": "MXR",
+      "x": 0,
+      "z": -0.22,
+      "w": 1.34,
+      "h": 0.32,
+      "spaced": false,
+      "bold": true,
+      "note": "Block MXR logo inside the decal rounded-rect border (main)."
+    },
+    {
+      "id": "input-label",
+      "text": "INPUT",
+      "x": 1.0,
+      "z": -0.2,
+      "w": 0.62,
+      "h": 0.14,
+      "spaced": true,
+      "bold": true,
+      "rot": 1.5708,
+      "note": "Vertical INPUT print on top edge by right jack (main)."
+    },
+    {
+      "id": "output-jack-label",
+      "text": "OUTPUT",
+      "x": -1.0,
+      "z": -0.2,
+      "w": 0.68,
+      "h": 0.14,
+      "spaced": true,
+      "bold": true,
+      "rot": 1.5708,
+      "note": "Vertical OUTPUT print on top edge by left jack (main)."
+    }
+  ],
+  "faceImage": "https://raw.githubusercontent.com/PedalPlayground/pedalplayground/master/public/images/pedals/mxr-m102.png",
+  "decal": "./textures/mxr-dyna-comp-decal.png",
+  "notes": "MXR Dyna Comp (M102) hero, detailed standalone for later board adaptation. Bare-enclosure dims from parts.js PRESETS.mxr_standard (60x111x32mm, high). Two knobs (OUTPUT/SENSITIVITY) + LED + round footswitch; no treadle. Coordinates: back=-z (knob side), front=+z (dyna comp text). All deck parts seat via surfaceAt() (flat deck h=1.26) — no hardcoded y on knobs/LED/switch. MXR badge border and the dyna comp lettering are baked into textures/mxr-dyna-comp-decal.png so the letterforms render identically on every platform; OUTPUT/SENSITIVITY/MXR/INPUT/OUTPUT remain vector textLabels. Power jack is on the right side wall on the real pedal: carried as sidePowerJack (powerJack null) because parts.js powerJack() is back-wall only; the hero page renders the side jack from the spec. Positions photo-derived from references/mxr-dyna-comp_measurements.md; side power/sticker values provisional (single view)."
+}
