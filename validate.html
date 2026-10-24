@@ -180,7 +180,19 @@ try {
   // deck function (TS9) or a closed body outline (DS-1): take the UPPER
   // envelope over every segment (plus the closing segment when closed),
   // so point order and outline bottoms cannot corrupt the deck height.
-  function expectedY(z) {
+  function expectedY(z, x = 0) {
+    if (spec.enclosure.type === 'round') {
+      // Lathe dome: height depends on radius, not z alone.
+      const prof = [...(spec.enclosure.profile || [])].sort((a, b) => a[0] - b[0]);
+      if (!prof.length) return H;
+      const r = Math.hypot(x, z);
+      if (r <= prof[0][0]) return prof[0][1];
+      for (let i = 0; i < prof.length - 1; i++) {
+        const [r0, y0] = prof[i], [r1, y1] = prof[i + 1];
+        if (r <= r1) return y0 + ((r - r0) / Math.max(r1 - r0, 1e-9)) * (y1 - y0);
+      }
+      return prof[prof.length - 1][1];
+    }
     const pts = spec.enclosure.points;
     if (!pts) return H;
     const segs = [];
@@ -217,9 +229,9 @@ try {
     if (a.kind === 'knob') {
       const k = (spec.knobs || []).find((s) => (s.id || 'knob') === a.id) || {};
       const recess = k.recess ?? 0;
-      return new THREE.Vector3(a.x, expectedY(a.z) - recess, a.z);
+      return new THREE.Vector3(a.x, expectedY(a.z, a.x) - recess, a.z);
     }
-    return new THREE.Vector3(a.x, expectedY(a.z), a.z);
+    return new THREE.Vector3(a.x, expectedY(a.z, a.x), a.z);
   }
   const [aw, ah] = [560, Math.round(560 * (D + 2 * MARGIN) / (W + 2 * MARGIN))];
   const topUrlA = capture(topCam, aw, ah);

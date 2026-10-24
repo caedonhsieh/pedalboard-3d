@@ -1,0 +1,151 @@
+{
+  "id": "dunlop-fuzz-face",
+  "brand": "Dunlop",
+  "name": "Fuzz Face",
+  "dims": {
+    "w": 7.25,
+    "d": 7.25,
+    "h": 2.45,
+    "source": "Diameter 7.25 in from data/spec_sheets_staging.json (verified secondary, Sweetwater JDF2: 7.25 x 7.25 x 3.25 in; published bounding box 7.25 W x 8 D x 3.25 H in, 8 in treated as protrusion-inclusive, diameter = smaller horizontal dimension; corroborated Music Store JD-F2 8 x 7-1/4 x 3-1/4 in, Equipboard JHF1 same shell). Bare-enclosure peak h 2.45 in measured from calibrated side/back elevations (references/dunlop-fuzz-face_measurements.md): published 3.25 in is overall (knobs/switch/feet), not bare, so it is not used for h. Full-size red JDF2, not a Mini."
+  },
+  "enclosure": {
+    "type": "round",
+    "diameter": 7.25,
+    "color": "#c1101c",
+    "profile": [
+      [0.0, 2.45],
+      [1.0, 2.43],
+      [1.38, 2.37],
+      [2.0, 2.3],
+      [2.76, 2.02],
+      [3.2, 1.62],
+      [3.5, 1.3],
+      [3.625, 1.2],
+      [3.625, 0.0]
+    ],
+    "wallHeight": 1.2,
+    "notes": "PROPOSED round enclosure (parts.js has no round builder yet — see build report): lathe profile [[r, y], ...], r = radius from centre axis, y up from base bottom. Measured dome peak 2.45 in, rim/wall top 1.20 in, vertical wall to the base (references/dunlop-fuzz-face_measurements.md). Back jack plateau (stepped sector ~x -1.6..+1.6 at the back rim carrying IN/OUT print) breaks pure revolution symmetry and is a builder option, not in the lathe points. Silver bottom plate + 3 rubber feet are underside only (not modelled). Deck parts seat on the dome at their radius — never at dims.h."
+  },
+  "knobs": [
+    {
+      "id": "volume",
+      "style": "mxr",
+      "x": -1.94,
+      "z": -1.96,
+      "rot": -0.12,
+      "diaScale": 1.17,
+      "tickRing": false,
+      "note": "Photo-derived top-view mask centroid (symmetrised), dia ~1.08 in (mxr Davies diaScale 1.17). Black Fuzz Face knob; no tick ring on the real pedal (the white teardrop is print). Pointer near 12 o'clock in the top reference."
+    },
+    {
+      "id": "fuzz",
+      "style": "mxr",
+      "x": 1.95,
+      "z": -1.97,
+      "rot": 0.1,
+      "diaScale": 1.17,
+      "tickRing": false,
+      "note": "Photo-derived top-view mask centroid (symmetrised), same row/size as VOLUME. Pointer near 12 o'clock."
+    }
+  ],
+  "led": null,
+  "footswitch": {
+    "style": "round",
+    "x": 0,
+    "z": 1.38,
+    "note": "Round chrome stomp through the rubber tread pad (top-view silver centroid 0.00/+1.38; front + both sides corroborate). No LED on the JDF2, so a press dips the plunger only and toggles nothing."
+  },
+  "jacks": [
+    {
+      "id": "input",
+      "face": "back",
+      "x": -0.98,
+      "y": 0.65,
+      "note": "IN on the back curved wall, LEFT in top view (vintage reversed layout, confirmed by the top IN print — do not swap to the modern right-input habit). Top-view nut centroid x -0.96, symmetrised. y mid-wall, provisional ±0.10 (no straight close-up). Round builder must seat this on the back curve (z from the circle), not on a flat back wall."
+    },
+    {
+      "id": "output",
+      "face": "back",
+      "x": 0.98,
+      "y": 0.65,
+      "note": "OUT on the back curved wall, RIGHT in top view, under the OUT print. Centroid x +0.99, symmetrised. Same y provisional as IN."
+    }
+  ],
+  "powerJack": null,
+  "rubberPad": {
+    "apex": [0, -0.25],
+    "baseLeft": [-1.58, 3.38],
+    "baseRight": [1.58, 3.38],
+    "thickness": 0.12,
+    "color": "#131315",
+    "note": "PROPOSED spec field (parts.js padProfile is a side-profile extrusion and cannot make this plan-view triangle): black ribbed rubber tread on the dome, apex toward the knobs, wide base at the front rim, footswitch hole at (0, +1.38). Plan from the top view (apex/base direct mask reads, base corners ±0.08 provisional). Ribs + DUNLOP banner are the padDecal texture, not geometry. Must follow the dome (seat on the round profile), not lie flat."
+  },
+  "labels": [
+    {
+      "id": "in-label",
+      "text": "IN",
+      "x": -0.98,
+      "z": -3.02,
+      "w": 0.52,
+      "h": 0.22,
+      "spaced": false,
+      "bold": true,
+      "color": "#ffffff",
+      "note": "White caps on the back plateau above the IN jack (top view). Flat-label approximation of plateau print; round builder must seat it on the plateau/dome."
+    },
+    {
+      "id": "out-label",
+      "text": "OUT",
+      "x": 0.98,
+      "z": -3.02,
+      "w": 0.62,
+      "h": 0.22,
+      "spaced": false,
+      "bold": true,
+      "color": "#ffffff",
+      "note": "White caps on the back plateau above the OUT jack (top view)."
+    },
+    {
+      "id": "volume-label",
+      "text": "VOLUME",
+      "x": -2.02,
+      "z": -1.12,
+      "w": 1.08,
+      "h": 0.24,
+      "spaced": false,
+      "bold": true,
+      "color": "#ffffff",
+      "rot": 0.55,
+      "note": "White arced print front/outboard of the VOLUME knob with a teardrop dot (top view). rot tilts the flat label along the arc — approximation; exact arc + dot need the proposed round top decal (see notes)."
+    },
+    {
+      "id": "fuzz-label",
+      "text": "FUZZ",
+      "x": 2.02,
+      "z": -1.12,
+      "w": 0.72,
+      "h": 0.24,
+      "spaced": false,
+      "bold": true,
+      "color": "#ffffff",
+      "rot": -0.55,
+      "note": "White arced print front/outboard of the FUZZ knob with a teardrop dot (top view). Same arc approximation as VOLUME."
+    },
+    {
+      "id": "fuzzface-label",
+      "text": "FUZZFACE",
+      "x": 0,
+      "z": -0.92,
+      "w": 2.6,
+      "h": 0.55,
+      "spaced": false,
+      "bold": true,
+      "color": "#ffffff",
+      "note": "Large white hand-lettered smile arc between the knobs and the pad apex (top view; registered mark omitted). Bold flat label is a first-pass approximation — the hand letterforms + smile curve need the proposed round top decal; do not shrink the font to fit, widen w first (guide Step 4)."
+    }
+  ],
+  "faceImage": "https://cdn11.bigcommerce.com/s-n26aknlnlm/images/stencil/1280x1280/products/660/6598/11602052001.MAIN__79836.1663874798.jpg?c=2",
+  "decal": null,
+  "padDecal": "./textures/dunlop-fuzz-face-decal.png",
+  "notes": "Dunlop Fuzz Face Distortion JDF2 hero — standard FULL-SIZE red Fuzz Face (7.25 in dia), NOT a Fuzz Face Mini. Round sand-cast shell as a proposed lathe enclosure (type round, profile above); no box/profile enclosure can express it, and parts.js is intentionally untouched. NO LED and NO power jack on the real pedal (battery-only, verified in all six references): led and powerJack are null and the hero press toggles nothing. Jacks are on the back curved wall in vintage reversed order (IN left / OUT right in top view). All positions trace to references/dunlop-fuzz-face_measurements.md (top-view mask centroids; jack y and pad base corners flagged provisional there). Deck parts carry no y: the round builder must seat knobs/LED/switch/labels on the dome at their radius. Top print: IN/OUT/VOLUME/FUZZ/FUZZFACE are vector labels above (arc/letterform approximations); pad ribs + DUNLOP MANUFACTURING INC. banner are textures/dunlop-fuzz-face-decal.png via padDecal. A future round top decal (full-disc art) would supersede the vector smile — not shipped here because applyDecal() only maps rectangles onto box/profile decks."
+}

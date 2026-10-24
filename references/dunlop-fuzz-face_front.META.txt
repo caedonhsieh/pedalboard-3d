@@ -1,0 +1,5 @@
+DUNLOP-FUZZ-FACE front reference
+Source: https://cdn11.bigcommerce.com/s-n26aknlnlm/images/stencil/1280x1280/products/660/6602/11602052001.BOTT__03418.1663874798.jpg?c=2
+Retrieved: 2026-09-29 (fetch_views.py, Dunlop jimdunlop.com JDF2 gallery, product 660)
+View: front
+Note: front elevation looking back (-z): rubber tread + footswitch centred, knobs beyond. Dunlop suffix BOTT (6602); renamed to _front. 1280x1280.

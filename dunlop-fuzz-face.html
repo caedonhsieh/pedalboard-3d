@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="icon" href="data:,">
+<title>Dunlop Fuzz Face Hero — pedalboard-3d</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #060607;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, Helvetica, Arial, sans-serif;
+    -webkit-user-select: none; user-select: none; }
+  #app { position: fixed; inset: 0; }
+  canvas { display: block; }
+  .hud { position: fixed; z-index: 10; color: #e8e9ec; }
+  #title { top: max(18px, env(safe-area-inset-top)); left: 20px; pointer-events: none; }
+  #title h1 { margin: 0; font-size: clamp(22px, 5.5vw, 34px); font-weight: 700; letter-spacing: -0.02em; }
+  #title h1 .accent { color: #e5382f; }
+  #title p { margin: 6px 0 0; font-size: clamp(12px, 3.2vw, 14px); color: #9aa0ab; font-weight: 500; }
+  #badge { top: max(18px, env(safe-area-inset-top)); right: 20px; text-align: right; pointer-events: none;
+    font-size: clamp(11px, 3vw, 12px); color: #6b7078; font-weight: 600; letter-spacing: 0.08em; }
+  #hint { top: max(16px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); right: auto; text-align: center; pointer-events: none;
+    font-size: clamp(12px, 3.2vw, 14px); color: #9aa0ab; font-weight: 500; white-space: nowrap;
+    background: rgba(8,8,10,.78); padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.07); }
+  #loader { top: 50%; left: 0; right: 0; text-align: center; color: #6b7078; pointer-events: none;
+    font-size: 14px; font-weight: 500; transition: opacity 0.6s ease; }
+  #controls { left: 0; right: 0; bottom: max(14px, env(safe-area-inset-bottom)); display: flex;
+    justify-content: center; gap: 8px; flex-wrap: wrap; padding: 0 12px; }
+  #controls button { pointer-events: auto; background: rgba(22,22,26,.92); color: #e8e9ec;
+    border: 1px solid #2b2b31; border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 600;
+    cursor: pointer; backdrop-filter: blur(8px); }
+  #controls button:hover { background: rgba(38,38,44,.95); border-color: #3a3a43; }
+  #controls button.active { border-color: #e5382f; color: #ff9a92; }
+  #specbar { left: 20px; top: max(98px, env(safe-area-inset-top)); max-width: min(340px, calc(100vw - 40px));
+    font-size: 11px; line-height: 1.55; color: #9aa0ab; pointer-events: none;
+    background: rgba(10,10,12,.62); border: 1px solid rgba(255,255,255,.06); border-radius: 10px; padding: 8px 10px; backdrop-filter: blur(8px); }
+  #specbar b { color: #d6d8dd; font-weight: 650; }
+  #err { display: none; left: 12px; right: 12px; top: 12px; z-index: 30;
+    background: rgba(60,10,8,.96); border: 1px solid #ff5147; color: #ffe1de; border-radius: 10px;
+    padding: 12px 14px; font-size: 13px; line-height: 1.5; white-space: pre-wrap; }
+  canvas { touch-action: none; }
+  @media (max-width: 600px) {
+    #title { left: 16px; } #title h1 { font-size: 24px; } #badge { right: 16px; font-size: 10px; }
+    #title p { max-width: 58vw; }
+    #hint { display: none; } #specbar { display: none; }
+  }
+  @media (max-height: 500px) { #title p { display: none; } #hint { display: none; } }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/three.module.js",
+    "three/addons/": "./vendor/three/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app"></div>
+<div class="hud" id="title">
+  <h1><span class="accent">Dunlop</span> Fuzz Face</h1>
+  <p>JDF2 full-size fuzz &middot; parametric part-library hero &middot; standalone for board adaptation</p>
+</div>
+<div class="hud" id="badge">STANDALONE&nbsp;HERO</div>
+<div class="hud" id="specbar"><b>Dunlop Fuzz Face (JDF2, full-size)</b> &middot; 7.25 in dia &times; 2.45 in bare dome &middot; red round shell &middot; VOLUME + FUZZ, round stomp on rubber tread, back IN/OUT, no LED</div>
+<div class="hud" id="hint">drag to orbit &nbsp;&middot;&nbsp; scroll to zoom &nbsp;&middot;&nbsp; drag VOLUME / FUZZ knobs &nbsp;&middot;&nbsp; hold the stomp down</div>
+<div class="hud" id="loader">warming up the fuzz&hellip;</div>
+<div class="hud" id="controls" aria-label="Camera views">
+  <button data-view="hero" class="active">3/4 view</button>
+  <button data-view="top">Top</button>
+  <button data-view="front">Front</button>
+  <button data-view="side">Side</button>
+  <button data-view="back">Back</button>
+</div>
+<div class="hud" id="err" role="alert"></div>
+
+<script type="module">
+/* Dunlop Fuzz Face (JDF2, full-size red) — thin consumer of the shared
+   part library (parts.js). Geometry lives in specs/dunlop-fuzz-face.json
+   + parts.js; this page only stages the studio, assembles the spec, and
+   wires view buttons. The round shell needs the proposed roundEnclosure
+   builder in parts.js (spec enclosure.type "round" + lathe profile);
+   until that lands, assemblePedal would fall back to a box, so this page
+   refuses to render a wrong box and shows the builder-required error
+   instead. Once parts.js exports roundEnclosure and seats deck parts on
+   the dome, this page runs unchanged. */
+import * as THREE from 'three';
+import * as Parts from './parts.js';
+import { studioScene, assemblePedal } from './parts.js';
+
+const errBox = document.getElementById('err');
+function showErr(msg) { errBox.style.display = 'block'; errBox.textContent = 'Could not start the 3D view.\n' + msg; document.getElementById('loader').style.opacity = '0'; }
+window.addEventListener('error', (e) => showErr(e.message || 'Unknown error'));
+window.addEventListener('unhandledrejection', (e) => showErr((e.reason && e.reason.message) || String(e.reason)));
+
+try {
+  const spec = await (await fetch('./specs/dunlop-fuzz-face.json')).json();
+  if (spec.enclosure && spec.enclosure.type === 'round' && typeof Parts.roundEnclosure !== 'function') {
+    throw new Error('Round enclosure builder required: parts.js must add roundEnclosure (lathe profile [[r, y], ...]) and an assemblePedal branch for enclosure.type "round" that seats knobs/footswitch/labels on the dome. Spec, measurements (references/dunlop-fuzz-face_measurements.md), references, and pad decal are complete; this page will run unchanged once the builder lands. It deliberately does not render the box fallback.');
+  }
+
+  const aspect = window.innerWidth / window.innerHeight;
+  let cameraPos = [7.2, 6.4, 9.4];
+  if (aspect < 1) {
+    const s = 1.88 - 0.55 * aspect;
+    cameraPos = cameraPos.map(v => v * s);
+  }
+
+  const S = studioScene(document.getElementById('app'), {
+    cameraPos, target: [0, 1.1, 0], autoRotate: true, exposure: 1.1,
+  });
+  S.scene.background = new THREE.Color(0x070708);
+  S.scene.fog = new THREE.Fog(0x070708, 45, 140);
+  let keyLight = null;
+  S.scene.traverse((o) => {
+    if (o.isDirectionalLight && o.intensity > 1) {
+      o.intensity = 1.3;
+      o.position.set(6, 3.6, 2.5);
+      o.color.set(0xfff1e0);
+      keyLight = o;
+    }
+  });
+  S.scene.traverse((o) => {
+    if (o.isMesh && o.geometry && o.geometry.type === 'CircleGeometry') {
+      o.material = new THREE.MeshStandardMaterial({ color: 0x060607, roughness: 0.95, metalness: 0 });
+    }
+  });
+  const fill = new THREE.DirectionalLight(0xfff1e2, 0.55);
+  fill.position.set(-3.5, 2.5, 6.5);
+  S.scene.add(fill);
+  const sideFill = new THREE.DirectionalLight(0xffe8d0, 0.45);
+  sideFill.position.set(-6, 1.6, -3);
+  S.scene.add(sideFill);
+  S.scene.traverse((o) => {
+    if (o.isHemisphereLight) {
+      o.color.set(0xffe2c4);
+      o.groundColor.set(0x201209);
+      o.intensity = 0.3;
+    }
+  });
+
+  S.controls.minPolarAngle = 0.12;
+  S.controls.maxPolarAngle = 1.62;
+  S.controls.minDistance = 5.5;
+  S.controls.maxDistance = 30;
+  const A = assemblePedal(spec);
+  A.group.position.y = 0.005;
+  S.scene.add(A.group);
+
+  {
+    const c = document.createElement('canvas'); c.width = c.height = 256;
+    const g2 = c.getContext('2d');
+    const grd = g2.createRadialGradient(128, 128, 18, 128, 128, 126);
+    grd.addColorStop(0, 'rgba(0,0,0,0.92)'); grd.addColorStop(0.55, 'rgba(0,0,0,0.6)');
+    grd.addColorStop(1, 'rgba(0,0,0,0)');
+    g2.fillStyle = grd; g2.fillRect(0, 0, 256, 256);
+    const tex = new THREE.CanvasTexture(c);
+    const sh = new THREE.Mesh(
+      new THREE.PlaneGeometry(spec.dims.w + 1.2, spec.dims.d + 1.2),
+      new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false })
+    );
+    sh.rotation.x = -Math.PI / 2;
+    sh.position.y = 0.006;
+    sh.renderOrder = 1;
+    S.scene.add(sh);
+  }
+
+  const fitDist = (subjectW, subjectH, margin = 1.45) => {
+    const vTan = Math.tan(THREE.MathUtils.degToRad(S.camera.fov / 2));
+    const hTan = vTan * S.camera.aspect;
+    return Math.max(subjectW / 2 / hTan, subjectH / 2 / vTan) * margin;
+  };
+  const dFront = fitDist(spec.dims.w, 3.2, 1.65) + spec.dims.d / 2;
+  const dSide = fitDist(spec.dims.d, 3.2, 1.65) + spec.dims.w / 2;
+  const dTop = fitDist(spec.dims.w, spec.dims.d, 1.45) + spec.dims.h;
+  let heroPos = cameraPos;
+  if (aspect < 1) {
+    const need = fitDist(10.6, 4.0, 1.12);
+    const dir = new THREE.Vector3(...cameraPos).normalize();
+    heroPos = dir.multiplyScalar(Math.max(new THREE.Vector3(...cameraPos).length(), need)).toArray();
+    S.camera.position.set(...heroPos);
+  }
+  {
+    const heroDist = new THREE.Vector3(...heroPos).distanceTo(new THREE.Vector3(0, 1.1, 0));
+    S.controls.maxDistance = Math.max(16, heroDist * 1.5);
+  }
+  const views = {
+    hero:  { pos: heroPos, tgt: [0, 1.1, 0] },
+    top:   { pos: [0, Math.max(11, dTop), 0.9], tgt: [0, 1.0, 0] },
+    front: { pos: [0, 2.6, dFront], tgt: [0, 1.15, 0] },
+    side:  { pos: [dSide, 2.6, 0], tgt: [0, 1.15, 0] },
+    back:  { pos: [0, 2.6, -dFront], tgt: [0, 1.15, 0] },
+  };
+  const buttons = [...document.querySelectorAll('#controls button')];
+  function setView(name) {
+    const v = views[name]; if (!v) return;
+    S.controls.autoRotate = false;
+    S.camera.position.set(...v.pos);
+    S.controls.target.set(...v.tgt);
+    S.controls.update();
+    if (keyLight) {
+      keyLight.color.set(name === 'top' ? 0xffffff : 0xfff1e0);
+      if (name === 'top') { keyLight.position.set(2, 8, 2); keyLight.intensity = 1.2; }
+      else if (name === 'front') { keyLight.position.set(3, 6, 8); keyLight.intensity = 1.25; }
+      else if (name === 'side') { keyLight.position.set(8, 4, 3); keyLight.intensity = 1.25; }
+      else if (name === 'back') { keyLight.position.set(-3, 6, -8); keyLight.intensity = 1.6; }
+      else { keyLight.position.set(6, 3.6, 2.5); keyLight.intensity = 1.3; }
+    }
+    buttons.forEach(b => b.classList.toggle('active', b.dataset.view === name));
+  }
+  buttons.forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+
+  /* Pedal's own interactions: drag VOLUME/FUZZ, hold the stomp.
+     The JDF2 has no LED, so a press only dips the plunger while held
+     and springs back on release — it toggles nothing. */
+  const knobAnchors = A.anchors.filter(a => a.kind === 'knob');
+  const fsA = A.anchors.find(a => a.kind === 'footswitch');
+  const ray = new THREE.Raycaster();
+  const ptr = new THREE.Vector2();
+  let knobDrag = null, downInfo = null;
+  function pick(e) {
+    const r = S.renderer.domElement.getBoundingClientRect();
+    ptr.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+    ptr.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+    ray.setFromCamera(ptr, S.camera);
+    const objs = [...knobAnchors.map(a => a.obj), fsA?.obj].filter(Boolean);
+    const hits = ray.intersectObjects(objs, true);
+    if (!hits.length) return null;
+    let o = hits[0].object;
+    while (o) {
+      for (const ka of knobAnchors) if (o === ka.obj) return { kind: 'knob', anchor: ka };
+      if (fsA && o === fsA.obj) return { kind: 'footswitch' };
+      o = o.parent;
+    }
+    return null;
+  }
+  function setStomp(on) {
+    if (!fsA) return;
+    const plunger = fsA.obj.userData.plunger;
+    if (plunger) plunger.position.y = on ? -0.05 : 0;
+  }
+  S.renderer.domElement.addEventListener('pointerdown', (e) => {
+    const hit = pick(e);
+    downInfo = { x: e.clientX, y: e.clientY, hit };
+    if (hit && hit.kind === 'knob') {
+      knobDrag = { x: e.clientX, y: e.clientY, anchor: hit.anchor, rot: hit.anchor.obj.rotation.y };
+      S.controls.enabled = false;
+      S.controls.autoRotate = false;
+    }
+    if (hit && hit.kind === 'footswitch') setStomp(true);
+  });
+  S.renderer.domElement.addEventListener('pointermove', (e) => {
+    if (!knobDrag) return;
+    const delta = (e.clientX - knobDrag.x) - (e.clientY - knobDrag.y);
+    knobDrag.anchor.obj.rotation.y = THREE.MathUtils.clamp(knobDrag.rot + delta * 0.011, -2.35, 2.35);
+  });
+  function endPress() {
+    if (knobDrag) { knobDrag = null; S.controls.enabled = true; }
+    setStomp(false);
+    downInfo = null;
+  }
+  S.renderer.domElement.addEventListener('pointerup', endPress);
+  S.renderer.domElement.addEventListener('pointercancel', endPress);
+  const specbar = document.getElementById('specbar');
+  specbar.style.transition = 'opacity 0.4s ease';
+  let idleT = null;
+  S.controls.addEventListener('start', () => { clearTimeout(idleT); specbar.style.opacity = '0.25'; });
+  S.controls.addEventListener('change', () => {
+    const close = S.camera.position.distanceTo(S.controls.target) < 6.5;
+    specbar.style.opacity = close ? '0.25' : '1';
+  });
+  S.controls.addEventListener('end', () => {
+    clearTimeout(idleT);
+    specbar.style.opacity = '1';
+    idleT = setTimeout(() => {
+      if (!document.querySelector('#controls button.active[data-view="top"], #controls button.active[data-view="front"], #controls button.active[data-view="side"], #controls button.active[data-view="back"]')) {
+        S.controls.autoRotate = true;
+      }
+    }, 3000);
+  });
+
+  document.getElementById('loader').style.opacity = '0';
+  S.start();
+} catch (e) {
+  showErr(e && e.message || String(e));
+  console.error(e);
+}
+</script>
+</body>
+</html>

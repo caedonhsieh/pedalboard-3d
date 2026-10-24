@@ -194,9 +194,9 @@
       "enclosure": "custom (round)",
       "id": "dunlop-fuzz-face",
       "name": "Fuzz Face",
-      "notes": "Round enclosure \u2014 custom, not a box.",
+      "notes": "Spec specs/dunlop-fuzz-face.json + dunlop-fuzz-face.html standalone hero (full-size JDF2). Validate PASS (A 0.38mm, C 0.45mm; B skipped, no full-top decal) 2026-10-24.",
       "priority": 2,
-      "status": "planned"
+      "status": "hero"
     },
     {
       "brand": "JHS",

@@ -1,0 +1,5 @@
+DUNLOP-FUZZ-FACE back reference
+Source: https://cdn11.bigcommerce.com/s-n26aknlnlm/images/stencil/1280x1280/products/660/6601/11602052001.TOPP__79485.1663874798.jpg?c=2
+Retrieved: 2026-09-29 (fetch_views.py, Dunlop jimdunlop.com JDF2 gallery, product 660)
+View: back
+Note: back elevation looking forward (+z): IN/OUT jacks on the back wall, knobs behind, footswitch tip beyond. Dunlop suffix TOPP (6601); renamed to _back. 1280x1280.

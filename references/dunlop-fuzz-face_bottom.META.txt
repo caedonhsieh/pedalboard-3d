@@ -1,0 +1,5 @@
+DUNLOP-FUZZ-FACE bottom reference
+Source: https://cdn11.bigcommerce.com/s-n26aknlnlm/images/stencil/1280x1280/products/660/6603/11602052001.BACK__96991.1663874798.jpg?c=2
+Retrieved: 2026-09-29 (fetch_views.py, Dunlop jimdunlop.com JDF2 gallery, product 660)
+View: bottom
+Note: underside / bottom plate (never in hero orbit range; inventoried, not modelled). Dunlop suffix BACK (6603); renamed to _bottom. 1280x1280.

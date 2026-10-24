@@ -1061,11 +1061,37 @@ export function studioScene(container, {
  * box enclosure). A deck is the sloped mounting plane of a top segment:
  * {group, z0, z1, zc, yc, pitch}.
  */
+/** Dome height of a round (lathe) enclosure at radius r, from [[r, y], ...]. */
+export function roundSurfaceY(profile, r) {
+  const pts = [...(profile || [])].sort((a, b) => a[0] - b[0]);
+  if (!pts.length) return 0;
+  if (r <= pts[0][0]) return pts[0][1];
+  for (let i = 0; i < pts.length - 1; i++) {
+    const [r0, y0] = pts[i], [r1, y1] = pts[i + 1];
+    if (r <= r1) return y0 + ((r - r0) / Math.max(r1 - r0, 1e-9)) * (y1 - y0);
+  }
+  return pts[pts.length - 1][1];
+}
+
+/** Round lathe enclosure (Fuzz Face): profile [[r, y], ...] revolved about Y. */
+export function roundEnclosure({ diameter, profile, material }) {
+  // Lathe order matters: bottom rim up to the dome peak gives outward normals.
+  const pts = [...profile].sort((a, b) => a[0] - b[0]).reverse()
+    .map(([r, y]) => new THREE.Vector2(Math.max(r, 0), y));
+  const geo = new THREE.LatheGeometry(pts, 96);
+  const m = shadowed(new THREE.Mesh(geo, material));
+  m.userData.kind = 'enclosure';
+  m.userData.diameter = diameter;
+  return m;
+}
+
 export function buildDecks(parent, spec) {
   const { w, d, h } = spec.dims;
   const decks = [];
   const enc = spec.enclosure || {};
-  if (enc.type === 'box' || !enc.points) {
+  if (enc.type === 'round') {
+    decks.push({ group: null, z0: -d / 2, z1: d / 2, zc: 0, yc: h, pitch: 0 });
+  } else if (enc.type === 'box' || !enc.points) {
     decks.push({ group: null, z0: -d / 2, z1: d / 2, zc: 0, yc: h, pitch: 0 });
   } else {
     const pts = enc.points;
@@ -1116,7 +1142,11 @@ export function assemblePedal(spec) {
   const parts = []; // everything except enclosure + base plate (toggleable for silhouette checks)
 
   const material = enc.color ? powderCoat(enc.color) : FIN.green;
-  const enclosureMesh = enc.type === 'box' || !enc.points
+  const isRound = enc.type === 'round';
+  const domeY = (x, z) => roundSurfaceY(enc.profile, Math.hypot(x, z));
+  const enclosureMesh = isRound
+    ? roundEnclosure({ diameter: enc.diameter ?? w, profile: enc.profile, material })
+    : enc.type === 'box' || !enc.points
     ? boxEnclosure({ w, d, h, edgeRadius: enc.edgeRadius ?? 0.06, material })
     : enc.closed
     ? extrudeProfile({ // closed measured polygon (DS-1 IJKLMN): extrude directly
@@ -1143,7 +1173,7 @@ export function assemblePedal(spec) {
     panel.userData.kind = 'backpanel';
     group.add(panel);
   }
-  group.add(basePlate({ w, d }));
+  if (!isRound) group.add(basePlate({ w, d })); // round shell: square base would poke out past the circle
 
   // Measured-profile parts (DS-1 v4, 2026-10-01). Absolute coords, no seating.
   // Only present when the spec carries them; TS9 and others are unaffected.
@@ -1186,7 +1216,62 @@ export function assemblePedal(spec) {
 
   const decks = buildDecks(group, spec);
 
+  if (isRound && spec.rubberPad) {
+    // Triangular rubber tread on the dome: plan-view triangle (apex + base
+    // corners in x/z), displaced vertex-by-vertex onto the dome surface.
+    const rp = spec.rubberPad;
+    // Grid over the triangle's bbox, faces kept only inside the triangle,
+    // so the pad has enough vertices to follow the dome.
+    const [ax, az] = rp.apex, [lx, lz] = rp.baseLeft, [rx, rz] = rp.baseRight;
+    const inTri = (x, z) => {
+      const d = (lz - rz) * (ax - rx) + (rx - lx) * (az - rz);
+      const a = ((lz - rz) * (x - rx) + (rx - lx) * (z - rz)) / d;
+      const b = ((rz - az) * (x - rx) + (ax - rx) * (z - rz)) / d;
+      const c = 1 - a - b;
+      return a >= -0.02 && b >= -0.02 && c >= -0.02;
+    };
+    const N = 72, verts = [], idx = [], grid = [];
+    const minX = Math.min(ax, lx, rx), maxX = Math.max(ax, lx, rx);
+    const minZ = Math.min(az, lz, rz), maxZ = Math.max(az, lz, rz);
+    for (let j = 0; j <= N; j++) {
+      grid.push([]);
+      for (let i = 0; i <= N; i++) {
+        const x = minX + (i / N) * (maxX - minX), z = minZ + (j / N) * (maxZ - minZ);
+        grid[j].push(inTri(x, z) ? verts.push(x, domeY(x, z) + 0.05, z) / 3 - 1 : -1);
+      }
+    }
+    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+      const a = grid[j][i], b = grid[j][i + 1], c = grid[j + 1][i], dd = grid[j + 1][i + 1];
+      if (a >= 0 && b >= 0 && c >= 0) idx.push(a, c, b);
+      if (b >= 0 && dd >= 0 && c >= 0) idx.push(b, c, dd);
+    }
+    const pg = new THREE.BufferGeometry();
+    pg.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+    pg.setIndex(idx);
+    pg.computeVertexNormals();
+    const pad = shadowed(new THREE.Mesh(pg, new THREE.MeshStandardMaterial({
+      color: new THREE.Color(rp.color || '#131315'), roughness: 0.92, metalness: 0,
+    })));
+    pad.userData.kind = 'rubberpad';
+    group.add(pad); parts.push(pad);
+  }
+
   function seat(part, x, z, id, kind) {
+    if (isRound) {
+      // Seat on the dome at this radius, tilted to the local surface normal.
+      const r = Math.hypot(x, z);
+      const e = 0.05;
+      const slope = (roundSurfaceY(enc.profile, r + e) - roundSurfaceY(enc.profile, Math.max(r - e, 0))) / (Math.min(r + e, (enc.diameter ?? w) / 2) - Math.max(r - e, 0) || 1);
+      group.add(part);
+      part.position.set(x, domeY(x, z), z);
+      if (r > 1e-6) {
+        const n = new THREE.Vector3(-slope * (x / r), 1, -slope * (z / r)).normalize();
+        part.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), n);
+      }
+      anchors.push({ id, kind, x, z, obj: part });
+      parts.push(part);
+      return part;
+    }
     const { y, pitch, deck } = surfaceAt(decks, z);
     if (deck.group) {
       deck.group.add(part);
@@ -1288,6 +1373,20 @@ export function assemblePedal(spec) {
   for (const j of spec.jacks || []) {
     const part = jack();
     if (j.face === 'back' || j.side === 'back') {
+      if (isRound) {
+        // Back curved wall: z comes from the circle at this x, and the barrel
+        // faces radially outward, not straight -z.
+        const R = (enc.diameter ?? w) / 2;
+        const jx = j.x ?? 0;
+        const dz = -Math.sqrt(Math.max(R * R - jx * jx, 0.01)) / R;
+        const dx = jx / R;
+        part.rotation.y = Math.atan2(-dz, dx);
+        const z = dz * (R - 0.018);
+        part.position.set(jx, j.y ?? 0.65, z);
+        group.add(part); parts.push(part);
+        anchors.push({ id: j.id || 'jack-back', kind: 'jack', x: jx, z, obj: part });
+        continue;
+      }
       // Back-wall audio jack (EHX big-box layout): the jack() barrel runs
       // along +X, so rotate it to face -z (out the back). Spec carries the
       // measured x/y; z is the back wall itself.
@@ -1372,7 +1471,18 @@ export function assemblePedal(spec) {
     const part = textLabel({ text: lb.text, w: lb.w ?? 0.3, h: lb.h ?? 0.12, spaced: lb.spaced ?? true,
                              arrow: lb.arrow ?? null, script: lb.script ?? false, bold: lb.bold ?? false, light: lb.light ?? false, rounded: lb.rounded ?? false,
                              color: lb.color ?? '#1a1a1a', bg: lb.bg ?? null });
-    if (lb.face === 'back') {
+    if (isRound) {
+      group.add(part);
+      part.position.set(lb.x ?? 0, domeY(lb.x ?? 0, lb.z ?? 0) + 0.015, lb.z ?? 0);
+      const r = Math.hypot(lb.x ?? 0, lb.z ?? 0);
+      if (r > 1e-6) {
+        const e = 0.05;
+        const slope = (roundSurfaceY(enc.profile, r + e) - roundSurfaceY(enc.profile, Math.max(r - e, 0))) / ((r + e) - Math.max(r - e, 0) || 1);
+        const n = new THREE.Vector3(-slope * ((lb.x ?? 0) / r), 1, -slope * ((lb.z ?? 0) / r)).normalize();
+        part.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), n);
+      }
+      if (lb.rot) part.rotateY(lb.rot);
+    } else if (lb.face === 'back') {
       // Rear wall: the textLabel mesh is pre-rotated -90° x for deck use;
       // reset it to face -z (out the back).
       part.children[0].rotation.set(0, Math.PI, 0);

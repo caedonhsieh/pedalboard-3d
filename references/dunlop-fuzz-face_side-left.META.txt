@@ -1,0 +1,5 @@
+DUNLOP-FUZZ-FACE side-left reference
+Source: https://cdn11.bigcommerce.com/s-n26aknlnlm/images/stencil/1280x1280/products/660/6599/11602052001.LEFT__75692.1663874798.jpg?c=2
+Retrieved: 2026-09-29 (fetch_views.py, Dunlop jimdunlop.com JDF2 gallery, product 660)
+View: side-left
+Note: left side elevation (VOLUME / IN side, -x). Dunlop suffix LEFT (6599). 1280x1280.

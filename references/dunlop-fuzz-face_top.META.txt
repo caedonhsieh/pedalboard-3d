@@ -1,0 +1,5 @@
+DUNLOP-FUZZ-FACE top reference
+Source: https://cdn11.bigcommerce.com/s-n26aknlnlm/images/stencil/1280x1280/products/660/6598/11602052001.MAIN__79836.1663874798.jpg?c=2
+Retrieved: 2026-09-29 (fetch_views.py, Dunlop jimdunlop.com JDF2 gallery, product 660)
+View: top
+Note: top-down (image top = back / jack edge, -z). Dunlop gallery suffix MAIN (6598) is the true top-down; renamed to _top for the guide. 1280x1280.
