@@ -90,8 +90,11 @@ export const FIN = {
     color: 0xf4f4f6, roughness: 0.22, metalness: 1.0, envMapIntensity: 1.35,
   }),
   plateRib: new THREE.MeshStandardMaterial({
-    color: 0xf4f4f6, roughness: 0.26, metalness: 1.0, envMapIntensity: 1.35,
-    bumpMap: stripeTexture({ horizontal: true, stripes: 30 }), bumpScale: 0.35,
+    // Lower metalness than pure chrome: on a software renderer (no env map)
+    // full metal goes flat black at grazing angles; this keeps the ribbed
+    // treadle reading silver-grey from the front and low orbits too.
+    color: 0xd7dade, roughness: 0.34, metalness: 0.45, envMapIntensity: 1.1,
+    bumpMap: stripeTexture({ horizontal: true, stripes: 30 }), bumpScale: 0.55,
   }),
   silverCap: new THREE.MeshStandardMaterial({
     color: 0xd9d9de, roughness: 0.32, metalness: 0.9, envMapIntensity: 1.1,
@@ -346,38 +349,38 @@ export function knob(style = 'ts9', pointerRot = 0, scale = 1, diaScale = null) 
     const pg = new THREE.Group(); pg.add(pointer); pg.rotation.y = pointerRot;
     k.add(body, top, pg);
   } else if (style === 'boss') {
-    // Boss 450-4618: fluted black body (12 scallops), silver aluminum inlay, white line.
-    // Body: 0.54" dia x 0.39" tall. Flange: 0.79" dia x 0.07" (spec A/D).
-    const skirt = flutedKnobBody({ rTop: 0.24, rBottom: 0.27, h: 0.39, flutes: 10, fluteAmp: 0.012 });
-    skirt.position.y = 0.07 + 0.195; // on top of flange
-    const flange = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.395, 0.395, 0.07, 48), FIN.blackPlastic));
+    // Boss knob: fluted black body ~0.72in dia over a thin base flange,
+    // wide silver cap covering most of the top (measured knobs 19.6mm dia).
+    const skirt = flutedKnobBody({ rTop: 0.29, rBottom: 0.33, h: 0.34, flutes: 10, fluteAmp: 0.012 });
+    skirt.position.y = 0.07 + 0.17; // on top of flange
+    const flange = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.36, 0.07, 48), FIN.blackPlastic));
     flange.position.y = 0.035;
-    const cap = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.19, 0.04, 32), FIN.silverCap));
-    cap.position.y = 0.46 + 0.02;
-    const pointer = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.012, 0.16), FIN.pointer);
-    pointer.position.set(0, 0.46 + 0.045, -0.045);
+    const cap = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 0.045, 32), FIN.silverCap));
+    cap.position.y = 0.4325;
+    const pointer = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.012, 0.18), FIN.pointer);
+    pointer.position.set(0, 0.46, -0.06);
     const pg = new THREE.Group(); pg.add(pointer); pg.rotation.y = pointerRot;
     k.add(flange, skirt, cap, pg);
   } else if (style === 'boss-smooth') {
     // LEVEL knob: smooth (no fluting, no flange), black body with silver cap.
-    const skirt = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.27, 0.45, 32), FIN.knobRib));
-    skirt.position.y = 0.225;
-    const cap = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.19, 0.04, 32), FIN.silverCap));
-    cap.position.y = 0.47;
+    const skirt = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.27, 0.38, 32), FIN.knobRib));
+    skirt.position.y = 0.19;
+    const cap = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.04, 32), FIN.silverCap));
+    cap.position.y = 0.40;
     const pointer = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.012, 0.16), FIN.pointer);
-    pointer.position.set(0, 0.495, -0.045);
+    pointer.position.set(0, 0.425, -0.045);
     const pg = new THREE.Group(); pg.add(pointer); pg.rotation.y = pointerRot;
     k.add(skirt, cap, pg);
   } else { // 'ts9'
     // Davies-style TS9 knobs. Overlay vs Sweetwater photo shows the original
     // 0.66" diameter is correct (the 0.34" "fix" was based on a bad measurement).
     // Tick rings in decal are sized to sit OUTSIDE the knob (0.70" dia).
-    const skirt = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.295, 0.33, 0.60, 48), FIN.knobRib));
-    skirt.position.y = 0.30;
+    const skirt = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.295, 0.33, 0.44, 48), FIN.knobRib));
+    skirt.position.y = 0.22;
     const cap = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.05, 48), FIN.silverCap));
-    cap.position.y = 0.625;
+    cap.position.y = 0.465;
     const pointer = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.014, 0.19), FIN.pointer);
-    pointer.position.set(0, 0.652, -0.055);
+    pointer.position.set(0, 0.492, -0.055);
     const pg = new THREE.Group(); pg.add(pointer); pg.rotation.y = pointerRot;
     k.add(skirt, cap, pg);
   }
@@ -520,8 +523,10 @@ export function footswitch({ w = 2.046, d = 1.382, style = 'plate', frameColor =
     // shows; the deck occludes the rest), chrome treadle sitting down inside it.
     const bezel = shadowed(new THREE.Mesh(new RoundedBoxGeometry(w + 0.26, 0.12, d + 0.26, 4, 0.06), FIN.blackPlastic));
     bezel.position.y = -0.04;
+    bezel.userData.kind = 'treadle-bezel';
     const plate = shadowed(new THREE.Mesh(new RoundedBoxGeometry(w, 0.16, d, 4, 0.05), FIN.plateRib));
     plate.position.y = 0.06;
+    plate.userData.kind = 'treadle-plate'; // dips alone on a stomp; the bezel well stays fixed
     g.add(bezel, plate);
   }
   g.userData.switchStyle = style;
@@ -535,42 +540,65 @@ export function ibanezPlate({ w = 2.145, d = 0.733, border = 0.06 } = {}) {
   // Black border (slightly larger, thin)
   g.userData.kind = 'plate';
   const borderMesh = shadowed(new THREE.Mesh(
-    new RoundedBoxGeometry(w + border*2, 0.04, d + border*2, 2, 0.02),
+    new RoundedBoxGeometry(w + border*2, 0.07, d + border*2, 2, 0.02),
     FIN.blackPlastic
   ));
-  borderMesh.position.y = 0.02;
-  // White plate on top
+  borderMesh.position.y = 0.035;
+  // Brushed silver plate on top
   const plateMesh = shadowed(new THREE.Mesh(
-    new RoundedBoxGeometry(w, 0.04, d, 2, 0.02),
-    new THREE.MeshStandardMaterial({ color: 0xf5f5f5, roughness: 0.35, metalness: 0.0 })
+    new RoundedBoxGeometry(w, 0.06, d, 2, 0.02),
+    new THREE.MeshStandardMaterial({ color: 0xd9dcdf, roughness: 0.38, metalness: 0.35 })
   ));
-  plateMesh.position.y = 0.05;
+  plateMesh.position.y = 0.075;
   g.add(borderMesh, plateMesh);
-  // "Ibanez" text via canvas texture — bright cyan-blue, bold rounded italic
+  // Plate art via canvas: blue Ibanez script over TS9 / Tube Screamer print,
+  // as on the real name plate (royal blue script, grey model print).
   const canvas = document.createElement('canvas');
-  canvas.width = 1024; canvas.height = 256;
+  canvas.width = 1024; canvas.height = 400;
   const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#f5f5f5';
-  ctx.fillRect(0, 0, 1024, 256);
-  ctx.fillStyle = '#31B4F7';  // sampled from reference photo 2026-09-28
-  ctx.font = 'italic 900 175px "Arial Rounded MT Bold", Arial, sans-serif';
+  const grad = ctx.createLinearGradient(0, 0, 0, 400);
+  grad.addColorStop(0, '#e3e6e9'); grad.addColorStop(0.5, '#cfd3d7'); grad.addColorStop(1, '#dde0e3');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 1024, 400);
+  // faint horizontal brushing
+  ctx.globalAlpha = 0.05;
+  for (let i = 0; i < 260; i++) {
+    ctx.fillStyle = Math.random() > 0.5 ? '#ffffff' : '#9aa0a6';
+    ctx.fillRect(0, Math.random() * 400, 1024, 1);
+  }
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = '#174f9e'; // deep royal blue: stays readable at grazing angles
+  ctx.font = 'italic 900 150px "Arial Rounded MT Bold", Arial, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   // Real Ibanez logo is bold and elongated — stretch horizontally
   ctx.save();
-  ctx.translate(512, 140);
+  ctx.translate(512, 128);
   ctx.scale(1.45, 1);
   ctx.fillText('Ibanez', 0, 0);
   ctx.restore();
+  ctx.fillStyle = '#33373b';
+  ctx.font = '700 62px Arial, sans-serif';
+  ctx.fillText('TS9', 512, 258);
+  // flanking lines + Tube Screamer
+  ctx.strokeStyle = '#6a6e72'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(140, 322); ctx.lineTo(325, 322); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(699, 322); ctx.lineTo(884, 322); ctx.stroke();
+  ctx.fillStyle = '#3f4448';
+  ctx.font = '600 48px Arial, sans-serif';
+  ctx.fillText('Tube Screamer', 512, 322);
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 8;
   const textMesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(w * 0.85, d * 0.55),
-    new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.35 })
+    new THREE.PlaneGeometry(w * 0.94, d * 0.94),
+    // Matte print layer: low metalness / higher roughness so the lettering
+    // stays dark and readable at the grazing hero angle instead of washing
+    // out in the plate's specular highlight.
+    new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.6, metalness: 0.0, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 })
   );
   textMesh.rotation.x = -Math.PI / 2;
-  textMesh.position.y = 0.071;
+  textMesh.position.y = 0.108;
   g.add(textMesh);
   return g;
 }
@@ -670,7 +698,7 @@ export function tickRing({ innerR = 0.32, outerR = 0.485, wedges = 12 } = {}) {
   // 12 positions, 10 wedges rendered (2-trapezoid gap centered at bottom)
   // Canvas angle: -π/2=top, π/2=bottom. Skip the 2 wedges straddling the bottom.
   const step = (Math.PI * 2) / wedges;
-  const wedgeAngular = step * 0.8;  // wedge covers 80% of step, gap 20%
+  const wedgeAngular = step * 0.20;  // fine printed ticks, not gear teeth
   for (let i = 0; i < wedges; i++) {
     // Half-step offset so the 2-wedge gap lands symmetric around the bottom
     const centerA = (i / wedges) * Math.PI * 2 - Math.PI / 2 + step / 2;
@@ -1150,7 +1178,7 @@ export function assemblePedal(spec) {
       const trScale = k.tickRingScale || 1;
       const ring = k.style === 'boss'
         ? dotRing({ r: 0.42 * trScale, dots: 11, dotR: 0.035 * trScale })
-        : tickRing({ innerR: 0.32 * trScale, outerR: 0.485 * trScale, wedges: 12 });
+        : tickRing({ innerR: 0.385 * trScale, outerR: 0.44 * trScale, wedges: 12 });
       // Stagger Y by knob index (0.001" steps) so overlapping tick rings
       // don't z-fight — later knobs render on top. Invisible to the eye.
       const ringY = 0.012 + ki * 0.001;
@@ -1254,17 +1282,26 @@ export function assemblePedal(spec) {
     );
   }
   if (spec.thumbscrew) {
-    // Battery-compartment thumb screw on the front (toe) face. Black knurled knob.
+    // Battery-compartment thumb screw on the front (toe) face: knurled steel.
     const ts = spec.thumbscrew;
     const screw = new THREE.Group();
     screw.userData.kind = 'thumbscrew';
     const r = ts.r ?? 0.20, h = 0.16;
-    const knob = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 24), FIN.blackPlastic));
+    const screwMat = hardwareChrome();
+    screwMat.color.set(0x7d848c); // darker steel so the head reads as a screw, not a gear
+    const knob = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 24), screwMat));
     knob.rotation.x = Math.PI / 2;
+    // Screwdriver slot across the front face
+    const slot = new THREE.Mesh(
+      new THREE.BoxGeometry(r * 1.45, 0.03, 0.012),
+      new THREE.MeshStandardMaterial({ color: 0x17181a, roughness: 0.8 })
+    );
+    slot.position.z = h / 2 + 0.004;
+    screw.add(slot);
     // Knurling: small boxes around the rim, subtle
-    for (let i = 0; i < 16; i++) {
-      const k = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.025, h + 0.01), FIN.blackPlastic);
-      const a = (i / 16) * Math.PI * 2;
+    for (let i = 0; i < 20; i++) {
+      const k = new THREE.Mesh(new THREE.BoxGeometry(0.013, 0.013, h + 0.01), screwMat);
+      const a = (i / 20) * Math.PI * 2;
       k.position.set(Math.cos(a) * r, Math.sin(a) * r, 0);
       screw.add(k);
     }
@@ -1304,7 +1341,7 @@ export function assemblePedal(spec) {
       if (lb.rot) part.rotation.y = lb.rot;
     }
     parts.push(part);
-    anchors.push({ id: `label-${(lb.id || lb.text).toLowerCase()}`, kind: 'label', x: lb.x, z: lb.z, obj: part });
+    anchors.push({ id: `label-${(lb.id || lb.text).toLowerCase()}`, kind: 'label', x: lb.x, z: lb.z, obj: part, onTreadle: !!lb.onTreadle });
   }
 
   return { group, spec, decks, anchors, parts, enclosureMesh };
@@ -1368,8 +1405,8 @@ export function applyTreadleDecal(assembly, texture, { anisotropy = 8 } = {}) {
   const len = Math.hypot(dx, dy);
   const width = tp.width ?? 2.875;
   const mat = new THREE.MeshStandardMaterial({
-    map: texture, transparent: true, roughness: 0.42, metalness: 0.05,
-    envMapIntensity: 0.7, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
+    map: texture, transparent: true, roughness: 0.6, metalness: 0.0,
+    envMapIntensity: 0.35, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
   });
   const g = new THREE.PlaneGeometry(width, len);
   const m = new THREE.Mesh(g, mat);
@@ -1384,7 +1421,46 @@ export function applyTreadleDecal(assembly, texture, { anisotropy = 8 } = {}) {
   // Place decal just above the beveled surface.
   m.position.set(0, cy + 0.045, cx); // profile-x -> world +Z
   m.receiveShadow = true;
+  m.userData.kind = 'treadledecal'; // moves with the treadle on a press
   assembly.group.add(m);
+  return m;
+}
+
+/* Same construction for the rubber pad's top face (Boss BOSS logo):
+ * sized/pitched from spec.padProfile's first two points. The pad mesh is
+ * returned so a viewer can dip pad + decal together on a treadle press. */
+export function applyPadDecal(assembly, texture, { anisotropy = 8 } = {}) {
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = anisotropy;
+  const { spec } = assembly;
+  const tp = spec.padProfile;
+  if (!tp || !tp.points || tp.points.length < 2) return null;
+  // padProfile is a traced outline: its upper edge runs from the first
+  // point to the farthest-x point, then returns along the underside.
+  // The decal spans that upper edge, not the first two tracer steps.
+  let end = 0;
+  for (let i = 1; i < tp.points.length; i++) {
+    if (tp.points[i][0] > tp.points[end][0]) end = i;
+  }
+  const [ax, ay] = tp.points[0], [bx, by] = tp.points[end];
+  const dx = bx - ax, dy = by - ay;
+  const len = Math.hypot(dx, dy);
+  const width = tp.width ?? 2.44;
+  const mat = new THREE.MeshStandardMaterial({
+    map: texture, transparent: true, roughness: 0.65, metalness: 0.0,
+    envMapIntensity: 0.3, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
+  });
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(width, len), mat);
+  const pitch = Math.atan2(dy, dx);
+  m.rotation.x = -Math.PI / 2 - pitch;
+  const cx = (ax + bx) / 2, cy = (ay + by) / 2;
+  // The traced upper edge humps ~0.06in above this chord (the pad ribs);
+  // sit clear of the highest rib so the logo is not buried mid-pad.
+  m.position.set(0, cy + 0.075, cx);
+  m.receiveShadow = true;
+  m.userData.kind = 'paddecal';
+  assembly.group.add(m);
+  return m;
 }
 
 /* ---------------- enclosure presets (boxy pedals) ----------------

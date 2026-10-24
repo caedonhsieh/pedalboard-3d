@@ -9,7 +9,7 @@
     },
     "enclosure": {
         "bevel": 0.05,
-        "color": "#7fb75c",
+        "color": "#74ba41",
         "frontLean": 0.06,
         "notes": "MEASURED by scripts/fix_hexagon_profile.py from validated mask (workspace/imagine_media/ts9-hexagon-mask.png, Caedon 2026-09-28: 'the right housing shape'). Vertices extracted by pixel scan, mapped to 4.88x2.09in. This is measurement from validated reference, not estimation.",
         "points": [
@@ -54,11 +54,13 @@
         {
             "id": "jack-in",
             "side": "right",
+            "y": 1.31,
             "z": -0.2
         },
         {
             "id": "jack-out",
             "side": "left",
+            "y": 1.31,
             "z": -0.2
         }
     ],
@@ -101,7 +103,9 @@
     "name": "TS9 Tube Screamer",
     "notes": "Profile corrected 2026-09-28 (see enclosure.notes) \u2014 the first real spec-edit-not-remodel fix. Knob x/z verified against the face photo. ALL part heights seat by sampling the enclosure profile at their z (the surfaceAt rule in PROCESS.md) \u2014 no hardcoded y values anywhere, so profile edits reseat parts automatically.",
     "powerJack": {
-        "x": 0.75
+        "x": 0.75,
+        "y": 0.65,
+        "style": "round"
     },
     "ibanezPlate": {
         "x": 0.0,
@@ -114,23 +118,26 @@
         {
             "text": "DRIVE",
             "x": -0.799,
-            "z": -1.32,
-            "w": 0.32,
-            "h": 0.14
+            "z": -1.08,
+            "w": 0.58,
+            "h": 0.14,
+            "spaced": false
         },
         {
             "text": "TONE",
             "x": 0.003,
-            "z": -1.85,
-            "w": 0.28,
-            "h": 0.1
+            "z": -1.88,
+            "w": 0.46,
+            "h": 0.1,
+            "spaced": false
         },
         {
             "text": "LEVEL",
             "x": 0.779,
-            "z": -1.3,
-            "w": 0.32,
-            "h": 0.14
+            "z": -1.08,
+            "w": 0.58,
+            "h": 0.14,
+            "spaced": false
         }
     ]
 }

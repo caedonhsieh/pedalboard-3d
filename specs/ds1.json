@@ -35,6 +35,10 @@
         1.5731
       ],
       [
+        -0.835,
+        1.695
+      ],
+      [
         -0.7854,
         1.8204
       ]
@@ -113,7 +117,7 @@
     {
       "text": "LEVEL",
       "x": 0.0,
-      "z": -1.65,
+      "z": -1.82,
       "w": 0.9,
       "h": 0.24,
       "spaced": false,
@@ -136,7 +140,8 @@
       "h": 0.12,
       "arrow": "left",
       "spaced": false,
-      "surfaceY": 1.7717
+      "surfaceY": 1.7717,
+      "onTreadle": true
     },
     {
       "text": "INPUT",
@@ -146,7 +151,8 @@
       "h": 0.12,
       "arrow": "right",
       "spaced": false,
-      "surfaceY": 1.7717
+      "surfaceY": 1.7717,
+      "onTreadle": true
     },
     {
       "text": "Distortion",
@@ -155,7 +161,8 @@
       "w": 1.8,
       "h": 0.35,
       "script": true,
-      "surfaceY": 1.6743
+      "surfaceY": 1.6743,
+      "onTreadle": true
     },
     {
       "text": "DS-1",
@@ -164,7 +171,8 @@
       "w": 0.8,
       "h": 0.3,
       "bold": true,
-      "surfaceY": 1.565
+      "surfaceY": 1.565,
+      "onTreadle": true
     }
   ],
   "jacks": [
@@ -186,13 +194,14 @@
   "powerJack": {
     "x": 0,
     "y": 0.56,
+    "style": "round",
     "note": "DC 9V in, centered on back face, below label per ds1_gc_back.jpg"
   },
   "thumbscrew": {
     "x": 0,
     "z": 2.62,
     "y": 1.643,
-    "r": 0.2,
+    "r": 0.15,
     "note": "Battery thumbscrew on treadle toe, front center"
   },
   "notes": "REBUILT 2026-10-01 from Caedon-approved v4 profile annotation. Body/treadle/recess/pad/base are measured side profiles. Top-view parts (knobs/LED/labels) retain 2026-09-29 positions, UNVALIDATED.",
@@ -239,8 +248,8 @@
       ]
     ],
     "width": 2.362,
-    "color": "#c44d0e",
-    "note": "Caedon nodes EFGH, DEFC/NHGI collinear 2026-10-01"
+    "color": "#8a3408",
+    "note": "Caedon nodes EFGH, DEFC/NHGI collinear 2026-10-01; colour darkened 2026-10-24 so the under-treadle recess reads as shadowed depth, not a flat panel"
   },
   "padProfile": {
     "points": [
@@ -1160,5 +1169,6 @@
     "color": "#8a8d92",
     "note": "Caedon L1/L2 division 2026-10-01, correct coordinate transform"
   },
-  "treadleDecal": "./textures/ds1_treadle_decal.png?v=20261001f"
+  "treadleDecal": "./textures/ds1_treadle_decal.png?v=20261001f",
+  "padDecal": "./textures/ds1_pad_decal.png"
 }

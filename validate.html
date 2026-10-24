@@ -23,6 +23,7 @@
     border-radius:6px; padding:2px 8px; margin-right:8px; }
   .pill.pass { background:rgba(63,217,124,.14); color:var(--pass); }
   .pill.fail { background:rgba(255,81,71,.14); color:var(--fail); }
+  .pill.skip { background:rgba(154,160,171,.14); color:#9aa0ab; }
   section.card { border:1px solid var(--line); border-radius:12px; background:var(--panel);
     padding:18px; margin-bottom:22px; }
   section.card p.cap { color:var(--dim); font-size:13px; line-height:1.5; margin:8px 0 0; }
@@ -120,9 +121,11 @@ $('specUrl').textContent = specUrl;
 
 const results = [];
 function line(pass, html) {
-  results.push(pass);
+  results.push(pass !== false);
   const li = document.createElement('li');
-  li.innerHTML = `<span class="pill ${pass ? 'pass' : 'fail'}">${pass ? 'PASS' : 'FAIL'}</span>${html}`;
+  li.innerHTML = pass === null
+    ? `<span class="pill skip">SKIP</span>${html}`
+    : `<span class="pill ${pass ? 'pass' : 'fail'}">${pass ? 'PASS' : 'FAIL'}</span>${html}`;
   $('checklines').appendChild(li);
   return pass;
 }
@@ -173,18 +176,39 @@ try {
   /* ================= CHECK A ================= */
   setPartsVisible(A, true);
   // Independent expected position: interpolate the SPEC profile here in the
-  // page — deliberately NOT parts.js's surfaceAt().
+  // page — deliberately NOT parts.js's surfaceAt(). The profile may be a
+  // deck function (TS9) or a closed body outline (DS-1): take the UPPER
+  // envelope over every segment (plus the closing segment when closed),
+  // so point order and outline bottoms cannot corrupt the deck height.
   function expectedY(z) {
     const pts = spec.enclosure.points;
     if (!pts) return H;
-    if (z <= pts[0][0]) return pts[0][1];
-    for (let i = 0; i < pts.length - 1; i++) {
-      const [z0, y0] = pts[i], [z1, y1] = pts[i + 1];
-      if (z >= z0 && z <= z1) { const t = (z - z0) / (z1 - z0); return y0 + t * (y1 - y0); }
+    const segs = [];
+    for (let i = 0; i < pts.length - 1; i++) segs.push([pts[i], pts[i + 1]]);
+    if (spec.enclosure.closed && pts.length > 2) segs.push([pts[pts.length - 1], pts[0]]);
+    let best = null;
+    for (const [[z0, y0], [z1, y1]] of segs) {
+      if (z < Math.min(z0, z1) || z > Math.max(z0, z1)) continue;
+      // Near-vertical edges (back/front walls) occupy one silhouette
+      // column up to their top — interpolate would undershoot the deck.
+      const y = Math.abs(z1 - z0) < 0.08 ? Math.max(y0, y1)
+        : y0 + ((z - z0) / (z1 - z0)) * (y1 - y0);
+      if (best === null || y > best) best = y;
     }
-    return pts[pts.length - 1][1];
+    if (best !== null) return best;
+    // outside the profile's z range: nearest endpoint height
+    let bd = 1e9, by = H;
+    for (const [pz, py] of pts) { const dd = Math.abs(pz - z); if (dd < bd) { bd = dd; by = py; } }
+    return by;
   }
   function expectedPos(a) {
+    // Treadle meshes carry pedal-space geometry at the group origin;
+    // their silhouette is check C's job, not an anchor height.
+    if (a.kind === 'treadle') return new THREE.Vector3(a.x, 0, a.z);
+    // The thumbscrew seats on the treadle toe, not the enclosure
+    // profile — the spec carries its measured height explicitly.
+    if (a.kind === 'thumbscrew' && spec.thumbscrew && spec.thumbscrew.y != null)
+      return new THREE.Vector3(a.x, spec.thumbscrew.y, a.z);
     if (a.kind === 'jack') {
       const j = (spec.jacks || []).find((s) => (s.id || `jack-${s.side}`) === a.id) || {};
       return new THREE.Vector3(a.x, j.y ?? 0.78, a.z);
@@ -235,10 +259,12 @@ try {
 
   /* ================= CHECK B ================= */
   let bNote = '';
+  let bSkip = !spec.decal;
+  if (bSkip) bNote = 'spec has no full-top decal — render→photo comparison not applicable. ';
   try {
     const tex = await new THREE.TextureLoader().loadAsync(spec.decal);
     applyDecal(A, tex);
-  } catch (e) { bNote = 'decal failed to load — render shown without art. '; }
+  } catch (e) { if (!bSkip) bNote = 'decal failed to load — render shown without art. '; }
   setPartsVisible(A, false);
   const [bw, bh] = [560, Math.round(560 * (D + 2 * MARGIN) / (W + 2 * MARGIN))];
   const renderImg = await loadImg(capture(topCam, bw, bh));
@@ -301,7 +327,7 @@ try {
   }
   $('iouLine').textContent = bDetail;
   $('iouLine').style.color = bPass ? 'var(--pass)' : 'var(--fail)';
-  line(bPass, `<b>B · render→photo</b> — ${bDetail}`);
+  line(bSkip ? null : bPass, `<b>B · render→photo</b> — ${bDetail}`);
   let blinking = false, blinkT = null, flip = false;
   $('blinkbtn').onclick = () => {
     blinking = !blinking;
@@ -334,15 +360,10 @@ try {
       const o = (y * cw2 + x) * 4;
       if (!isBg(sd[o], sd[o + 1], sd[o + 2])) { edge[x] = y; break; }
     }
-  // dense spec profile samples
-  const profPts = spec.enclosure.points || [[-D / 2, H], [D / 2, H]];
+  // dense spec profile samples: the UPPER envelope (same independent
+  // interpolation as check A), so closed outlines compare by their top.
   const samples = [];
-  for (let i = 0; i < profPts.length - 1; i++) {
-    const [z0, y0] = profPts[i], [z1, y1] = profPts[i + 1];
-    const n = Math.max(2, Math.ceil((z1 - z0) / 0.1));
-    for (let k = 0; k < n; k++) { const t = k / n; samples.push([z0 + t * (z1 - z0), y0 + t * (y1 - y0)]); }
-  }
-  samples.push(profPts[profPts.length - 1].slice());
+  for (let z = -D / 2; z <= D / 2 + 1e-6; z += 0.05) samples.push([z, expectedY(z)]);
   const mmPxV = (2 * (H / 2 + MARGIN) * IN) / ch2;
   let maxDev = 0;
   const scr = samples.map(([z, y]) => { const [sx, sy] = toPx(new THREE.Vector3(0, y, z), sideCam, cw2, ch2); return [sx, sy]; });
