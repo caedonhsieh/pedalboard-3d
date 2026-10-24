@@ -1,0 +1,4 @@
+TC-ELECTRONIC-HALL-OF-FAME-2 detail reference
+Source: https://images.static-thomann.de/pics/bdb/_41/415009/12228552_800.jpg
+Retrieved: 2026-09-29 (fetch_views.py)
+View: detail

@@ -1,0 +1,275 @@
+{
+  "id": "tc-electronic-hall-of-fame-2",
+  "brand": "TC Electronic",
+  "name": "Hall of Fame 2",
+  "dims": {
+    "w": 2.835,
+    "d": 4.803,
+    "h": 1.969,
+    "source": "TC Electronic Hall of Fame manual (identical enclosure) via data/spec_sheets_staging.json (verified): 72 x 122 x 50 mm = 2.835 x 4.803 x 1.969 in; Thomann corroborates. 50 mm adopted as bare-enclosure height (height_includes_knobs unknown in staging; see references/tc-electronic-hall-of-fame-2_measurements.md)."
+  },
+  "enclosure": {
+    "type": "box",
+    "color": "#a11624",
+    "edgeRadius": 0.1,
+    "notes": "Custom compact box: no PRESETS entry matches (Boss compact 73x129x59 mm is 7 mm longer and 9 mm taller). Flat top, rounded corners; per-model dims govern. Colour sampled in references/tc-electronic-hall-of-fame-2_measurements.md (median #A9152A, lit patch adopted)."
+  },
+  "knobs": [
+    {
+      "id": "decay",
+      "style": "mxr",
+      "x": -0.66,
+      "z": -1.72,
+      "rot": 2.25,
+      "scale": 0.88,
+      "diaScale": 0.72,
+      "tickRing": false,
+      "note": "DECAY top-left of the 2x2 grid. Photo-derived dark-blob centroid in front view, symmetrised to +/-0.66 (see measurements). Black Davies-style knob ~0.66 in dia (mxr body scaled); pointer to the south-west as in the front photo."
+    },
+    {
+      "id": "tone",
+      "style": "mxr",
+      "x": 0.66,
+      "z": -1.72,
+      "rot": 2.35,
+      "scale": 0.88,
+      "diaScale": 0.72,
+      "tickRing": false,
+      "note": "TONE top-right, same row/size as DECAY (front + hero34)."
+    },
+    {
+      "id": "level",
+      "style": "mxr",
+      "x": -0.66,
+      "z": -0.69,
+      "rot": 2.3,
+      "scale": 0.88,
+      "diaScale": 0.72,
+      "tickRing": false,
+      "note": "LEVEL bottom-left of the grid (front + hero34)."
+    },
+    {
+      "id": "mode",
+      "style": "mxr",
+      "x": 0.66,
+      "z": -0.69,
+      "rot": 2.2,
+      "scale": 0.88,
+      "diaScale": 0.72,
+      "tickRing": false,
+      "note": "Reverb-type rotary selector (CHURCH/SHIM/MOD/LOFI/1/2/3/ROOM/HALL/SPRING/PLATE arc in the decal), bottom-right of the grid (front + hero34)."
+    }
+  ],
+  "led": {
+    "x": 0.05,
+    "z": -0.03,
+    "note": "Red LED centred just forward of the mode row, above the HALL OF FAME 2 wordmark (front view lens centroid). Lit in the reference photos."
+  },
+  "footswitch": {
+    "style": "round",
+    "x": 0,
+    "z": 1.24,
+    "note": "MASH pressure-sensitive chrome stomp, centred in the front third (front-view chrome centroid). Press-hold dips the plunger; release toggles the LED (see measurements, MASH behaviour)."
+  },
+  "toggle": {
+    "x": 0.0,
+    "z": -1.6,
+    "note": "PRE-DELAY SHORT/LONG miniature bat toggle between DECAY and TONE (front view). No parts.js builder exists; the hero page builds it from this field (shared-needs list in the build report)."
+  },
+  "usb": {
+    "x": 0.7,
+    "y": 0.98,
+    "note": "Mini-USB (TonePrint) on the back wall, right of the DC jack (plugged cable in hero34/detail views). No parts.js builder; the hero page builds it from this field."
+  },
+  "jacks": [
+    {
+      "id": "out-mono",
+      "side": "left",
+      "z": 0.05,
+      "y": 0.98,
+      "note": "MONO OUT, left wall rear jack (front-view cluster y=307 px; MONO label adjacent). Left = OUTPUT (print-confirmed)."
+    },
+    {
+      "id": "out-stereo",
+      "side": "left",
+      "z": 0.71,
+      "y": 0.98,
+      "note": "STEREO OUT, left wall front jack (front-view cluster y=382 px)."
+    },
+    {
+      "id": "in-mono",
+      "side": "right",
+      "z": 0.05,
+      "y": 0.98,
+      "note": "MONO IN, right wall rear jack (front-view cluster y=306 px). Right = INPUT (print-confirmed)."
+    },
+    {
+      "id": "in-stereo",
+      "side": "right",
+      "z": 0.71,
+      "y": 0.98,
+      "note": "STEREO IN, right wall front jack (front-view cluster y=380 px)."
+    }
+  ],
+  "powerJack": {
+    "x": 0.0,
+    "y": 0.98,
+    "style": "round",
+    "note": "9V DC round barrel centred on the back wall (back view)."
+  },
+  "labels": [
+    {
+      "id": "decay-label",
+      "text": "DECAY",
+      "x": -0.66,
+      "z": -2.19,
+      "w": 0.78,
+      "h": 0.16,
+      "spaced": false,
+      "bold": true,
+      "color": "#e6e9ee",
+      "note": "Silver caps above the DECAY knob (front view)."
+    },
+    {
+      "id": "tone-label",
+      "text": "TONE",
+      "x": 0.66,
+      "z": -2.19,
+      "w": 0.66,
+      "h": 0.16,
+      "spaced": false,
+      "bold": true,
+      "color": "#e6e9ee",
+      "note": "Silver caps above the TONE knob."
+    },
+    {
+      "id": "predelay-label",
+      "text": "PRE-DELAY",
+      "x": 0.0,
+      "z": -2.1,
+      "w": 0.82,
+      "h": 0.13,
+      "spaced": false,
+      "bold": true,
+      "color": "#e6e9ee",
+      "note": "Above the toggle, between DECAY and TONE."
+    },
+    {
+      "id": "short-label",
+      "text": "SHORT",
+      "x": 0.0,
+      "z": -1.94,
+      "w": 0.52,
+      "h": 0.11,
+      "spaced": false,
+      "bold": false,
+      "color": "#e6e9ee",
+      "note": "Toggle throw label (upper)."
+    },
+    {
+      "id": "long-label",
+      "text": "LONG",
+      "x": 0.0,
+      "z": -1.82,
+      "w": 0.44,
+      "h": 0.11,
+      "spaced": false,
+      "bold": false,
+      "color": "#e6e9ee",
+      "note": "Toggle throw label (lower)."
+    },
+    {
+      "id": "level-label",
+      "text": "LEVEL",
+      "x": -0.66,
+      "z": -1.18,
+      "w": 0.74,
+      "h": 0.16,
+      "spaced": false,
+      "bold": true,
+      "color": "#e6e9ee",
+      "note": "Between the rows, above the LEVEL knob."
+    },
+    {
+      "id": "side-out-mono",
+      "text": "MONO",
+      "x": -1.22,
+      "z": 0.05,
+      "w": 0.5,
+      "h": 0.12,
+      "spaced": false,
+      "bold": true,
+      "rot": 1.5708,
+      "color": "#e6e9ee",
+      "note": "Vertical print by the rear left jack (reading bottom-to-top in the front view)."
+    },
+    {
+      "id": "side-out",
+      "text": "OUT",
+      "x": -1.22,
+      "z": 0.38,
+      "w": 0.36,
+      "h": 0.13,
+      "spaced": false,
+      "bold": true,
+      "rot": 1.5708,
+      "color": "#e07a2e",
+      "note": "Orange OUT between MONO and STEREO, left wall."
+    },
+    {
+      "id": "side-out-stereo",
+      "text": "STEREO",
+      "x": -1.22,
+      "z": 0.71,
+      "w": 0.62,
+      "h": 0.12,
+      "spaced": false,
+      "bold": true,
+      "rot": 1.5708,
+      "color": "#e6e9ee",
+      "note": "Vertical print by the front left jack."
+    },
+    {
+      "id": "side-in-mono",
+      "text": "MONO",
+      "x": 1.22,
+      "z": 0.05,
+      "w": 0.5,
+      "h": 0.12,
+      "spaced": false,
+      "bold": true,
+      "rot": 1.5708,
+      "color": "#e6e9ee",
+      "note": "Vertical print by the rear right jack."
+    },
+    {
+      "id": "side-in",
+      "text": "IN",
+      "x": 1.22,
+      "z": 0.38,
+      "w": 0.28,
+      "h": 0.13,
+      "spaced": false,
+      "bold": true,
+      "rot": 1.5708,
+      "color": "#e07a2e",
+      "note": "Orange IN between MONO and STEREO, right wall."
+    },
+    {
+      "id": "side-in-stereo",
+      "text": "STEREO",
+      "x": 1.22,
+      "z": 0.71,
+      "w": 0.62,
+      "h": 0.12,
+      "spaced": false,
+      "bold": true,
+      "rot": 1.5708,
+      "color": "#e6e9ee",
+      "note": "Vertical print by the front right jack."
+    }
+  ],
+  "faceImage": "https://images.static-thomann.de/pics/bdb/_41/415009/12228542_800.jpg",
+  "decal": "./textures/tc-electronic-hall-of-fame-2-decal.png",
+  "notes": "TC Electronic Hall of Fame 2 hero. Custom compact box (72x122x50 mm), flat deck: every deck part (4 knobs, LED, footswitch, labels) seats via surfaceAt() at h=1.969 - no y on any deck part; only side jacks, powerJack and usb carry explicit wall y. 2x2 knob grid (DECAY/TONE/LEVEL/mode selector) measured in two views (front ortho centroids + hero34 fractions, see references/tc-electronic-hall-of-fame-2_measurements.md). Stereo side jacks (MONO rear z=0.05, STEREO front z=0.71; left OUT, right IN), 9V + USB on the back wall. Top print split: mode arc, HALL OF FAME 2 wordmark, MASH/TRUE BYPASS and tc electronic in the decal; knob and side words are vector labels above it. PRE-DELAY toggle and USB have no parts.js builder and are built by tc-electronic-hall-of-fame-2.html from spec.toggle/spec.usb."
+}

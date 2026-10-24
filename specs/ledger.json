@@ -158,9 +158,9 @@
       "enclosure": "custom",
       "id": "tc-electronic-hall-of-fame-2",
       "name": "Hall of Fame 2",
-      "notes": "",
+      "notes": "Spec specs/tc-electronic-hall-of-fame-2.json + tc-electronic-hall-of-fame-2.html standalone hero. Validate PASS (A 0.38mm, B 99.5%, C 1.68mm) 2026-10-24.",
       "priority": 2,
-      "status": "planned"
+      "status": "hero"
     },
     {
       "brand": "TC Electronic",
