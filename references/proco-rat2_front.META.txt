@@ -1,0 +1,4 @@
+PROCO-RAT2 front reference
+Source: https://media.sweetwater.com/m/products/image/0026f4d4bb9n9fZyl1hT3a7srcJevlMZyKVGDvK7.jpg?ha=0026f4d4bbfa3f277b576553c2763592a05dff60&quality=82&width=750
+Retrieved: 2026-09-29 (fetch_views.py)
+View: front

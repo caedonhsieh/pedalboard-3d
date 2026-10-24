@@ -1,0 +1,4 @@
+PROCO-RAT2 hero34 reference
+Source: https://media.sweetwater.com/api/i/version-2cf744e4f02082a2ac2c0bd032998116db279cfc__w-750__hmac-dc1489cc789bcb57593b2cf675ed3c48ba4a7c04/images/closeup/750-Rat2_detail2.jpg
+Retrieved: 2026-09-29 (fetch_views.py)
+View: hero34

@@ -1,0 +1,133 @@
+{
+  "id": "proco-rat2",
+  "brand": "ProCo",
+  "name": "Rat 2",
+  "dims": {
+    "w": 3.5,
+    "d": 4.0,
+    "h": 2.48,
+    "source": "Retailer spec 3.5 x 4.0 x 2.5 in (data/spec_sheets_staging.json, verified secondary: buyorborrowmusic listing corroborated by eBay catalog 88.9 x 101.6 x 63.5 mm; ProCo publishes no dims). Bare back height measured 2.48 in from the side views (references/proco-rat2_measurements.md), corroborating the published 2.5 in as bare-enclosure height; front height 1.97 in measured (single straight slope)."
+  },
+  "enclosure": {
+    "type": "profile",
+    "color": "#1a1a1c",
+    "bevel": 0.05,
+    "points": [
+      [
+        -2.0,
+        2.48
+      ],
+      [
+        2.0,
+        1.97
+      ]
+    ],
+    "notes": "Single straight slope measured from both side views (see references/proco-rat2_measurements.md): bare back 2.48 in to bare front 1.97 in over 4.0 in depth, midpoint on the line. Folded black steel case, glossy black deck, crackle side walls (one black powder coat in the model)."
+  },
+  "knobs": [
+    {
+      "id": "distortion",
+      "style": "mxr",
+      "x": -1.02,
+      "z": -0.76,
+      "rot": 0.0,
+      "diaScale": 0.83,
+      "tickRing": false,
+      "note": "Photo-derived (homography of front view, symmetrised): DISTORTION left knob. Black ribbed knob 0.76 in dia (mxr body diaScale 0.83), ~0.57 in above deck. Tick arc is in the decal, so no tickRing."
+    },
+    {
+      "id": "filter",
+      "style": "mxr",
+      "x": 0,
+      "z": -0.76,
+      "rot": 0.0,
+      "diaScale": 0.83,
+      "tickRing": false,
+      "note": "Photo-derived: FILTER centre knob, same row."
+    },
+    {
+      "id": "volume",
+      "style": "mxr",
+      "x": 1.02,
+      "z": -0.76,
+      "rot": 0.0,
+      "diaScale": 0.83,
+      "tickRing": false,
+      "note": "Photo-derived: VOLUME right knob, same row."
+    }
+  ],
+  "led": {
+    "x": 0,
+    "z": 0.16,
+    "note": "Red LED inside the counter of the A in the RAT wordmark (lit in the front reference, grey triangle unlit in the 3/4 views). Homography of the front view."
+  },
+  "footswitch": {
+    "style": "round",
+    "x": 0,
+    "z": 1.23,
+    "note": "Round chrome stomp centred below the RAT box (homography of front view)."
+  },
+  "jacks": [
+    {
+      "id": "input",
+      "face": "back",
+      "x": 0.88,
+      "y": 0.72,
+      "note": "INPUT on the back wall, right in top view (back view viewed from behind: IN on image-left = pedal right). Provisional to ~0.05 in, single view."
+    },
+    {
+      "id": "output",
+      "face": "back",
+      "x": -0.88,
+      "y": 0.72,
+      "note": "OUTPUT on the back wall, left in top view (back view image-right). Provisional to ~0.05 in, single view."
+    }
+  ],
+  "powerJack": {
+    "x": 0,
+    "y": 0.72,
+    "style": "round",
+    "note": "9V-DC round barrel centred on the back wall between the audio jacks (back view). Provisional to ~0.05 in, single view."
+  },
+  "labels": [
+    {
+      "id": "distortion-label",
+      "text": "DISTORTION",
+      "x": -1.02,
+      "z": -1.4,
+      "w": 1.0,
+      "h": 0.21,
+      "spaced": false,
+      "bold": true,
+      "color": "#f5f5f5",
+      "note": "White caps in the outlined box at the back edge, above the DISTORTION knob (decal draws the box)."
+    },
+    {
+      "id": "filter-label",
+      "text": "FILTER",
+      "x": 0,
+      "z": -1.4,
+      "w": 0.72,
+      "h": 0.21,
+      "spaced": false,
+      "bold": true,
+      "color": "#f5f5f5",
+      "note": "Above the FILTER knob."
+    },
+    {
+      "id": "volume-label",
+      "text": "VOLUME",
+      "x": 1.02,
+      "z": -1.4,
+      "w": 0.8,
+      "h": 0.21,
+      "spaced": false,
+      "bold": true,
+      "color": "#f5f5f5",
+      "note": "Above the VOLUME knob."
+    }
+  ],
+  "faceImage": "https://raw.githubusercontent.com/PedalPlayground/pedalplayground/master/public/images/pedals/proco-rat-2.png",
+  "decal": "./textures/proco-rat2-decal.png",
+  "notes": "ProCo Rat 2 hero. Dims: published 3.5 x 4.0 x 2.5 in (retail, verified staging); enclosure is the measured single straight slope 2.48 in back / 1.97 in front. All deck parts seat via surfaceAt() on the sloped deck — no hardcoded y on knobs/LED/switch. Audio jacks and power are on the back wall (face:'back' in parts.js), confirmed in the back view (IN right / OUT left in top view). Top art: label-strip boxes, tick arcs and the RAT wordmark are in textures/proco-rat2-decal.png (canvas-drawn vector art, transparent ground); DISTORTION/FILTER/VOLUME are vector textLabels above it. The LED sits in the A of RAT. Back-wall IN/9V-DC/OUT print and the front-wall Pro Co logo have no shared-library wall-label support for the front face (and the validator mishandles face:'back' label anchors), so the hero page stages those two prints locally; they are not in this spec. Positions are photo-derived from references/proco-rat2_measurements.md; back-wall jack positions are single-view provisional."
+}
