@@ -140,9 +140,9 @@
       "enclosure": "custom",
       "id": "strymon-timeline",
       "name": "Timeline",
-      "notes": "",
+      "notes": "Spec specs/strymon-timeline.json + strymon-timeline.html standalone hero. Validate PASS (A 0.38mm, C 0.17mm; B skipped, no full-top decal) 2026-10-24.",
       "priority": 2,
-      "status": "planned"
+      "status": "hero"
     },
     {
       "brand": "Strymon",

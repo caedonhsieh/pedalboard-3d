@@ -1,0 +1,375 @@
+{
+  "id": "strymon-timeline",
+  "brand": "Strymon",
+  "name": "TimeLine",
+  "dims": {
+    "w": 6.75,
+    "d": 5.0,
+    "h": 1.87,
+    "source": "Strymon TimeLine manual 5 deep x 6.75 wide x 1.87 tall in (verified_strymon_jhs_walrus.json, hand-verified); Strymon product page 6.75 x 5.1 x 2.7 in overall (knob-inclusive) flagged in references/strymon-timeline_measurements.md \u2014 manual footprint adopted, bare slope 1.87 back / 1.30 front corroborated by product-intro sheet"
+  },
+  "enclosure": {
+    "type": "profile",
+    "color": "#3a3d42",
+    "bevel": 0.03,
+    "smooth": false,
+    "points": [
+      [
+        -2.5,
+        1.87
+      ],
+      [
+        2.5,
+        1.3
+      ]
+    ],
+    "notes": "Custom wide box: single straight slope, graphite powder coat sampled from hero34 (see measurements). No preset fits a 6.75in-wide enclosure. bevel 0.03 (not 0.06): the shared profileEnclosure bevel compensation overshoots the silhouette on this steep slope at 0.06 \u2014 validator C 23.87mm there, 0.17mm at 0.03; shared-builder note, not edited here."
+  },
+  "knobs": [
+    {
+      "id": "value",
+      "style": "mxr",
+      "x": -0.44,
+      "z": -1.75,
+      "rot": 0.0,
+      "tickRing": false,
+      "note": "VALUE encoder, top row. Photo-derived in 2 views (measurements). Library mxr knob approximates the smooth metal encoder \u2014 no encoder builder exists (shared need)."
+    },
+    {
+      "id": "time",
+      "style": "mxr",
+      "x": 0.57,
+      "z": -1.75,
+      "rot": 0.0,
+      "scale": 0.85,
+      "tickRing": false,
+      "note": "TIME knob, top row, 2 views."
+    },
+    {
+      "id": "repeats",
+      "style": "mxr",
+      "x": 1.45,
+      "z": -1.75,
+      "rot": 0.0,
+      "scale": 0.85,
+      "tickRing": false,
+      "note": "REPEATS knob, top row, 2 views."
+    },
+    {
+      "id": "mix",
+      "style": "mxr",
+      "x": 2.33,
+      "z": -1.75,
+      "rot": 0.0,
+      "scale": 0.85,
+      "tickRing": false,
+      "note": "MIX knob, top row, 2 views."
+    },
+    {
+      "id": "type",
+      "style": "mxr",
+      "x": -2.33,
+      "z": -0.4,
+      "rot": 0.0,
+      "tickRing": false,
+      "note": "TYPE encoder left of centre with 12-machine ring, 2 views."
+    },
+    {
+      "id": "filter",
+      "style": "mxr",
+      "x": -0.17,
+      "z": -0.3,
+      "rot": 0.0,
+      "scale": 0.85,
+      "tickRing": false,
+      "note": "FILTER knob, second row, 2 views."
+    },
+    {
+      "id": "grit",
+      "style": "mxr",
+      "x": 0.78,
+      "z": -0.3,
+      "rot": 0.0,
+      "scale": 0.85,
+      "tickRing": false,
+      "note": "GRIT knob, second row, 2 views."
+    },
+    {
+      "id": "speed",
+      "style": "mxr",
+      "x": 1.72,
+      "z": -0.3,
+      "rot": 0.0,
+      "scale": 0.85,
+      "tickRing": false,
+      "note": "SPEED (MOD) knob, second row, 2 views."
+    },
+    {
+      "id": "depth",
+      "style": "mxr",
+      "x": 2.6,
+      "z": -0.3,
+      "rot": 0.0,
+      "scale": 0.85,
+      "tickRing": false,
+      "note": "DEPTH (MOD) knob, second row, 2 views."
+    }
+  ],
+  "led": {
+    "x": -2.94,
+    "z": 0.8,
+    "note": "LED A (amber, lit in top view), provisional single-view. LEDs B/TAP are hero-page local parts \u2014 assemblePedal supports one led (shared need, measurements)."
+  },
+  "footswitch": {
+    "style": "round",
+    "x": -2.9,
+    "z": 1.6,
+    "note": "Footswitch A (REC/DUB). Switches B/TAP are hero-page local parts \u2014 assemblePedal supports one footswitch (shared need, measurements)."
+  },
+  "jacks": [
+    {
+      "id": "input",
+      "face": "back",
+      "x": 2.2,
+      "y": 0.95,
+      "note": "INPUT (stereo pair simplified to one jack) on back wall, pedal right. Rear view corroborates back-panel layout; exact x provisional."
+    },
+    {
+      "id": "output",
+      "face": "back",
+      "x": -2.2,
+      "y": 0.95,
+      "note": "OUTPUT on back wall, pedal left. EXP/MIDI jacks omitted \u2014 no shared builder (measurements)."
+    }
+  ],
+  "powerJack": {
+    "x": 0.0,
+    "y": 0.95,
+    "style": "round",
+    "note": "9V barrel centred on back wall (rear view, provisional x/y)."
+  },
+  "labels": [
+    {
+      "id": "lcd",
+      "text": "705 mS",
+      "x": -2.03,
+      "z": -1.8,
+      "w": 2.3,
+      "h": 0.62,
+      "spaced": false,
+      "bold": true,
+      "color": "#8dff5a",
+      "bg": "#0a0f0a",
+      "note": "LED display rendered as a lit labelled screen (no working UI, per brief). Green readout matches top/topdown photos."
+    },
+    {
+      "id": "value-label",
+      "text": "VALUE",
+      "x": -0.44,
+      "z": -1.05,
+      "w": 0.85,
+      "h": 0.15,
+      "spaced": false,
+      "bold": true,
+      "color": "#e8e9ec"
+    },
+    {
+      "id": "time-label",
+      "text": "TIME",
+      "x": 0.57,
+      "z": -1.05,
+      "w": 0.7,
+      "h": 0.15,
+      "spaced": false,
+      "bold": true,
+      "color": "#e8e9ec"
+    },
+    {
+      "id": "repeats-label",
+      "text": "REPEATS",
+      "x": 1.45,
+      "z": -1.05,
+      "w": 1.0,
+      "h": 0.15,
+      "spaced": false,
+      "bold": true,
+      "color": "#e8e9ec"
+    },
+    {
+      "id": "mix-label",
+      "text": "MIX",
+      "x": 2.33,
+      "z": -1.05,
+      "w": 0.6,
+      "h": 0.15,
+      "spaced": false,
+      "bold": true,
+      "color": "#e8e9ec"
+    },
+    {
+      "id": "type-label",
+      "text": "TYPE",
+      "x": -2.33,
+      "z": 0.35,
+      "w": 0.7,
+      "h": 0.15,
+      "spaced": false,
+      "bold": true,
+      "color": "#e8e9ec"
+    },
+    {
+      "id": "filter-label",
+      "text": "FILTER",
+      "x": -0.17,
+      "z": 0.42,
+      "w": 0.85,
+      "h": 0.15,
+      "spaced": false,
+      "bold": true,
+      "color": "#e8e9ec"
+    },
+    {
+      "id": "grit-label",
+      "text": "GRIT",
+      "x": 0.78,
+      "z": 0.42,
+      "w": 0.7,
+      "h": 0.15,
+      "spaced": false,
+      "bold": true,
+      "color": "#e8e9ec"
+    },
+    {
+      "id": "speed-label",
+      "text": "SPEED",
+      "x": 1.72,
+      "z": 0.42,
+      "w": 0.85,
+      "h": 0.15,
+      "spaced": false,
+      "bold": true,
+      "color": "#e8e9ec"
+    },
+    {
+      "id": "depth-label",
+      "text": "DEPTH",
+      "x": 2.6,
+      "z": 0.42,
+      "w": 0.85,
+      "h": 0.15,
+      "spaced": false,
+      "bold": true,
+      "color": "#e8e9ec"
+    },
+    {
+      "id": "strymon-script",
+      "text": "strymon.",
+      "x": 0.35,
+      "z": -0.62,
+      "w": 1.3,
+      "h": 0.22,
+      "spaced": false,
+      "script": true,
+      "color": "#e8e9ec"
+    },
+    {
+      "id": "timeline-word",
+      "text": "TIMELINE",
+      "x": 0.42,
+      "z": -0.15,
+      "w": 2.1,
+      "h": 0.42,
+      "spaced": false,
+      "bold": true,
+      "color": "#e8e9ec"
+    },
+    {
+      "id": "a-label",
+      "text": "A",
+      "x": -2.55,
+      "z": 0.8,
+      "w": 0.3,
+      "h": 0.15,
+      "spaced": false,
+      "bold": true,
+      "color": "#e8e9ec"
+    },
+    {
+      "id": "b-label",
+      "text": "B",
+      "x": 0.6,
+      "z": 0.8,
+      "w": 0.3,
+      "h": 0.15,
+      "spaced": false,
+      "bold": true,
+      "color": "#e8e9ec"
+    },
+    {
+      "id": "tap-label",
+      "text": "TAP",
+      "x": 2.45,
+      "z": 0.8,
+      "w": 0.55,
+      "h": 0.15,
+      "spaced": false,
+      "bold": true,
+      "color": "#e8e9ec"
+    },
+    {
+      "id": "recdub-label",
+      "text": "REC / DUB",
+      "x": -2.9,
+      "z": 2.25,
+      "w": 1.0,
+      "h": 0.13,
+      "spaced": false,
+      "color": "#e8e9ec"
+    },
+    {
+      "id": "play-label",
+      "text": "PLAY",
+      "x": 0.24,
+      "z": 2.25,
+      "w": 0.7,
+      "h": 0.13,
+      "spaced": false,
+      "color": "#e8e9ec"
+    },
+    {
+      "id": "stop-label",
+      "text": "STOP",
+      "x": 2.87,
+      "z": 2.25,
+      "w": 0.7,
+      "h": 0.13,
+      "spaced": false,
+      "color": "#e8e9ec"
+    }
+  ],
+  "screws": [
+    {
+      "id": "screw-back-left",
+      "x": -3.1,
+      "z": -2.25
+    },
+    {
+      "id": "screw-back-right",
+      "x": 3.1,
+      "z": -2.25
+    },
+    {
+      "id": "screw-front-left",
+      "x": -3.1,
+      "z": 2.25
+    },
+    {
+      "id": "screw-front-right",
+      "x": 3.1,
+      "z": 2.25
+    }
+  ],
+  "faceImage": "https://www.strymon.net/wp-content/uploads/2015/09/timeline_topdowncrop_1600.jpg",
+  "decal": null,
+  "notes": "Strymon TimeLine hero, custom wide box. All deck parts seat via surfaceAt() on the sloped profile \u2014 no hardcoded y on knobs/LED/switch/labels. Shared gaps (not edited): assemblePedal supports one footswitch/one led (B/TAP + LEDs staged by strymon-timeline.html from shared builders), no LCD builder (display is a lit bg label), back-panel EXP/MIDI/stereo pairs simplified, no smooth encoder knob style."
+}
